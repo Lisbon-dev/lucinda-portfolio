@@ -24,8 +24,13 @@ jobs:
       uses: actions/github-script@v7
       with:
         script: |
-          const { data: item } = context.payload.issue || context.payload.pull_request;
+          const item = context.payload.issue || context.payload.pull_request;
           const itemType = context.payload.issue ? 'issue' : 'pull_request';
+          
+          if (!item) {
+            console.log('No issue or PR found in payload');
+            return null;
+          }
           
           // Extract issue numbers from PR body for linking
           let linkedIssues = [];
@@ -46,10 +51,16 @@ jobs:
           };
 
     - name: Move to appropriate status using Labels and GraphQL
+      if: steps.get-details.outputs.result != 'null'
       uses: actions/github-script@v7
       with:
         script: |
           const details = ${{ steps.get-details.outputs.result }};
+          
+          if (!details) {
+            console.log('No details to process');
+            return;
+          }
           
           // Status mapping based on LisbonDev 7-status workflow
           const getNewStatus = (details, action) => {
@@ -195,11 +206,16 @@ jobs:
           }
 
     - name: Handle linked issues for PRs
-      if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+      if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && steps.get-details.outputs.result != 'null'
       uses: actions/github-script@v7
       with:
         script: |
           const details = ${{ steps.get-details.outputs.result }};
+          
+          if (!details || !details.linkedIssues || details.linkedIssues.length === 0) {
+            console.log('No linked issues to process');
+            return;
+          }
           
           // Move linked issues to Done when PR is merged
           for (const issueNumber of details.linkedIssues) {
