@@ -1,0 +1,47 @@
+# Label for CI/CD workflow changes
+'CI/CD':
+  - '.github/workflows/**'
+
+# Label for documentation changes
+documentation:
+  - 'README.md'
+  - 'src/pages/faq.astro'
+  - 'src/pages/cookies-policy.astro'
+  - 'src/pages/privacy-policy.astro'
+  - 'src/pages/terms-and-conditions.astro'
+
+# Label for dependency updates
+dependencies:
+  - 'package.json'
+  - 'pnpm-lock.yaml'
+
+# Label for component changes
+component:
+  - 'src/components/**'
+
+# Label for page changes
+page:
+  - 'src/pages/**'
+
+# Label for script changes
+script:
+  - 'src/scripts/**'
+
+# Label for asset changes (images, videos, etc.)
+asset:
+  - 'public/**'
+  - 'src/assets/**'
+
+# Label for test-related changes
+test:
+  - 'playwright.config.ts'
+  - 'tests/**'
+  - 'tests-examples/**'
+
+# Label for configuration changes
+configuration:
+  - '.gitignore'
+  - 'astro.config.mjs'
+  - 'tsconfig.json'
+  - 'vercel.json'
+  - '.vscode/**'

@@ -1,0 +1,330 @@
+# Complete Agile Workflow Management with 7-Status Board
+# Leverages enhanced GitHub Projects API permissions
+name: Agile Workflow Management
+
+on:
+  issues:
+    types: [opened, closed, reopened, labeled, unlabeled, assigned, unassigned]
+  pull_request:
+    types: [opened, closed, converted_to_draft, ready_for_review]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  manage-agile-workflow:
+    runs-on: ubuntu-latest
+    name: 7-Status Agile Workflow Automation
+    
+    steps:
+    - name: Determine workflow action
+      id: workflow-action
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const event = context.eventName;
+          const action = context.payload.action;
+          const item = context.payload.issue || context.payload.pull_request;
+          
+          let workflowAction = {
+            type: event,
+            action: action,
+            number: item?.number,
+            itemType: context.payload.issue ? 'issue' : 'pull_request',
+            currentLabels: item?.labels?.map(l => l.name) || [],
+            state: item?.state,
+            isDraft: item?.draft || false,
+            assignees: item?.assignees?.map(a => a.login) || []
+          };
+          
+          // Determine new status based on 7-status workflow
+          const getTargetStatus = (workflowAction) => {
+            const { type, action, itemType, currentLabels, state, isDraft, assignees } = workflowAction;
+            
+            // Status progression logic
+            if (itemType === 'issue') {
+              if (action === 'opened') return 'status:backlog';
+              if (action === 'assigned' && assignees.length > 0) return 'status:todo';
+              if (currentLabels.includes('in-progress')) return 'status:in-progress';
+              if (action === 'closed' && state === 'closed') return 'status:done';
+              if (currentLabels.includes('review')) return 'status:review';
+            }
+            
+            if (itemType === 'pull_request') {
+              if (action === 'opened' && isDraft) return 'status:in-progress';
+              if (action === 'ready_for_review' || (action === 'opened' && !isDraft)) return 'status:review';
+              if (action === 'closed' && context.payload.pull_request?.merged) return 'status:done';
+            }
+            
+            return null;
+          };
+          
+          workflowAction.targetStatus = getTargetStatus(workflowAction);
+          
+          console.log('Workflow Action:', JSON.stringify(workflowAction, null, 2));
+          return workflowAction;
+
+    - name: Execute status transition
+      if: steps.workflow-action.outputs.result != null
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const workflowAction = ${{ steps.workflow-action.outputs.result }};
+          
+          if (!workflowAction.targetStatus || !workflowAction.number) {
+            console.log('No status transition needed');
+            return;
+          }
+          
+          const { itemType, number, targetStatus, currentLabels } = workflowAction;
+          
+          console.log(`🔄 Transitioning ${itemType} #${number} to ${targetStatus}`);
+          
+          // Dual-strategy: Labels + Projects API
+          
+          // Strategy 1: Label-based status tracking (always works)
+          if (itemType === 'issue') {
+            // Remove existing status labels
+            const existingStatusLabels = currentLabels.filter(label => 
+              label.startsWith('status:'));
+            
+            for (const statusLabel of existingStatusLabels) {
+              try {
+                await github.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: number,
+                  name: statusLabel
+                });
+                console.log(`🏷️  Removed label: ${statusLabel}`);
+              } catch (e) {
+                console.log(`Label ${statusLabel} not found, skipping`);
+              }
+            }
+            
+            // Add new status label
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: number,
+              labels: [targetStatus]
+            });
+            console.log(`✅ Added label: ${targetStatus}`);
+          }
+          
+          // Strategy 2: GitHub Projects API (with enhanced permissions)
+          try {
+            console.log('🚀 Attempting Projects API integration...');
+            
+            // Query for project boards and issue associations
+            const projectQuery = `
+              query($owner: String!, $repo: String!, $issue: Int!) {
+                repository(owner: $owner, name: $repo) {
+                  issue(number: $issue) {
+                    id
+                    projectItems(first: 10) {
+                      nodes {
+                        id
+                        project {
+                          id
+                          title
+                        }
+                      }
+                    }
+                  }
+                  projectsV2(first: 5) {
+                    nodes {
+                      id
+                      title
+                      fields(first: 20) {
+                        nodes {
+                          ... on ProjectV2SingleSelectField {
+                            id
+                            name
+                            options {
+                              id
+                              name
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            `;
+            
+            const result = await github.graphql(projectQuery, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue: number
+            });
+            
+            const projects = result.repository.projectsV2.nodes;
+            const issue = result.repository.issue;
+            
+            if (projects.length > 0 && issue.projectItems.nodes.length > 0) {
+              const project = projects[0]; // Use first project
+              const projectItem = issue.projectItems.nodes[0];
+              
+              // Find status field
+              const statusField = project.fields.nodes.find(field => 
+                field.name && (
+                  field.name.toLowerCase().includes('status') || 
+                  field.name.toLowerCase().includes('column')
+                )
+              );
+              
+              if (statusField) {
+                // Map label to project status
+                const statusMapping = {
+                  'status:backlog': ['backlog', 'to do', 'todo'],
+                  'status:todo': ['todo', 'to do', 'ready'],
+                  'status:in-progress': ['in progress', 'in-progress', 'doing'],
+                  'status:review': ['review', 'in review', 'testing'],
+                  'status:done': ['done', 'completed', 'closed']
+                };
+                
+                const possibleNames = statusMapping[targetStatus] || [];
+                const statusOption = statusField.options.find(option =>
+                  possibleNames.some(name => 
+                    option.name.toLowerCase().includes(name.toLowerCase())
+                  )
+                );
+                
+                if (statusOption) {
+                  const updateMutation = `
+                    mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $value: ProjectV2FieldValue!) {
+                      updateProjectV2ItemFieldValue(input: {
+                        projectId: $projectId
+                        itemId: $itemId
+                        fieldId: $fieldId
+                        value: $value
+                      }) {
+                        projectV2Item {
+                          id
+                        }
+                      }
+                    }
+                  `;
+                  
+                  await github.graphql(updateMutation, {
+                    projectId: project.id,
+                    itemId: projectItem.id,
+                    fieldId: statusField.id,
+                    value: {
+                      singleSelectOptionId: statusOption.id
+                    }
+                  });
+                  
+                  console.log(`🎯 Successfully moved to "${statusOption.name}" in Projects board`);
+                } else {
+                  console.log(`⚠️  No matching status option found for ${targetStatus}`);
+                }
+              } else {
+                console.log('⚠️  No status field found in project');
+              }
+            } else {
+              console.log('⚠️  Issue not added to any project board yet');
+              
+              // Auto-add issue to first available project
+              if (projects.length > 0 && itemType === 'issue') {
+                const addToProjectMutation = `
+                  mutation($projectId: ID!, $contentId: ID!) {
+                    addProjectV2ItemByContentId(input: {
+                      projectId: $projectId
+                      contentId: $contentId
+                    }) {
+                      item {
+                        id
+                      }
+                    }
+                  }
+                `;
+                
+                await github.graphql(addToProjectMutation, {
+                  projectId: projects[0].id,
+                  contentId: issue.id
+                });
+                
+                console.log(`📌 Added issue to project: ${projects[0].title}`);
+              }
+            }
+            
+          } catch (error) {
+            console.log('⚠️  Projects API not fully available:', error.message);
+            console.log('✅ Using label-based tracking as fallback');
+          }
+
+    - name: Handle PR to Issue linking
+      if: github.event_name == 'pull_request' && contains(fromJSON('["closed", "merged"]'), github.event.action)
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const pr = context.payload.pull_request;
+          
+          if (!pr.merged) {
+            console.log('PR was closed but not merged, skipping issue linking');
+            return;
+          }
+          
+          // Extract issue numbers from PR body
+          const issuePattern = /(?:fixes|closes|resolves)\s+#(\d+)/gi;
+          const matches = pr.body ? Array.from(pr.body.matchAll(issuePattern)) : [];
+          const linkedIssues = matches.map(match => parseInt(match[1]));
+          
+          console.log(`Found linked issues: ${linkedIssues.join(', ')}`);
+          
+          for (const issueNumber of linkedIssues) {
+            try {
+              // Move linked issues to Done status
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                state: 'closed',
+                labels: ['status:done']
+              });
+              
+              // Add completion comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                body: `🎉 This issue has been resolved by merging PR #${pr.number}.\n\n**Workflow Status**: Automatically moved to "Done" ✅\n**Merged by**: @${pr.merged_by?.login || 'system'}\n**Merge commit**: ${pr.merge_commit_sha?.substring(0, 7)}`
+              });
+              
+              console.log(`✅ Closed issue #${issueNumber} and moved to Done`);
+              
+            } catch (error) {
+              console.error(`❌ Failed to close issue #${issueNumber}:`, error.message);
+            }
+          }
+
+    - name: Workflow compliance check
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const workflowAction = ${{ steps.workflow-action.outputs.result }};
+          
+          // Log workflow execution for monitoring
+          console.log(`
+          📊 WORKFLOW EXECUTION REPORT
+          ════════════════════════════
+          Event: ${context.eventName}
+          Action: ${context.payload.action}
+          Item: ${workflowAction.itemType} #${workflowAction.number}
+          Status Transition: ${workflowAction.targetStatus || 'None'}
+          Repository: ${context.repo.owner}/${context.repo.repo}
+          Timestamp: ${new Date().toISOString()}
+          ════════════════════════════
+          `);
+          
+          // Check for workflow violations
+          if (workflowAction.itemType === 'issue' && !workflowAction.targetStatus) {
+            console.log('⚠️  No status transition determined - review workflow logic');
+          }
+          
+          console.log('✅ Agile Workflow Management Complete');

@@ -1,0 +1,224 @@
+# GitHub Projects Board Automation
+# Handles 7-status workflow automation for LisbonDev
+name: Projects Board Automation
+
+on:
+  issues:
+    types: [opened, closed, reopened, labeled, unlabeled]
+  pull_request:
+    types: [opened, closed, converted_to_draft, ready_for_review]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  manage-project-board:
+    runs-on: ubuntu-latest
+    name: Manage Project Board Status
+    
+    steps:
+    - name: Get issue or PR details
+      id: get-details
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { data: item } = context.payload.issue || context.payload.pull_request;
+          const itemType = context.payload.issue ? 'issue' : 'pull_request';
+          
+          // Extract issue numbers from PR body for linking
+          let linkedIssues = [];
+          if (itemType === 'pull_request' && item.body) {
+            const matches = item.body.match(/(?:fixes|closes|resolves)\s+#(\d+)/gi);
+            if (matches) {
+              linkedIssues = matches.map(match => match.match(/\d+/)[0]);
+            }
+          }
+          
+          return {
+            itemType,
+            number: item.number,
+            state: item.state,
+            labels: (item.labels || []).map(l => l.name),
+            linkedIssues,
+            isDraft: item.draft || false
+          };
+
+    - name: Move to appropriate status using Labels and GraphQL
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const details = ${{ steps.get-details.outputs.result }};
+          
+          // Status mapping based on LisbonDev 7-status workflow
+          const getNewStatus = (details, action) => {
+            // New issues go to Backlog
+            if (details.itemType === 'issue' && action === 'opened') {
+              return 'status:backlog';
+            }
+            
+            // Issues with "in-progress" label go to In Progress  
+            if (details.labels.includes('in-progress')) {
+              return 'status:in-progress';
+            }
+            
+            // PRs ready for review go to Review status
+            if (details.itemType === 'pull_request' && !details.isDraft) {
+              return 'status:review';
+            }
+            
+            // Closed/merged items
+            if (details.state === 'closed') {
+              return 'status:done';
+            }
+            
+            return null;
+          };
+          
+          const newStatusLabel = getNewStatus(details, context.payload.action);
+          if (newStatusLabel && details.itemType === 'issue') {
+            console.log(`Moving issue #${details.number} to ${newStatusLabel}`);
+            
+            // Remove existing status labels
+            const existingStatusLabels = details.labels.filter(label => 
+              label.startsWith('status:'));
+            
+            for (const statusLabel of existingStatusLabels) {
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: details.number,
+                name: statusLabel
+              });
+            }
+            
+            // Add new status label
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: details.number,
+              labels: [newStatusLabel]
+            });
+            
+            // Try GitHub Projects GraphQL API with enhanced permissions
+            try {
+              const query = `
+                query($owner: String!, $repo: String!, $issue: Int!) {
+                  repository(owner: $owner, name: $repo) {
+                    issue(number: $issue) {
+                      id
+                      projectItems(first: 10) {
+                        nodes {
+                          id
+                          project {
+                            id
+                            title
+                          }
+                        }
+                      }
+                    }
+                    projectsV2(first: 5) {
+                      nodes {
+                        id
+                        title
+                        fields(first: 20) {
+                          nodes {
+                            ... on ProjectV2SingleSelectField {
+                              id
+                              name
+                              options {
+                                id
+                                name
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              `;
+              
+              const result = await github.graphql(query, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue: details.number
+              });
+              
+              console.log('Projects GraphQL Result:', JSON.stringify(result, null, 2));
+              
+              // If we have project access, move the item
+              if (result.repository.projectsV2.nodes.length > 0) {
+                const project = result.repository.projectsV2.nodes[0];
+                const statusField = project.fields.nodes.find(field => 
+                  field.name && field.name.toLowerCase().includes('status'));
+                
+                if (statusField) {
+                  const statusValue = statusField.options.find(option => 
+                    option.name.toLowerCase() === newStatusLabel.replace('status:', ''));
+                  
+                  if (statusValue && result.repository.issue.projectItems.nodes.length > 0) {
+                    const projectItem = result.repository.issue.projectItems.nodes[0];
+                    
+                    const updateMutation = `
+                      mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $value: ProjectV2FieldValue!) {
+                        updateProjectV2ItemFieldValue(input: {
+                          projectId: $projectId
+                          itemId: $itemId
+                          fieldId: $fieldId
+                          value: $value
+                        }) {
+                          projectV2Item {
+                            id
+                          }
+                        }
+                      }
+                    `;
+                    
+                    await github.graphql(updateMutation, {
+                      projectId: project.id,
+                      itemId: projectItem.id,
+                      fieldId: statusField.id,
+                      value: {
+                        singleSelectOptionId: statusValue.id
+                      }
+                    });
+                    
+                    console.log(`✅ Successfully moved issue #${details.number} to ${newStatusLabel} in Projects board`);
+                  }
+                }
+              }
+            } catch (error) {
+              console.log('Projects API not yet available, using labels for now:', error.message);
+            }
+          }
+
+    - name: Handle linked issues for PRs
+      if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const details = ${{ steps.get-details.outputs.result }};
+          
+          // Move linked issues to Done when PR is merged
+          for (const issueNumber of details.linkedIssues) {
+            console.log(`Moving issue #${issueNumber} to Done status`);
+            
+            // Update issue with "done" label and close it
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: parseInt(issueNumber),
+              state: 'closed',
+              labels: ['done']
+            });
+            
+            // Add comment explaining the closure
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: parseInt(issueNumber),
+              body: `🎉 This issue has been automatically resolved by merging PR #${context.payload.pull_request.number}.`
+            });
+          }
