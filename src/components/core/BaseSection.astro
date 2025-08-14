@@ -1,0 +1,67 @@
+---
+export interface Props {
+  variant?: 'hero' | 'portfolio' | 'default';
+  fullHeight?: boolean;
+  backgroundColor?: 'background' | 'surface' | 'custom';
+  customBg?: string;
+  padding?: 'none' | 'sm' | 'md' | 'lg' | 'hero';
+  id?: string;
+  class?: string;
+}
+
+const {
+  variant = 'default',
+  fullHeight = false,
+  backgroundColor = 'background',
+  customBg,
+  padding = 'md',
+  id,
+  class: className = '',
+} = Astro.props;
+
+const sectionClasses = [
+  'base-section',
+  `section--${variant}`,
+  fullHeight && 'section--full-height',
+  `section--bg-${backgroundColor}`,
+  `section--padding-${padding}`,
+  className
+].filter(Boolean).join(' ');
+
+const sectionStyles = customBg ? `background-color: ${customBg};` : '';
+---
+
+<section class={sectionClasses} style={sectionStyles} id={id}>
+  <slot />
+</section>
+
+<style>
+  .base-section {
+    position: relative;
+    width: 100%;
+  }
+
+  .section--full-height {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .section--bg-background { background-color: var(--color-background); }
+  .section--bg-surface { background-color: var(--color-surface); }
+
+  .section--padding-none { padding: 0; }
+  .section--padding-sm { padding: var(--spacing-sm) 0; }
+  .section--padding-md { padding: var(--spacing-md) 0; }
+  .section--padding-lg { padding: var(--spacing-lg) 0; }
+  .section--padding-hero { padding: var(--spacing-2xl) 0; }
+
+  .section--hero {
+    text-align: center;
+  }
+
+  .section--portfolio {
+    background-color: var(--color-surface);
+  }
+</style>

@@ -1,0 +1,76 @@
+---
+export interface Props {
+  position?: 'top-right' | 'top-left' | 'custom';
+  text?: string;
+  class?: string;
+}
+
+const {
+  position = 'top-right',
+  text = 'MENU',
+  class: className = '',
+} = Astro.props;
+
+const navClasses = [
+  'navigation',
+  `nav--${position}`,
+  className
+].filter(Boolean).join(' ');
+---
+
+<nav class={navClasses}>
+  <button class="menu-button nav-text interactive-element" type="button">
+    {text}
+  </button>
+</nav>
+
+<style>
+  .navigation {
+    position: fixed;
+    z-index: 1000;
+  }
+
+  .nav--top-right {
+    top: var(--spacing-lg);
+    right: var(--spacing-lg);
+  }
+
+  .nav--top-left {
+    top: var(--spacing-lg);
+    left: var(--spacing-lg);
+  }
+
+  .menu-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: var(--spacing-sm);
+    font-family: var(--font-alt-heading);
+    font-size: var(--text-base);
+    font-weight: 400;
+    color: var(--color-text-primary);
+    letter-spacing: var(--tracking-wider);
+    transition: all var(--transition-normal);
+  }
+
+  .menu-button:hover {
+    color: var(--color-primary);
+  }
+
+  .menu-button:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 768px) {
+    .nav--top-right {
+      top: var(--spacing-md);
+      right: var(--spacing-md);
+    }
+
+    .nav--top-left {
+      top: var(--spacing-md);
+      left: var(--spacing-md);
+    }
+  }
+</style>

@@ -1,172 +1,62 @@
 ---
 import Layout from "../layout/Layout.astro";
+import BaseSection from "../components/core/BaseSection.astro";
+import Container from "../components/core/Container.astro";
+import Typography from "../components/core/Typography.astro";
+import Navigation from "../components/layout/Navigation.astro";
+import SocialLinks from "../components/layout/SocialLinks.astro";
+import PortfolioGrid from "../components/portfolio/PortfolioGrid.astro";
+
+// Portfolio data
+const portfolioItems = [
+  { id: '1', title: 'Portfolio Item 1' },
+  { id: '2', title: 'Portfolio Item 2' },
+  { id: '3', title: 'Portfolio Item 3' },
+  { id: '4', title: 'Portfolio Item 4' }
+];
+
+const socialLinks = [
+  { name: 'Instagram', href: '#', external: true },
+  { name: 'Behance', href: '#', external: true },
+  { name: 'LinkedIn', href: '#', external: true }
+];
 ---
 
 <Layout>
   <!-- Hero Section -->
-  <section class="hero-section">
-    <div class="container">
+  <BaseSection variant="hero" fullHeight={true} backgroundColor="background">
+    <Container>
       <header class="hero-header">
-        <h1 class="header-text">LUCINDA BURMAN</h1>
-        <p class="explanatory-text">Illustrator | Designer | Creative Director</p>
+        <Typography as="h1" variant="header" tracking="wider">
+          LUCINDA BURMAN
+        </Typography>
+        <Typography as="p" variant="explanatory" tracking="wide">
+          Illustrator | Designer | Creative Director
+        </Typography>
       </header>
-    </div>
-  </section>
+    </Container>
+  </BaseSection>
 
   <!-- Portfolio Grid Section -->
-  <section class="portfolio-section">
-    <div class="container">
-      <div class="portfolio-grid">
-        <!-- Portfolio items will be dynamically added here -->
-        <article class="portfolio-item">
-          <div class="portfolio-placeholder">
-            <p class="small-text">Portfolio Item 1</p>
-          </div>
-        </article>
-        <article class="portfolio-item">
-          <div class="portfolio-placeholder">
-            <p class="small-text">Portfolio Item 2</p>
-          </div>
-        </article>
-        <article class="portfolio-item">
-          <div class="portfolio-placeholder">
-            <p class="small-text">Portfolio Item 3</p>
-          </div>
-        </article>
-        <article class="portfolio-item">
-          <div class="portfolio-placeholder">
-            <p class="small-text">Portfolio Item 4</p>
-          </div>
-        </article>
-      </div>
-    </div>
-  </section>
+  <BaseSection variant="portfolio" backgroundColor="surface" padding="none">
+    <Container>
+      <PortfolioGrid items={portfolioItems} />
+    </Container>
+  </BaseSection>
 
-  <!-- Navigation Button (Fixed Position) -->
-  <button class="menu-button nav-text interactive-element" type="button">
-    MENU
-  </button>
+  <!-- Fixed Navigation -->
+  <Navigation />
 
-  <!-- Social Links (Fixed Position) -->
-  <aside class="social-links">
-    <ul>
-      <li><a href="#" class="small-text interactive-element">Instagram</a></li>
-      <li><a href="#" class="small-text interactive-element">Behance</a></li>
-      <li><a href="#" class="small-text interactive-element">LinkedIn</a></li>
-    </ul>
-  </aside>
+  <!-- Fixed Social Links -->
+  <SocialLinks links={socialLinks} />
 </Layout>
 
 <style>
-  /* Hero Section */
-  .hero-section {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .hero-header {
     text-align: center;
-    background-color: var(--color-background);
   }
 
-  .hero-header h1 {
+  .hero-header > :global(.typography:first-child) {
     margin-bottom: var(--spacing-md);
-    letter-spacing: var(--tracking-wider);
-  }
-
-  .hero-header p {
-    margin-bottom: 0;
-    letter-spacing: var(--tracking-wide);
-  }
-
-  /* Portfolio Section */
-  .portfolio-section {
-    background-color: var(--color-surface);
-    min-height: 100vh;
-  }
-
-  /* Portfolio Placeholder Items */
-  .portfolio-placeholder {
-    background-color: var(--color-modal-bg);
-    border: 1px solid var(--color-primary);
-    aspect-ratio: 4/5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform var(--transition-normal);
-  }
-
-  .portfolio-placeholder:hover {
-    transform: scale(1.02);
-    border-color: var(--color-primary-hover);
-  }
-
-  /* Navigation Button */
-  .menu-button {
-    position: fixed;
-    top: var(--spacing-lg);
-    right: var(--spacing-lg);
-    z-index: 1000;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: var(--spacing-sm);
-    letter-spacing: var(--tracking-wider);
-  }
-
-  /* Social Links */
-  .social-links {
-    position: fixed;
-    left: var(--spacing-lg);
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 100;
-  }
-
-  .social-links ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    writing-mode: vertical-lr;
-    text-orientation: mixed;
-  }
-
-  .social-links li {
-    margin: var(--spacing-sm) 0;
-    transform: rotate(180deg);
-  }
-
-  .social-links a {
-    text-decoration: none;
-    letter-spacing: var(--tracking-wide);
-    display: block;
-    padding: var(--spacing-xs);
-  }
-
-  /* Responsive Adjustments */
-  @media (max-width: 768px) {
-    .social-links {
-      position: static;
-      transform: none;
-      text-align: center;
-      padding: var(--spacing-md);
-      background-color: var(--color-surface);
-    }
-    
-    .social-links ul {
-      writing-mode: initial;
-      display: flex;
-      justify-content: center;
-      gap: var(--spacing-md);
-    }
-    
-    .social-links li {
-      transform: none;
-      margin: 0;
-    }
-    
-    .menu-button {
-      top: var(--spacing-md);
-      right: var(--spacing-md);
-    }
   }
 </style>

@@ -1,0 +1,145 @@
+---
+export interface Props {
+  links?: Array<{
+    name: string;
+    href: string;
+    external?: boolean;
+  }>;
+  position?: 'left' | 'right' | 'bottom' | 'custom';
+  orientation?: 'vertical' | 'horizontal';
+  class?: string;
+}
+
+const {
+  links = [
+    { name: 'Instagram', href: '#', external: true },
+    { name: 'Behance', href: '#', external: true },
+    { name: 'LinkedIn', href: '#', external: true }
+  ],
+  position = 'left',
+  orientation = 'vertical',
+  class: className = '',
+} = Astro.props;
+
+const socialClasses = [
+  'social-links',
+  `social--${position}`,
+  `social--${orientation}`,
+  className
+].filter(Boolean).join(' ');
+---
+
+<aside class={socialClasses}>
+  <ul class="social-list">
+    {links.map(link => (
+      <li class="social-item">
+        <a 
+          href={link.href} 
+          class="social-link small-text interactive-element"
+          target={link.external ? '_blank' : undefined}
+          rel={link.external ? 'noopener noreferrer' : undefined}
+        >
+          {link.name}
+        </a>
+      </li>
+    ))}
+  </ul>
+</aside>
+
+<style>
+  .social-links {
+    position: fixed;
+    z-index: 100;
+  }
+
+  .social--left {
+    left: var(--spacing-lg);
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .social--right {
+    right: var(--spacing-lg);
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .social--bottom {
+    bottom: var(--spacing-lg);
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .social-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+  }
+
+  .social--vertical .social-list {
+    flex-direction: column;
+    writing-mode: vertical-lr;
+    text-orientation: mixed;
+  }
+
+  .social--horizontal .social-list {
+    flex-direction: row;
+    gap: var(--spacing-md);
+  }
+
+  .social-item {
+    margin: var(--spacing-sm) 0;
+  }
+
+  .social--vertical .social-item {
+    transform: rotate(180deg);
+  }
+
+  .social--horizontal .social-item {
+    margin: 0;
+  }
+
+  .social-link {
+    text-decoration: none;
+    font-family: var(--font-alt-heading);
+    font-size: var(--text-sm);
+    font-weight: 300;
+    color: var(--color-text-primary);
+    letter-spacing: var(--tracking-wide);
+    display: block;
+    padding: var(--spacing-xs);
+    transition: all var(--transition-normal);
+  }
+
+  .social-link:hover {
+    color: var(--color-primary);
+  }
+
+  .social-link:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 768px) {
+    .social-links {
+      position: static;
+      transform: none;
+      text-align: center;
+      padding: var(--spacing-md);
+      background-color: var(--color-surface);
+    }
+    
+    .social-list {
+      writing-mode: initial;
+      flex-direction: row;
+      justify-content: center;
+      gap: var(--spacing-md);
+    }
+    
+    .social-item {
+      transform: none;
+      margin: 0;
+    }
+  }
+</style>
