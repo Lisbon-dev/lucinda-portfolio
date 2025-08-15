@@ -7,12 +7,16 @@ import Navigation from "../components/layout/Navigation.astro";
 import SocialLinks from "../components/layout/SocialLinks.astro";
 import PortfolioGrid from "../components/portfolio/PortfolioGrid.astro";
 
-// Portfolio data
+// Portfolio data - Expanded for wireframing demonstration
 const portfolioItems = [
-  { id: '1', title: 'Portfolio Item 1' },
-  { id: '2', title: 'Portfolio Item 2' },
-  { id: '3', title: 'Portfolio Item 3' },
-  { id: '4', title: 'Portfolio Item 4' }
+  { id: '1', title: 'Editorial Illustration' },
+  { id: '2', title: 'Brand Identity Design' },
+  { id: '3', title: 'Book Cover Series' },
+  { id: '4', title: 'Digital Art Collection' },
+  { id: '5', title: 'Logo Design Portfolio' },
+  { id: '6', title: 'Packaging Design' },
+  { id: '7', title: 'Website Illustrations' },
+  { id: '8', title: 'Creative Direction' }
 ];
 
 const socialLinks = [
@@ -44,6 +48,83 @@ const socialLinks = [
     </Container>
   </BaseSection>
 
+  <!-- About Section with Wireframing -->
+  <BaseSection variant="default" backgroundColor="background" padding="lg">
+    <Container>
+      <div class="about-section-wireframe">
+        <Typography as="h2" variant="nav" tracking="wider">
+          About
+        </Typography>
+        <div class="about-content-placeholder">
+          <div class="about-text-block">
+            <Typography as="p" variant="explanatory">
+              Professional illustrator and creative director specializing in editorial design, 
+              brand identity, and digital art. Based in London, working with clients worldwide.
+            </Typography>
+          </div>
+          <div class="about-image-placeholder">
+            <Typography as="p" variant="small">
+              Portrait Image Placeholder
+            </Typography>
+          </div>
+        </div>
+      </div>
+    </Container>
+  </BaseSection>
+
+  <!-- Services Section with Wireframing -->
+  <BaseSection variant="default" backgroundColor="surface" padding="lg">
+    <Container>
+      <div class="services-section-wireframe">
+        <Typography as="h2" variant="nav" tracking="wider">
+          Services
+        </Typography>
+        <div class="services-grid-placeholder">
+          <div class="service-item-placeholder">
+            <Typography as="h3" variant="small">Editorial Illustration</Typography>
+            <Typography as="p" variant="small">Magazine covers, book illustrations, editorial graphics</Typography>
+          </div>
+          <div class="service-item-placeholder">
+            <Typography as="h3" variant="small">Brand Identity</Typography>
+            <Typography as="p" variant="small">Logo design, visual identity systems, brand guidelines</Typography>
+          </div>
+          <div class="service-item-placeholder">
+            <Typography as="h3" variant="small">Creative Direction</Typography>
+            <Typography as="p" variant="small">Art direction, concept development, visual strategy</Typography>
+          </div>
+        </div>
+      </div>
+    </Container>
+  </BaseSection>
+
+  <!-- Contact Section with Wireframing -->
+  <BaseSection variant="default" backgroundColor="background" padding="lg">
+    <Container size="narrow">
+      <div class="contact-section-wireframe">
+        <Typography as="h2" variant="nav" tracking="wider">
+          Contact
+        </Typography>
+        <div class="contact-form-placeholder">
+          <div class="form-field-placeholder">
+            <Typography as="label" variant="small">Name</Typography>
+            <div class="input-placeholder"></div>
+          </div>
+          <div class="form-field-placeholder">
+            <Typography as="label" variant="small">Email</Typography>
+            <div class="input-placeholder"></div>
+          </div>
+          <div class="form-field-placeholder">
+            <Typography as="label" variant="small">Message</Typography>
+            <div class="textarea-placeholder"></div>
+          </div>
+          <div class="button-placeholder">
+            <Typography as="span" variant="small">Send Message</Typography>
+          </div>
+        </div>
+      </div>
+    </Container>
+  </BaseSection>
+
   <!-- Fixed Navigation -->
   <Navigation />
 
@@ -58,5 +139,205 @@ const socialLinks = [
 
   .hero-header > :global(.typography:first-child) {
     margin-bottom: var(--spacing-md);
+  }
+
+  /* Wireframing Styles - Showcase Layout and Spacing */
+  .about-section-wireframe {
+    border: 2px dashed var(--color-primary);
+    border-radius: 4px;
+    padding: var(--spacing-lg);
+    margin: var(--spacing-md) 0;
+  }
+
+  .about-content-placeholder {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-lg);
+    border: 1px solid var(--color-primary);
+    border-radius: 4px;
+    padding: var(--spacing-md);
+  }
+
+  .about-text-block {
+    border: 1px dashed rgba(50, 92, 89, 0.5);
+    padding: var(--spacing-md);
+    border-radius: 4px;
+  }
+
+  .about-image-placeholder {
+    border: 1px dashed rgba(50, 92, 89, 0.5);
+    padding: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-modal-bg);
+    border-radius: 4px;
+    aspect-ratio: 4/5;
+  }
+
+  .services-section-wireframe {
+    border: 2px dashed var(--color-primary);
+    border-radius: 4px;
+    padding: var(--spacing-lg);
+    margin: var(--spacing-md) 0;
+  }
+
+  .services-grid-placeholder {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-lg);
+  }
+
+  .service-item-placeholder {
+    border: 1px solid var(--color-primary);
+    padding: var(--spacing-md);
+    border-radius: 4px;
+    background-color: var(--color-surface);
+    transition: transform var(--transition-normal);
+  }
+
+  .service-item-placeholder:hover {
+    transform: translateY(-2px);
+  }
+
+  .service-item-placeholder h3 {
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .contact-section-wireframe {
+    border: 2px dashed var(--color-primary);
+    border-radius: 4px;
+    padding: var(--spacing-lg);
+    margin: var(--spacing-md) 0;
+  }
+
+  .contact-form-placeholder {
+    margin-top: var(--spacing-lg);
+    border: 1px solid var(--color-primary);
+    padding: var(--spacing-lg);
+    border-radius: 4px;
+    background-color: var(--color-surface);
+  }
+
+  .form-field-placeholder {
+    margin-bottom: var(--spacing-md);
+  }
+
+  .form-field-placeholder label {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .input-placeholder {
+    height: 40px;
+    border: 1px dashed rgba(50, 92, 89, 0.5);
+    border-radius: 4px;
+    background-color: var(--color-background);
+    display: flex;
+    align-items: center;
+    padding: 0 var(--spacing-sm);
+  }
+
+  .input-placeholder::after {
+    content: "Input Field";
+    color: rgba(50, 92, 89, 0.6);
+    font-size: var(--text-xs);
+    font-family: var(--font-alt-heading);
+  }
+
+  .textarea-placeholder {
+    height: 120px;
+    border: 1px dashed rgba(50, 92, 89, 0.5);
+    border-radius: 4px;
+    background-color: var(--color-background);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .textarea-placeholder::after {
+    content: "Textarea Field";
+    color: rgba(50, 92, 89, 0.6);
+    font-size: var(--text-xs);
+    font-family: var(--font-alt-heading);
+  }
+
+  .button-placeholder {
+    border: 2px solid var(--color-primary);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: 4px;
+    background-color: var(--color-primary);
+    color: var(--color-background);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    margin-top: var(--spacing-md);
+  }
+
+  .button-placeholder:hover {
+    background-color: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
+  }
+
+  .button-placeholder span {
+    color: var(--color-background);
+  }
+
+  /* Responsive Wireframing */
+  @media (max-width: 768px) {
+    .about-content-placeholder {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-md);
+    }
+
+    .about-image-placeholder {
+      aspect-ratio: 16/9;
+    }
+
+    .services-grid-placeholder {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-md);
+    }
+  }
+
+  /* Visual Indicators for Spacing System */
+  .about-section-wireframe::before {
+    content: "About Section - padding: var(--spacing-lg)";
+    position: absolute;
+    top: -12px;
+    left: var(--spacing-sm);
+    background: var(--color-background);
+    padding: 0 var(--spacing-xs);
+    font-size: var(--text-xxs);
+    color: var(--color-primary);
+    font-family: var(--font-alt-heading);
+  }
+
+  .services-section-wireframe::before {
+    content: "Services Section - gap: var(--spacing-lg)";
+    position: absolute;
+    top: -12px;
+    left: var(--spacing-sm);
+    background: var(--color-surface);
+    padding: 0 var(--spacing-xs);
+    font-size: var(--text-xxs);
+    color: var(--color-primary);
+    font-family: var(--font-alt-heading);
+  }
+
+  .contact-section-wireframe::before {
+    content: "Contact Section - Container: narrow";
+    position: absolute;
+    top: -12px;
+    left: var(--spacing-sm);
+    background: var(--color-background);
+    padding: 0 var(--spacing-xs);
+    font-size: var(--text-xxs);
+    color: var(--color-primary);
+    font-family: var(--font-alt-heading);
   }
 </style>
