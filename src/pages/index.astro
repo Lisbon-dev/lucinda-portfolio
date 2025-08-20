@@ -6,7 +6,17 @@ import Typography from "../components/core/Typography.astro";
 import Header from "../components/layout/Header.astro";
 import SocialLinks from "../components/layout/SocialLinks.astro";
 import MasonryGrid from "../components/portfolio/MasonryGrid.astro";
-import { portfolioProjects } from "../lib/portfolio-data";
+import { getCollection } from 'astro:content';
+
+// Get all portfolio projects from content collection
+let portfolioProjects;
+try {
+  portfolioProjects = await getCollection('projects');
+  console.log('Portfolio projects loaded:', portfolioProjects.length);
+} catch (error) {
+  console.error('Error loading portfolio projects:', error);
+  portfolioProjects = [];
+}
 
 const socialLinks = [
   { name: 'Instagram', href: '#', external: true },
@@ -52,7 +62,6 @@ const socialLinks = [
   .hero-header {
     text-align: center;
     padding-top: 11.2vh; /* Based on 110px / 982px wireframe ratio */
-    min-height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;

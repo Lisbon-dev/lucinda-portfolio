@@ -2,47 +2,41 @@
 // MasonryGrid.astro - Responsive masonry grid component using Macy.js
 // Based on Task #23 requirements and TASK_007_#23_CLARIFICATIONS.md
 
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+
 export interface Props {
-  projects: Array<{
-    title: string;
-    images: string[];
-    category?: string;
-    description?: string;
-    slug?: string;
-  }>;
+  projects: CollectionEntry<'projects'>[];
   className?: string;
 }
 
 const { projects = [], className = '' } = Astro.props;
-
-// Import Macy.js from CDN in the head
 ---
 
 <div class={`masonry-container ${className}`}>
   <div id="masonry-grid" class="masonry-grid">
-    {projects.map((project) => 
-      project.images.map((imagePath, index) => (
-        <div class="masonry-item" data-project={project.slug || project.title} data-image={index}>
+    {projects.flatMap((project, index) => 
+        <div class="masonry-item" data-project={project.slug} data-image={index}>
           <div class="image-container">
-            <img 
-              src={`/portfolio/${imagePath}`}
-              alt={`${project.title} - Image ${index + 1}`}
-              loading="lazy"
+            <Image 
+              src={`/portfolio/${project.data.mainImage.src}`}
+              alt={project.data.mainImage.alt}
               class="masonry-image"
-              onload="this.classList.add('loaded')"
+              width={project.data.mainImage.width || 800}
+              height={project.data.mainImage.height || 600}
+              format="webp"
+              quality={85}
             />
             <div class="overlay">
               <div class="overlay-content">
-                <h3 class="project-title">{project.title}</h3>
-                {project.category && (
-                  <p class="project-category">{project.category}</p>
-                )}
+                <h3 class="project-title">{project.data.title}</h3>
+                <p class="project-category">{project.data.category}</p>
               </div>
             </div>
           </div>
         </div>
-      ))
-    )}
+      ) || []
+    }
   </div>
 </div>
 
@@ -50,13 +44,22 @@ const { projects = [], className = '' } = Astro.props;
 <script is:inline src="https://cdn.jsdelivr.net/npm/macy@2"></script>
 
 <script>
+  // Declare global types for TypeScript
+  declare global {
+    interface Window {
+      Macy: any;
+    }
+  }
+
   // Initialize Macy.js masonry grid
   document.addEventListener('DOMContentLoaded', () => {
     const masonryContainer = document.getElementById('masonry-grid');
     
-    if (masonryContainer) {
+    if (masonryContainer && window.Macy) {
+      let resizeTimeout: number;
+
       // Initialize Macy.js with responsive breakpoint configuration
-      const macyInstance = new Macy({
+      const macyInstance = new window.Macy({
         container: '#masonry-grid',
         trueOrder: false,
         waitForImages: true,
@@ -70,7 +73,7 @@ const { projects = [], className = '' } = Astro.props;
         breakAt: {
           1600: {  // 4 columns for >1600px (matches design system --breakpoint-2xl)
             columns: 4,
-            margin: { y: 32, x: '2.5%' }
+            margin: { y: 66, x: '2.5%' }
           },
           768: {   // 3 columns for 768-1600px (matches design system --breakpoint-md)
             columns: 3,
@@ -116,10 +119,9 @@ const { projects = [], className = '' } = Astro.props;
       }
 
       // Handle resize events
-      let resizeTimeout;
       window.addEventListener('resize', () => {
         clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(() => {
+        resizeTimeout = window.setTimeout(() => {
           macyInstance.recalculate(true, true);
         }, 250);
       });
@@ -139,7 +141,6 @@ const { projects = [], className = '' } = Astro.props;
 <style>
   .masonry-container {
     width: 100%;
-    max-width: 1512px; /* Match design system container width */
     margin: 0 auto;
     padding: 0 var(--spacing-container-mobile);
   }
@@ -158,7 +159,7 @@ const { projects = [], className = '' } = Astro.props;
 
   .masonry-grid {
     /* Macy.js will manage the grid layout */
-    opacity: 0;
+    opacity: 1;
     transition: opacity var(--transition-normal);
   }
 
@@ -207,14 +208,7 @@ const { projects = [], className = '' } = Astro.props;
     width: 100%;
     height: auto;
     display: block;
-    transition: 
-      transform var(--transition-normal),
-      opacity var(--transition-normal);
-    opacity: 0;
-  }
-
-  .masonry-image.loaded {
-    opacity: 1;
+    transition: transform var(--transition-normal);
   }
 
   /* Hover effects - only on non-touch devices */
@@ -295,22 +289,8 @@ const { projects = [], className = '' } = Astro.props;
     outline-offset: 4px;
   }
 
-  /* Loading state */
-  .masonry-image:not(.loaded) {
+  /* Loading state placeholder for Astro Image optimization */
+  .masonry-image {
     background-color: var(--color-surface);
-    min-height: 200px;
-  }
-
-  /* Responsive image sizing */
-  @media (min-width: 768px) {
-    .masonry-image:not(.loaded) {
-      min-height: 300px;
-    }
-  }
-
-  @media (min-width: 1200px) {
-    .masonry-image:not(.loaded) {
-      min-height: 400px;
-    }
   }
 </style>
