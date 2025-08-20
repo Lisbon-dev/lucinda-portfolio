@@ -5,6 +5,8 @@ import Container from "../components/core/Container.astro";
 import Typography from "../components/core/Typography.astro";
 import Header from "../components/layout/Header.astro";
 import SocialLinks from "../components/layout/SocialLinks.astro";
+import MasonryGrid from "../components/portfolio/MasonryGrid.astro";
+import { portfolioProjects } from "../lib/portfolio-data";
 
 const socialLinks = [
   { name: 'Instagram', href: '#', external: true },
@@ -33,6 +35,11 @@ const socialLinks = [
           </Container>
         </header>
       </Container>
+    </BaseSection>
+
+    <!-- Portfolio Grid Section -->
+    <BaseSection variant="default" backgroundColor="background">
+      <MasonryGrid projects={portfolioProjects} />
     </BaseSection>
   </main>
 

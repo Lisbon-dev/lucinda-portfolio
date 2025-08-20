@@ -1,0 +1,316 @@
+---
+// MasonryGrid.astro - Responsive masonry grid component using Macy.js
+// Based on Task #23 requirements and TASK_007_#23_CLARIFICATIONS.md
+
+export interface Props {
+  projects: Array<{
+    title: string;
+    images: string[];
+    category?: string;
+    description?: string;
+    slug?: string;
+  }>;
+  className?: string;
+}
+
+const { projects = [], className = '' } = Astro.props;
+
+// Import Macy.js from CDN in the head
+---
+
+<div class={`masonry-container ${className}`}>
+  <div id="masonry-grid" class="masonry-grid">
+    {projects.map((project) => 
+      project.images.map((imagePath, index) => (
+        <div class="masonry-item" data-project={project.slug || project.title} data-image={index}>
+          <div class="image-container">
+            <img 
+              src={`/portfolio/${imagePath}`}
+              alt={`${project.title} - Image ${index + 1}`}
+              loading="lazy"
+              class="masonry-image"
+              onload="this.classList.add('loaded')"
+            />
+            <div class="overlay">
+              <div class="overlay-content">
+                <h3 class="project-title">{project.title}</h3>
+                {project.category && (
+                  <p class="project-category">{project.category}</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      ))
+    )}
+  </div>
+</div>
+
+<!-- Macy.js CDN -->
+<script is:inline src="https://cdn.jsdelivr.net/npm/macy@2"></script>
+
+<script>
+  // Initialize Macy.js masonry grid
+  document.addEventListener('DOMContentLoaded', () => {
+    const masonryContainer = document.getElementById('masonry-grid');
+    
+    if (masonryContainer) {
+      // Initialize Macy.js with responsive breakpoint configuration
+      const macyInstance = new Macy({
+        container: '#masonry-grid',
+        trueOrder: false,
+        waitForImages: true,
+        useOwnImageLoader: false,
+        mobileFirst: true,
+        columns: 1,
+        margin: {
+          y: 24,
+          x: '3%'
+        },
+        breakAt: {
+          1600: {  // 4 columns for >1600px (matches design system --breakpoint-2xl)
+            columns: 4,
+            margin: { y: 32, x: '2.5%' }
+          },
+          768: {   // 3 columns for 768-1600px (matches design system --breakpoint-md)
+            columns: 3,
+            margin: { y: 28, x: '3%' }
+          },
+          550: {   // 2 columns for 550-768px (matches design system --breakpoint-base)
+            columns: 2,
+            margin: { y: 24, x: '3%' }
+          }
+          // 1 column for <550px (mobile-first default)
+        }
+      });
+
+      // Handle image loading with fade-in animation
+      macyInstance.runOnImageLoad(function() {
+        // Recalculate layout after images load
+        macyInstance.recalculate(true);
+      }, true);
+
+      // Enhanced staggered animation for masonry items
+      const animateItems = () => {
+        const items = masonryContainer.querySelectorAll('.masonry-item');
+        items.forEach((item, index) => {
+          setTimeout(() => {
+            item.classList.add('animated');
+          }, index * 100); // Stagger by 100ms for smooth cascade effect
+        });
+      };
+
+      // Add intersection observer for performance
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+            }
+          });
+        }, { threshold: 0.1 });
+
+        // Observe all masonry items
+        const items = masonryContainer.querySelectorAll('.masonry-item');
+        items.forEach(item => observer.observe(item));
+      }
+
+      // Handle resize events
+      let resizeTimeout;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+          macyInstance.recalculate(true, true);
+        }, 250);
+      });
+
+      // Add loaded class to trigger CSS animations
+      macyInstance.on(macyInstance.constants.EVENT_INITIALIZED, () => {
+        masonryContainer.classList.add('masonry-initialized');
+        // Start staggered animations after initialization
+        setTimeout(() => {
+          animateItems();
+        }, 200);
+      });
+    }
+  });
+</script>
+
+<style>
+  .masonry-container {
+    width: 100%;
+    max-width: 1512px; /* Match design system container width */
+    margin: 0 auto;
+    padding: 0 var(--spacing-container-mobile);
+  }
+
+  @media (min-width: 768px) {
+    .masonry-container {
+      padding: 0 var(--spacing-container-tablet);
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .masonry-container {
+      padding: 0 var(--spacing-container-desktop);
+    }
+  }
+
+  .masonry-grid {
+    /* Macy.js will manage the grid layout */
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+  }
+
+  .masonry-grid.masonry-initialized {
+    opacity: 1;
+  }
+
+  .masonry-item {
+    width: 100%;
+    margin-bottom: 0; /* Macy.js handles margins internally */
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+    transition: 
+      opacity 0.6s cubic-bezier(0.4, 0.0, 0.2, 1),
+      transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1),
+      box-shadow var(--transition-normal);
+    will-change: opacity, transform;
+  }
+
+  /* Fade in animation for items */
+  .masonry-initialized .masonry-item {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  /* Enhanced visibility animation */
+  .masonry-item.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  .masonry-item.animated {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  .image-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0; /* Clean, minimal aesthetic */
+    cursor: pointer;
+    background-color: var(--color-surface);
+  }
+
+  .masonry-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: 
+      transform var(--transition-normal),
+      opacity var(--transition-normal);
+    opacity: 0;
+  }
+
+  .masonry-image.loaded {
+    opacity: 1;
+  }
+
+  /* Hover effects - only on non-touch devices */
+  @media (hover: hover) and (pointer: fine) {
+    .masonry-item:hover {
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    }
+
+    .masonry-item:hover .masonry-image {
+      transform: scale(1.03);
+    }
+
+    .masonry-item:hover .overlay {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  /* Touch devices - show overlay on tap */
+  @media (hover: none) and (pointer: coarse) {
+    .masonry-item:active .overlay {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--color-overlay);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: 
+      opacity var(--transition-normal),
+      visibility var(--transition-normal);
+  }
+
+  .overlay-content {
+    text-align: center;
+    padding: var(--spacing-md);
+    color: white;
+  }
+
+  .project-title {
+    font-family: var(--font-alt-heading);
+    font-size: var(--text-lg);
+    font-weight: 400;
+    line-height: var(--leading-tight);
+    margin-bottom: var(--spacing-xs);
+    letter-spacing: var(--tracking-wide);
+  }
+
+  .project-category {
+    font-family: var(--font-alt-heading);
+    font-size: var(--text-sm);
+    font-weight: 300;
+    letter-spacing: var(--tracking-wider);
+    opacity: 0.9;
+    margin: 0;
+  }
+
+  /* Mobile spacing adjustments */
+  @media (max-width: 549px) {
+    .masonry-container {
+      padding: 0 var(--spacing-container-mobile);
+    }
+  }
+
+  /* Focus management for accessibility */
+  .masonry-item:focus-within {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 4px;
+  }
+
+  /* Loading state */
+  .masonry-image:not(.loaded) {
+    background-color: var(--color-surface);
+    min-height: 200px;
+  }
+
+  /* Responsive image sizing */
+  @media (min-width: 768px) {
+    .masonry-image:not(.loaded) {
+      min-height: 300px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .masonry-image:not(.loaded) {
+      min-height: 400px;
+    }
+  }
+</style>
