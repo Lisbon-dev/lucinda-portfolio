@@ -1,0 +1,51 @@
+---
+export interface Props {
+  size?: 'default' | 'narrow' | 'wide' | 'full';
+  class?: string;
+}
+
+const {
+  size = 'default',
+  class: className = '',
+} = Astro.props;
+
+const containerClasses = [
+  'container',
+  `container--${size}`,
+  className
+].filter(Boolean).join(' ');
+---
+
+<div class={containerClasses}>
+  <slot />
+</div>
+
+<style>
+  .container {
+    max-width: 1512px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-container-desktop);
+  }
+
+  .container--narrow { max-width: 800px; }
+  .container--wide { max-width: 1800px; }
+  .container--full { max-width: none; padding: 0; }
+
+  @media (max-width: 1200px) {
+    .container:not(.container--full) {
+      padding: 0 var(--spacing-container-tablet);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .container:not(.container--full) {
+      padding: 0 var(--spacing-container-mobile);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .container:not(.container--full) {
+      padding: 0 5vw;
+    }
+  }
+</style>

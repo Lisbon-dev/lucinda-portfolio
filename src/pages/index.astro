@@ -1,0 +1,105 @@
+---
+import Layout from "../layout/Layout.astro";
+import BaseSection from "../components/core/BaseSection.astro";
+import Container from "../components/core/Container.astro";
+import Typography from "../components/core/Typography.astro";
+import Header from "../components/layout/Header.astro";
+import SocialLinks from "../components/layout/SocialLinks.astro";
+import MasonryGrid from "../components/portfolio/MasonryGrid.astro";
+import { getCollection } from 'astro:content';
+
+// Get all portfolio projects from content collection
+let portfolioProjects;
+try {
+  portfolioProjects = await getCollection('projects');
+  console.log('Portfolio projects loaded:', portfolioProjects.length);
+} catch (error) {
+  console.error('Error loading portfolio projects:', error);
+  portfolioProjects = [];
+}
+
+const socialLinks = [
+  { name: 'Instagram', href: '#', external: true },
+  { name: 'Behance', href: '#', external: true },
+  { name: 'LinkedIn', href: '#', external: true }
+];
+---
+
+<Layout>
+  <!-- Minimalist Header with Menu -->
+  <Header />
+
+  <!-- Hero Section - Clean Landing Page -->
+  <main>
+    <BaseSection variant="hero" fullHeight={false} backgroundColor="background">
+      <Container>
+        <header class="hero-header">
+          <Typography as="h1" variant="header" tracking="wider">
+            LUCINDA BURMAN
+          </Typography>
+          <Container size="narrow">
+            <Typography as="p" variant="explanatory" tracking="wide">
+              Editorial Illustration  |  Branding & Interior Artwork  |  2D & 3D  |  
+              Bespoke Commissions  |  Weddings & Events
+            </Typography>
+          </Container>
+        </header>
+      </Container>
+    </BaseSection>
+
+    <!-- Portfolio Grid Section -->
+    <BaseSection variant="default" backgroundColor="background">
+      <MasonryGrid projects={portfolioProjects} />
+    </BaseSection>
+  </main>
+
+  <!-- Fixed Social Links -->
+ <!--  <SocialLinks links={socialLinks} /> -->
+</Layout>
+
+<style>
+  /* Viewport-relative spacing based on wireframe: 110px from top for 982px height = 11.2vh */
+  .hero-header {
+    text-align: center;
+    padding-top: 11.2vh; /* Based on 110px / 982px wireframe ratio */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+  }
+
+  .hero-header > :global(.typography:first-child) {
+    margin-bottom: var(--spacing-md);
+    line-height: var(--leading-tight);
+  }
+
+  /* Ensure proper spacing even on very small screens */
+  @media (max-height: 600px) {
+    .hero-header {
+      padding-top: 15vh; /* Slightly more relative space on short screens */
+    }
+  }
+
+  /* Ensure readable spacing on very tall screens */
+  @media (min-height: 1200px) {
+    .hero-header {
+      padding-top: 10vh; /* Proportionally less space on tall screens */
+    }
+  }
+
+  /* Mobile portrait adjustments */
+  @media (max-width: 480px) and (orientation: portrait) {
+    .hero-header > :global(.typography:first-child) {
+      margin-bottom: var(--spacing-sm);
+    }
+  }
+
+  /* Landscape mobile adjustments */
+  @media (max-width: 768px) and (orientation: landscape) {
+    .hero-header {
+      padding-top: 8vh; /* Less padding on landscape mobile */
+      min-height: 100vh;
+    }
+  }
+
+</style>
