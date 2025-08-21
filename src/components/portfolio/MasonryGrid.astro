@@ -77,7 +77,7 @@ const { projects = [], className = '' } = Astro.props;
           },
           768: {   // 3 columns for 768-1600px (matches design system --breakpoint-md)
             columns: 3,
-            margin: { y: 28, x: '3%' }
+            margin: { y: 66, x: '3%' }
           },
           550: {   // 2 columns for 550-768px (matches design system --breakpoint-base)
             columns: 2,
@@ -127,12 +127,17 @@ const { projects = [], className = '' } = Astro.props;
       });
 
       // Add loaded class to trigger CSS animations
-      macyInstance.on(macyInstance.constants.EVENT_INITIALIZED, () => {
-        masonryContainer.classList.add('masonry-initialized');
-        // Start staggered animations after initialization
-        setTimeout(() => {
-          animateItems();
-        }, 200);
+      // Use EVENT_RECALCULATED instead of EVENT_INITIALIZED because:
+      // EVENT_INITIALIZED fires immediately when instance is created, before layout
+      // EVENT_RECALCULATED fires after layout calculations are complete
+      macyInstance.on(macyInstance.constants.EVENT_RECALCULATED, () => {
+        if (!masonryContainer.classList.contains('masonry-initialized')) {
+          masonryContainer.classList.add('masonry-initialized');
+          // Start staggered animations after layout is complete
+          setTimeout(() => {
+            animateItems();
+          }, 200);
+        }
       });
     }
   });
@@ -159,13 +164,15 @@ const { projects = [], className = '' } = Astro.props;
 
   .masonry-grid {
     /* Macy.js will manage the grid layout */
-    opacity: 1;
+    opacity: 0;
     transition: opacity var(--transition-normal);
   }
+
 
   .masonry-grid.masonry-initialized {
     opacity: 1;
   }
+
 
   .masonry-item {
     width: 100%;
