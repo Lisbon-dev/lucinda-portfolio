@@ -7,12 +7,12 @@ publishedDate: 2023-06-10
 client: "Gallery Exhibition"
 year: 2023
 mainImage:
-    src: "History Repeating - Einsteen charcoal.png"
+    src: "../../assets/portfolio/History Repeating - Einsteen charcoal.png"
     alt: "Charcoal portrait of Einstein for History Repeating series"
 images:
-  - src: "History Repeating - Einsteen charcoal.png"
+  - src: "../../assets/portfolio/History Repeating - Einsteen charcoal.png"
     alt: "Charcoal portrait of Einstein for History Repeating series"
-  - src: "History Repeating.png"
+  - src: "../../assets/portfolio/History Repeating.png"
     alt: "History Repeating main artwork showing abstract historical themes"
 tags:
   - "charcoal"
