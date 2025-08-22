@@ -57,8 +57,51 @@ const socialLinks = [
  <!--  <SocialLinks links={socialLinks} /> -->
 </Layout>
 
+<!-- Performance Monitoring Script -->
+<script>
+  // Core Web Vitals Monitoring for Task-009 optimization
+  if ('PerformanceObserver' in window) {
+    // Monitor LCP (Largest Contentful Paint)
+    new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        if (entry.entryType === 'largest-contentful-paint') {
+          console.log('LCP:', entry.startTime, 'ms');
+          // Track if hero text is the LCP element
+          if (entry.element && entry.element.closest('.hero-header')) {
+            console.log('Hero section is LCP element - optimizations working');
+          }
+        }
+      }
+    }).observe({ entryTypes: ['largest-contentful-paint'] });
+
+    // Monitor CLS (Cumulative Layout Shift)
+    let clsScore = 0;
+    new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        if (!entry.hadRecentInput) {
+          clsScore += entry.value;
+        }
+      }
+      console.log('CLS Score:', clsScore);
+    }).observe({ entryTypes: ['layout-shift'] });
+
+    // Monitor font loading performance
+    document.fonts.ready.then(() => {
+      console.log('Fonts loaded at:', performance.now(), 'ms');
+    });
+
+    // Track hero animation performance
+    const heroHeader = document.querySelector('.hero-header');
+    if (heroHeader) {
+      heroHeader.addEventListener('animationend', () => {
+        console.log('Hero animation completed at:', performance.now(), 'ms');
+      });
+    }
+  }
+</script>
+
 <style>
-  /* Viewport-relative spacing based on wireframe: 110px from top for 982px height = 11.2vh */
+  /* Performance-Optimized Hero Section */
   .hero-header {
     text-align: center;
     padding-top: 11.2vh; /* Based on 110px / 982px wireframe ratio */
@@ -66,6 +109,29 @@ const socialLinks = [
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
+    
+    /* Performance optimizations inherited from Layout.astro */
+    /* Animation setup for progressive enhancement */
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Progressive enhancement: Add animations only for capable devices */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-header {
+      animation: heroFadeIn 0.8s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+    }
+  }
+
+  @keyframes heroFadeIn {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   .hero-header > :global(.typography:first-child) {

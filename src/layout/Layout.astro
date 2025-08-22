@@ -13,16 +13,36 @@
       lucindaburman.com
     </title>
 
-    <!-- Google Fonts preconnect & embed -->
+    <!-- Critical Font Preloading & Optimization -->
+    <!-- High-priority preconnects -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
-      rel="stylesheet"
-    />
-
     <link rel="preconnect" href="https://use.typekit.net" crossorigin />
-    <link href="https://use.typekit.net/roo1sig.css" rel="stylesheet" />
+    
+    <!-- Critical font preloading -->
+    <link 
+      rel="preload" 
+      href="https://use.typekit.net/roo1sig.css" 
+      as="style" 
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript>
+      <link rel="stylesheet" href="https://use.typekit.net/roo1sig.css" />
+    </noscript>
+    
+    <!-- Google Fonts with optimized loading -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=optional"
+      rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
   </head>
 
   <body>
@@ -148,11 +168,15 @@
     --container-xl: 75%;
     --container-2xl: 70%;
 
-    /* Typography */
+    /* Typography with Performance Optimization */
     --font-title: "Libre Baskerville", serif; /* Serif for titles */
     --font-body: "Montserrat", "Inter", sans-serif; /* Clean sans for body text */
     --font-heading: "Playfair Display", serif; /* Clean serif for body text */
-    --font-alt-heading: "ivypresto-display", "Fraunces", serif;
+    --font-alt-heading: "ivypresto-display", "Times New Roman", serif;
+    
+    /* Font fallback metrics for CLS prevention */
+    --font-fallback-size-adjust: 100%;
+    --font-hero-min-height: 200px; /* Reserve space during font loading */
 
     /* Font Sizes */
     --text-xxs: clamp(0.5rem, 0.4rem + 0.227vw, 0.705rem);
@@ -354,6 +378,37 @@
   .focusable:focus {
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
+  }
+
+  /* Performance-Optimized Font Loading */
+  @font-face {
+    font-family: 'ivypresto-display-optimized';
+    src: local('ivypresto-display'), local('Ivy Presto Display');
+    font-display: optional; /* Prevents layout shifts for hero content */
+    size-adjust: var(--font-fallback-size-adjust);
+  }
+
+  /* Hero Section Performance Optimization */
+  .hero-header {
+    /* Hardware acceleration for animations */
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    
+    /* Reserve space during font loading to prevent CLS */
+    min-height: var(--font-hero-min-height);
+    
+    /* Optimize for LCP */
+    contain: layout style;
+  }
+
+  /* Reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-header {
+      animation: none !important;
+      transition: none !important;
+      will-change: auto;
+      transform: none;
+    }
   }
 
   /* Base body styling */
