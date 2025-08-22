@@ -19,13 +19,17 @@ const { projects = [], className = '' } = Astro.props;
         <div class="masonry-item" data-project={project.slug} data-image={index}>
           <div class="image-container">
             <Image 
-              src={`/portfolio/${project.data.mainImage.src}`}
+              src={project.data.mainImage.src}
               alt={project.data.mainImage.alt}
               class="masonry-image"
               width={project.data.mainImage.width || 800}
               height={project.data.mainImage.height || 600}
               format="webp"
               quality={85}
+              loading={index < 4 ? "eager" : "lazy"}
+              decoding="async"
+              fetchpriority={index < 2 ? "high" : "low"}
+              densities={[1, 1.5, 2]}
             />
             <div class="overlay">
               <div class="overlay-content">
@@ -103,19 +107,69 @@ const { projects = [], className = '' } = Astro.props;
         });
       };
 
-      // Add intersection observer for performance
+      // Enhanced Intersection Observer for advanced lazy loading and performance
       if ('IntersectionObserver' in window) {
-        const observer = new IntersectionObserver((entries) => {
+        let ticking = false;
+        
+        const imageObserver = new IntersectionObserver((entries) => {
+          if (!ticking) {
+            requestAnimationFrame(() => {
+              entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                  const item = entry.target;
+                  const img = item.querySelector('.masonry-image');
+                  const container = item.querySelector('.image-container');
+                  
+                  // Progressive loading with performance optimizations
+                  if (img && container) {
+                    // Upgrade image importance when in viewport
+                    img.setAttribute('fetchpriority', 'high');
+                    (img as HTMLElement).style.contentVisibility = 'visible';
+                    
+                    // Add loading state
+                    container.classList.add('loading');
+                    
+                    // Mark as visible for animations
+                    item.classList.add('visible');
+                    
+                    // Stop observing this image
+                    imageObserver.unobserve(item);
+                  }
+                }
+              });
+              ticking = false;
+            });
+            ticking = true;
+          }
+        }, { 
+          rootMargin: '100px 0px', // Start loading 100px before viewport
+          threshold: [0, 0.25, 0.5, 0.75, 1] // Multiple thresholds for progressive loading
+        });
+
+        // Memory management observer for large grids
+        const memoryObserver = new IntersectionObserver((entries) => {
           entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('visible');
+            const item = entry.target;
+            const img = item.querySelector('.masonry-image');
+            
+            if (!entry.isIntersecting && img) {
+              // Unload images far from viewport to save memory
+              const rect = item.getBoundingClientRect();
+              if (Math.abs(rect.top) > window.innerHeight * 3) {
+                (img as HTMLElement).style.contentVisibility = 'auto';
+              }
             }
           });
-        }, { threshold: 0.1 });
+        }, {
+          rootMargin: '300% 0px' // Very large margin for memory management
+        });
 
         // Observe all masonry items
         const items = masonryContainer.querySelectorAll('.masonry-item');
-        items.forEach(item => observer.observe(item));
+        items.forEach(item => {
+          imageObserver.observe(item);
+          memoryObserver.observe(item);
+        });
       }
 
       // Handle resize events
@@ -125,6 +179,38 @@ const { projects = [], className = '' } = Astro.props;
           macyInstance.recalculate(true, true);
         }, 250);
       });
+
+      // Enhanced focus management for accessibility
+      const handleFocus = (event: FocusEvent) => {
+        const focusedItem = (event.target as Element).closest('.masonry-item');
+        if (focusedItem && !focusedItem.querySelector('img[src]')) {
+          // Ensure focusable elements have their images loaded immediately
+          const img = focusedItem.querySelector('.masonry-image') as HTMLImageElement;
+          const container = focusedItem.querySelector('.image-container');
+          if (img && container) {
+            img.setAttribute('fetchpriority', 'high');
+            container.classList.add('loading');
+          }
+        }
+      };
+
+      // Add focus event listener for accessibility
+      masonryContainer.addEventListener('focusin', handleFocus);
+
+      // Performance monitoring for Task-011 optimization
+      let imageLoadCount = 0;
+      const totalImages = masonryContainer.querySelectorAll('.masonry-image').length;
+      
+      masonryContainer.addEventListener('load', (event) => {
+        if (event.target && (event.target as HTMLElement).classList.contains('masonry-image')) {
+          imageLoadCount++;
+          console.log(`Image loaded: ${imageLoadCount}/${totalImages}`);
+          
+          if (imageLoadCount === totalImages) {
+            console.log('All masonry images loaded at:', performance.now(), 'ms');
+          }
+        }
+      }, true);
 
       // Add loaded class to trigger CSS animations
       // Use EVENT_RECALCULATED instead of EVENT_INITIALIZED because:
@@ -184,6 +270,11 @@ const { projects = [], className = '' } = Astro.props;
       transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1),
       box-shadow var(--transition-normal);
     will-change: opacity, transform;
+    
+    /* Performance optimizations */
+    content-visibility: auto;
+    contain-intrinsic-size: 300px 400px; /* Estimated size for layout stability */
+    contain: layout style;
   }
 
   /* Fade in animation for items */
@@ -216,6 +307,35 @@ const { projects = [], className = '' } = Astro.props;
     height: auto;
     display: block;
     transition: transform var(--transition-normal);
+    
+    /* Performance and loading optimizations */
+    content-visibility: auto;
+    background-color: var(--color-surface);
+    aspect-ratio: attr(width) / attr(height); /* Maintain aspect ratio during loading */
+  }
+
+  .masonry-image-picture {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Loading state styling */
+  .image-container.loading .masonry-image {
+    background: linear-gradient(90deg, var(--color-surface) 25%, rgba(255,255,255,0.3) 50%, var(--color-surface) 75%);
+    background-size: 200% 100%;
+    animation: loading-shimmer 1.5s infinite;
+  }
+
+  @keyframes loading-shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  /* Stop shimmer when image loads */
+  .image-container.loading .masonry-image[src] {
+    animation: none;
+    background: none;
   }
 
   /* Hover effects - only on non-touch devices */
@@ -296,8 +416,40 @@ const { projects = [], className = '' } = Astro.props;
     outline-offset: 4px;
   }
 
-  /* Loading state placeholder for Astro Image optimization */
-  .masonry-image {
-    background-color: var(--color-surface);
+  /* Accessibility: Respect reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    .masonry-item {
+      animation: none !important;
+      transition: none !important;
+      will-change: auto;
+    }
+
+    .masonry-grid {
+      transition: none !important;
+    }
+
+    .image-container.loading .masonry-image {
+      animation: none !important;
+      background: var(--color-surface) !important;
+    }
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .masonry-item {
+      border: 2px solid ButtonText;
+    }
+    
+    .overlay {
+      background: rgba(0, 0, 0, 0.9);
+      border: 1px solid ButtonText;
+    }
+  }
+
+  /* Performance optimizations for large screens */
+  @media (min-width: 1600px) {
+    .masonry-item {
+      contain-intrinsic-size: 382px 500px; /* Larger estimated size for desktop */
+    }
   }
 </style>
