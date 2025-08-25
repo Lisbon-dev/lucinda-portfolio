@@ -44,11 +44,9 @@ const nextProject = currentIndex < allProjects.length - 1 ? allProjects[currentI
               LUCINDA BURMAN
             </Typography>
           </a>
-          <Typography as="h2" variant="explanatory" tracking="wider">
-            {project.data.title}
-          </Typography>
+         
           <Typography as="p" variant="explanatory" tracking="wide">
-            {project.data.category}  |  {project.data.client}  |  {project.data.year}
+            {project.data.category} 
           </Typography>
         </header>
       </Container>
@@ -56,13 +54,13 @@ const nextProject = currentIndex < allProjects.length - 1 ? allProjects[currentI
 
     <!-- Project Content Section -->
     <div class="project-content-section">
-      <div class="project-content-container">
+      <div class="container">
         <!-- Project Description with Navigation -->
         <div class="description-with-navigation">
           <div class="project-description">
-            <Typography as="p" variant="body">
-              {project.data.description}
-            </Typography>
+             <Typography as="h2" variant="explanatory" tracking="wider">
+            {project.data.title} - {project.data.description}
+          </Typography>
           </div>
           
           <!-- Navigation Arrows positioned beside description -->
