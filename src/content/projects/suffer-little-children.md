@@ -1,7 +1,7 @@
 ---
 title: "Suffer Little Children"
-description: "Multi-page editorial series with celebrity portraits exploring themes of innocence and fame."
-category: "Editorial Series"
+description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+category: "Editorial Illustration"
 featured: true
 publishedDate: 2023-09-18
 client: "Contemporary Culture Magazine"

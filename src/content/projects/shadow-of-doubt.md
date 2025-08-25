@@ -1,6 +1,6 @@
 ---
 title: "Shadow of a Doubt"
-description: "Film-inspired editorial illustrations capturing noir atmosphere and psychological tension."
+description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
 category: "Editorial Illustration"
 featured: false
 publishedDate: 2023-10-05
