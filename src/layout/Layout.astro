@@ -170,7 +170,7 @@
 
     /* Typography with Performance Optimization */
     --font-title: "Libre Baskerville", serif; /* Serif for titles */
-    --font-body: "Montserrat", "Inter", sans-serif; /* Clean sans for body text */
+    --font-body: "ibm-plex-sans", "Montserrat", "Inter", sans-serif; /* Clean sans for body text */
     --font-heading: "Playfair Display", serif; /* Clean serif for body text */
     --font-alt-heading: "ivypresto-display", "Times New Roman", serif;
     
@@ -253,19 +253,21 @@
 
   /* Container System */
   .container {
-    max-width: 1512px;
+    max-width: var(--breakpoint-xl);
     margin: 0 auto;
     padding: 0 var(--spacing-container-desktop);
   }
 
-  @media (max-width: 1200px) {
+/*   @media (max-width: 1200px) {
     .container {
       padding: 0 var(--spacing-container-tablet);
     }
-  }
+  } */
 
   @media (max-width: 768px) {
     .container {
+      max-width: var(--breakpoint-md);
+      margin: 0 auto;
       padding: 0 var(--spacing-container-mobile);
     }
   }
