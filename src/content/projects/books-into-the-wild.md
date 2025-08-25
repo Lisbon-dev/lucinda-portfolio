@@ -1,6 +1,6 @@
 ---
 title: "Books Into The Wild"
-description: "Illustrated spreads for literary work adaptation, capturing the essence of wilderness and adventure through editorial illustration."
+description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
 category: "Editorial Illustration"
 featured: true
 publishedDate: 2023-08-15

@@ -1,7 +1,7 @@
 ---
 title: "Bimini Magazine"
-description: "Double-page spread designs for Bimini Magazine featuring bold typography and contemporary layout design."
-category: "Magazine Design"
+description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+category: "Editorial Illustration"
 featured: true
 publishedDate: 2023-07-22
 client: "Bimini Magazine"

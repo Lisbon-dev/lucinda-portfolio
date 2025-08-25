@@ -1,7 +1,7 @@
 ---
 title: "History Repeating"
-description: "Charcoal portrait series exploring historical themes and the cyclical nature of human experience."
-category: "Portrait Illustration"
+description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+category: "Editorial Illustration"
 featured: false
 publishedDate: 2023-06-10
 client: "Gallery Exhibition"

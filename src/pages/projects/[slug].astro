@@ -1,0 +1,332 @@
+---
+import Layout from "../../layout/Layout.astro";
+import BaseSection from "../../components/core/BaseSection.astro";
+import Container from "../../components/core/Container.astro";
+import Typography from "../../components/core/Typography.astro";
+import Header from "../../components/layout/Header.astro";
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((project) => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props;
+
+// Get all projects for navigation carousel
+const allProjects = await getCollection('projects');
+const currentIndex = allProjects.findIndex(p => p.slug === project.slug);
+const previousProject = currentIndex > 0 ? allProjects[currentIndex - 1] : allProjects[allProjects.length - 1];
+const nextProject = currentIndex < allProjects.length - 1 ? allProjects[currentIndex + 1] : allProjects[0];
+---
+
+<Layout>
+  <!-- Reuse Header Component -->
+  <Header />
+
+  <!-- Main Project Content -->
+  <main class="project-page">
+    <!-- Hero Section - Match landing page exactly -->
+    <BaseSection variant="hero" fullHeight={false} backgroundColor="background" padding="none">
+      <Container>
+        <header class="project-hero">
+          <a href="/" class="home-link" aria-label="Go to homepage">
+            <Typography as="h1" variant="header" tracking="wider">
+              LUCINDA BURMAN
+            </Typography>
+          </a>
+         
+          <Typography as="p" variant="explanatory" tracking="wide">
+            {project.data.category} 
+          </Typography>
+        </header>
+      </Container>
+    </BaseSection>
+
+    <!-- Project Content Section -->
+    <div class="project-content-section">
+      <div class="container">
+        <!-- Project Description with Navigation -->
+        <div class="description-with-navigation">
+          <div class="project-description">
+             <Typography as="h2" variant="explanatory" tracking="wider">
+            {project.data.title} - {project.data.description}
+          </Typography>
+          </div>
+          
+          <!-- Navigation Arrows positioned beside description -->
+          <nav class="project-navigation" aria-label="Project navigation">
+            <a href={`/projects/${previousProject.slug}`} class="nav-arrow nav-arrow--prev" aria-label={`Previous project: ${previousProject.data.title}`}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
+            <a href={`/projects/${nextProject.slug}`} class="nav-arrow nav-arrow--next" aria-label={`Next project: ${nextProject.data.title}`}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
+          </nav>
+        </div>
+
+        <!-- Single Column Image Display -->
+        <div class="project-images">
+          <!-- Main Image -->
+          <div class="image-wrapper">
+            <Image 
+              src={project.data.mainImage.src}
+              alt={project.data.mainImage.alt}
+              class="project-image"
+              width={695}
+              height={project.data.mainImage.height || 600}
+              format="webp"
+              quality={85}
+              loading="eager"
+              fetchpriority="high"
+              densities={[1, 1.5, 2]}
+            />
+          </div>
+
+          <!-- Additional Images -->
+          {project.data.images && project.data.images.map((image: {src: any, alt: string, height?: number}, index: number) => (
+            <div class="image-wrapper">
+              <Image 
+                src={image.src}
+                alt={image.alt}
+                class="project-image"
+                width={695}
+                height={image.height || 600}
+                format="webp"
+                quality={85}
+                loading={index < 2 ? "eager" : "lazy"}
+                fetchpriority={index < 1 ? "high" : "low"}
+                densities={[1, 1.5, 2]}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .project-page {
+    position: relative;
+  }
+
+  /* Hero Section - Match landing page exactly */
+  .project-hero {
+    text-align: center;
+    /* Fixed height approach - 318px baseline with responsive scaling */
+    height: 318px;
+    max-height: 318px;
+    padding-top: 11.2vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    box-sizing: border-box;
+    overflow: hidden; /* Prevent content overflow */
+  }
+
+  .home-link {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .project-hero > :global(.typography:first-child) {
+    margin-bottom: var(--spacing-sm);
+    line-height: var(--leading-tight);
+  }
+
+  .project-hero > :global(.typography:last-child) {
+    opacity: 0.8;
+  }
+
+  /* Project Content Section */
+  .project-content-section {
+    /* Ensure 397px total from body top to first image */
+    /* 397px - 318px (hero) = 79px remaining */
+    padding-top: 79px;
+    background-color: var(--color-background);
+  }
+
+  .project-content-container {
+    max-width: 1512px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-container-desktop);
+    position: relative;
+  }
+
+  /* Description with Navigation */
+  .description-with-navigation {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: calc(66px / 982px * 100vh); /* 66px gap ratio */
+  }
+
+  .project-description {
+    max-width: calc(695px / 1512px * 100%); /* Match image width ratio */
+    text-align: center;
+    padding: 0 var(--spacing-md);
+  }
+
+  /* Navigation positioned beside description */
+  .project-navigation {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+    transform: translateY(-50%);
+    z-index: 10;
+  }
+
+  .nav-arrow {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background: var(--color-background);
+    border: 1px solid var(--color-text-secondary);
+    border-radius: 50%;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: all var(--transition-normal);
+    opacity: 0.8;
+  }
+
+  .nav-arrow:hover {
+    opacity: 1;
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
+    transform: scale(1.1);
+  }
+
+  .nav-arrow:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 4px;
+  }
+
+  /* Single Column Images with proper gaps */
+  .project-images {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .image-wrapper {
+    max-width: calc(695px / 1512px * 100%); /* 695px on 1512px viewport ratio */
+    width: 100%;
+  }
+
+  .image-wrapper:not(:last-child) {
+    margin-bottom: 66px; /* Fixed 66px gap between images as per wireframe */
+  }
+
+  .project-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 0; /* Clean, minimal aesthetic */
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 1512px) {
+    .project-content-container {
+      padding: 0 var(--spacing-container-tablet);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .project-hero {
+      height: calc(318px * 0.8); /* Proportionally smaller for mobile */
+      max-height: calc(318px * 0.8);
+      padding-top: calc(110px * 0.8);
+    }
+
+    .project-content-section {
+      padding-top: calc(79px * 0.8); /* Adjusted mobile spacing */
+    }
+
+    .project-content-container {
+      padding: 0 var(--spacing-container-mobile);
+    }
+
+    .image-wrapper:not(:last-child) {
+      margin-bottom: calc(66px * 0.8); /* Proportional gaps for mobile */
+    }
+
+    .description-with-navigation {
+      margin-bottom: calc(66px * 0.8);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .nav-arrow {
+      width: 40px;
+      height: 40px;
+    }
+
+    .project-description {
+      padding: 0 var(--spacing-sm);
+    }
+
+    .project-hero {
+      height: calc(318px * 0.7); /* Even smaller for mobile */
+      max-height: calc(318px * 0.7);
+      padding-top: calc(110px * 0.7);
+    }
+
+    .project-content-section {
+      padding-top: calc(79px * 0.7);
+    }
+
+    .image-wrapper:not(:last-child) {
+      margin-bottom: calc(66px * 0.7); /* Consistent proportional gaps */
+    }
+
+    .description-with-navigation {
+      margin-bottom: calc(66px * 0.7);
+    }
+  }
+
+  /* Desktop measurements are now the default above */
+
+  /* Accessibility: Respect reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    .nav-arrow {
+      transition: none;
+    }
+
+    .nav-arrow:hover {
+      transform: none;
+    }
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .nav-arrow {
+      border: 2px solid ButtonText;
+      background: ButtonFace;
+      color: ButtonText;
+    }
+  }
+</style>
