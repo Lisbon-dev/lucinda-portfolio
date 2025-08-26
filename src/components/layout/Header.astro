@@ -1,4 +1,8 @@
 ---
+import AboutModal from '../modal/AboutModal.astro';
+import ContactModal from '../modal/ContactModal.astro';
+import ModalTrigger from '../modal/ModalTrigger.astro';
+
 export interface Props {
   class?: string;
 }
@@ -28,13 +32,9 @@ const headerClasses = [
   <!-- Slide-down header -->
   <header class="slide-header" id="slide-header" aria-hidden="true">
     <nav class="slide-nav" role="navigation" aria-label="Main navigation">
-      <button 
-        class="nav-button about-button"
-        type="button"
-        aria-label="Open about information"
-      >
+      <ModalTrigger modalId="about-modal" variant="text" class="nav-button about-button">
         About
-      </button>
+      </ModalTrigger>
       <a 
         href="/projects"
         class="nav-button work-button"
@@ -42,47 +42,26 @@ const headerClasses = [
       >
         Work
       </a>
+      <ModalTrigger modalId="contact-modal" variant="text" class="nav-button contact-button">
+        Contact
+      </ModalTrigger>
     </nav>
   </header>
 
-  <!-- About Modal -->
-  <div class="about-modal-overlay" aria-hidden="true" role="dialog" aria-labelledby="about-title" aria-modal="true">
-    <div class="about-modal-content">
-      <header class="about-modal-header">
-        <h2 id="about-title" class="about-title">About Lucinda</h2>
-        <button 
-          class="close-modal-button"
-          type="button"
-          aria-label="Close about information"
-        >
-          ×
-        </button>
-      </header>
-      <div class="about-modal-body">
-        <p class="about-text">
-          Professional illustrator and creative director specializing in editorial design, 
-          brand identity, and digital art. Based in London, working with clients worldwide.
-        </p>
-        <p class="about-text">
-          With over a decade of experience in the creative industry, Lucinda brings a unique 
-          blend of traditional illustration techniques and contemporary digital design to every project.
-        </p>
-      </div>
-    </div>
-  </div>
+  <!-- Modal Components -->
+  <AboutModal />
+  <ContactModal />
 </div>
 
 <!-- Header functionality script -->
 <script>
+  import { isModalActive } from '../modal/modal-manager.js';
+
   class MinimalistHeader {
     constructor() {
       this.menuButton = document.querySelector('.menu-button');
       this.slideHeader = document.querySelector('.slide-header');
-      this.aboutButton = document.querySelector('.about-button');
-      this.aboutModal = document.querySelector('.about-modal-overlay');
-      this.closeModalButton = document.querySelector('.close-modal-button');
       this.isMenuOpen = false;
-      this.isModalOpen = false;
       
       this.init();
     }
@@ -92,31 +71,17 @@ const headerClasses = [
         this.menuButton.addEventListener('click', () => this.toggleMenu());
       }
 
-      if (this.aboutButton && this.aboutModal) {
-        this.aboutButton.addEventListener('click', () => this.openAboutModal());
-      }
-
-      if (this.closeModalButton) {
-        this.closeModalButton.addEventListener('click', () => this.closeAboutModal());
-      }
-
-      // Close modal on overlay click
-      if (this.aboutModal) {
-        this.aboutModal.addEventListener('click', (e) => {
-          if (e.target === this.aboutModal) {
-            this.closeAboutModal();
-          }
-        });
-      }
-
-      // Close modal on escape key
+      // Close menu on escape key (if no modal is open)
       document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          if (this.isModalOpen) {
-            this.closeAboutModal();
-          } else if (this.isMenuOpen) {
-            this.closeMenu();
-          }
+        if (e.key === 'Escape' && this.isMenuOpen && !isModalActive()) {
+          this.closeMenu();
+        }
+      });
+
+      // Close menu when a modal is opened
+      document.addEventListener('modal:opened', () => {
+        if (this.isMenuOpen) {
+          this.closeMenu();
         }
       });
     }
@@ -134,6 +99,9 @@ const headerClasses = [
       this.menuButton.setAttribute('aria-expanded', 'true');
       this.slideHeader.setAttribute('aria-hidden', 'false');
       this.isMenuOpen = true;
+      
+      // Announce to screen readers
+      this.announceToScreenReader('Navigation menu opened');
     }
 
     closeMenu() {
@@ -141,30 +109,32 @@ const headerClasses = [
       this.menuButton.setAttribute('aria-expanded', 'false');
       this.slideHeader.setAttribute('aria-hidden', 'true');
       this.isMenuOpen = false;
+      
+      // Announce to screen readers
+      this.announceToScreenReader('Navigation menu closed');
     }
 
-    openAboutModal() {
-      this.aboutModal.classList.add('about-modal--open');
-      this.aboutModal.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
-      this.isModalOpen = true;
-      
-      // Close the slide menu when opening modal
-      if (this.isMenuOpen) {
-        this.closeMenu();
+    announceToScreenReader(message) {
+      // Create or find existing live region for header announcements
+      let liveRegion = document.getElementById('header-live-region');
+      if (!liveRegion) {
+        liveRegion = document.createElement('div');
+        liveRegion.id = 'header-live-region';
+        liveRegion.setAttribute('aria-live', 'polite');
+        liveRegion.setAttribute('aria-atomic', 'true');
+        liveRegion.style.position = 'absolute';
+        liveRegion.style.left = '-10000px';
+        liveRegion.style.width = '1px';
+        liveRegion.style.height = '1px';
+        liveRegion.style.overflow = 'hidden';
+        document.body.appendChild(liveRegion);
       }
 
-      // Focus trap - focus on close button
+      // Clear and set message
+      liveRegion.textContent = '';
       setTimeout(() => {
-        this.closeModalButton.focus();
+        liveRegion.textContent = message;
       }, 100);
-    }
-
-    closeAboutModal() {
-      this.aboutModal.classList.remove('about-modal--open');
-      this.aboutModal.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-      this.isModalOpen = false;
     }
   }
 
@@ -266,103 +236,22 @@ const headerClasses = [
     width: 100%;
   }
 
-  /* About Modal */
-  .about-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(5px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    visibility: hidden;
-    transition: all var(--transition-slow);
-    z-index: 1100;
-    padding: var(--spacing-lg);
+  /* Modal trigger styling - override ModalTrigger styles for nav context */
+  .nav-button.modal-trigger {
+    background: none !important;
+    color: var(--color-text-primary) !important;
+    padding: var(--spacing-xs) var(--spacing-md) !important;
+    font-family: var(--font-alt-heading) !important;
+    font-size: var(--text-lg) !important;
+    font-weight: 400 !important;
+    letter-spacing: var(--tracking-wider) !important;
   }
 
-  .about-modal--open {
-    opacity: 1;
-    visibility: visible;
-  }
-
-  .about-modal-content {
-    background: var(--color-background);
-    width: 70vw; /* Desktop: 70vw */
-    max-width: 600px;
-    min-height: 50vh;
-    border-radius: 2px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    transform: scale(0.9) translateY(20px);
-    transition: all var(--transition-slow);
-    overflow: hidden;
-  }
-
-  .about-modal--open .about-modal-content {
-    transform: scale(1) translateY(0);
-  }
-
-  .about-modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-md);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  }
-
-  .about-title {
-    font-family: var(--font-alt-heading);
-    font-size: var(--text-2xl);
-    font-weight: 400;
-    letter-spacing: var(--tracking-wider);
-    color: var(--color-text-primary);
-    margin: 0;
-  }
-
-  .close-modal-button {
-    background: none;
-    border: none;
-    font-size: var(--text-2xl);
-    color: var(--color-text-primary);
-    cursor: pointer;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all var(--transition-normal);
-  }
-
-  .close-modal-button:hover {
-    color: var(--color-primary);
-    background-color: rgba(0, 0, 0, 0.05);
-    border-radius: 50%;
-  }
-
-  .close-modal-button:focus {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
-  }
-
-  .about-modal-body {
-    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg);
-  }
-
-  .about-text {
-    font-family: var(--font-alt-heading);
-    font-size: var(--text-base);
-    font-weight: 300;
-    line-height: var(--leading-relaxed);
-    color: var(--color-text-primary);
-    margin-bottom: var(--spacing-md);
-  }
-
-  .about-text:last-child {
-    margin-bottom: 0;
+  .nav-button.modal-trigger:hover {
+    color: var(--color-primary) !important;
+    background: none !important;
+    transform: none !important;
+    box-shadow: none !important;
   }
 
   /* Mobile responsive adjustments */
@@ -381,21 +270,9 @@ const headerClasses = [
       padding: var(--spacing-sm);
     }
 
-    /* Mobile: 100vw width for about modal */
-    .about-modal-content {
-      width: 100vw;
-      height: 100vh;
-      border-radius: 0;
-      max-width: none;
-      min-height: 100vh;
-    }
-
-    .about-modal-overlay {
-      padding: 0;
-    }
-
-    .about-title {
-      font-size: var(--text-xl);
+    .nav-button.modal-trigger {
+      font-size: var(--text-base) !important;
+      padding: var(--spacing-sm) !important;
     }
   }
 
@@ -424,17 +301,11 @@ const headerClasses = [
       background-color: white;
       border-bottom-color: black;
     }
-
-    .about-modal-overlay {
-      background-color: rgba(0, 0, 0, 0.95);
-    }
   }
 
   /* Reduced motion support */
   @media (prefers-reduced-motion: reduce) {
     .slide-header,
-    .about-modal-overlay,
-    .about-modal-content,
     .nav-button,
     .nav-button::after {
       transition: none;
