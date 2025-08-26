@@ -1,0 +1,490 @@
+---
+import FormField from './FormField.astro';
+import FormMessage from './FormMessage.astro';
+
+const subjectOptions = [
+  { value: 'general', label: 'General Inquiry' },
+  { value: 'project', label: 'Project Collaboration' },
+  { value: 'commission', label: 'Commission Request' },
+  { value: 'press', label: 'Press & Media' },
+  { value: 'other', label: 'Other' },
+];
+---
+
+<form 
+  class="contact-form" 
+  data-contact-form
+  novalidate
+  aria-label="Contact form"
+>
+  <div class="contact-form__fields">
+    <FormField
+      type="text"
+      name="name"
+      label="Full Name"
+      placeholder="Your full name"
+      required
+      validation="minLength:2,maxLength:50"
+    />
+
+    <FormField
+      type="email"
+      name="email"
+      label="Email Address"
+      placeholder="your@email.com"
+      required
+      validation="email,maxLength:100"
+    />
+
+    <FormField
+      type="select"
+      name="subject"
+      label="Subject"
+      required
+      options={subjectOptions}
+      validation="required"
+    />
+
+    <FormField
+      type="textarea"
+      name="message"
+      label="Message"
+      placeholder="Tell me about your project or inquiry..."
+      required
+      rows={6}
+      validation="minLength:10,maxLength:1000"
+    >
+      <div slot="help">
+        Share details about your project, timeline, and any specific requirements.
+      </div>
+    </FormField>
+  </div>
+
+  <div class="contact-form__actions">
+    <button 
+      type="submit" 
+      class="contact-form__submit focusable"
+      data-submit-button
+    >
+      <span class="contact-form__submit-text">Send Message</span>
+      <span class="contact-form__submit-loading" aria-hidden="true">
+        <svg class="contact-form__spinner" width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"/>
+          <path fill="currentColor" opacity="0.75" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+        </svg>
+        Sending...
+      </span>
+    </button>
+  </div>
+
+  <!-- Message container for form-wide messages -->
+  <div class="contact-form__messages" data-form-messages>
+    <!-- Success/error messages will be inserted here -->
+  </div>
+</form>
+
+<style>
+  .contact-form {
+    width: 100%;
+    max-width: 600px;
+  }
+
+  .contact-form__fields {
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .contact-form__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .contact-form__submit {
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: 2px;
+    font-family: var(--font-alt-heading);
+    font-size: var(--text-base);
+    font-weight: 400;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    min-width: 140px;
+    position: relative;
+  }
+
+  .contact-form__submit:hover:not(:disabled) {
+    background: var(--color-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(50, 92, 89, 0.3);
+  }
+
+  .contact-form__submit:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  .contact-form__submit:disabled {
+    background: rgba(50, 92, 89, 0.6);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .contact-form__submit-loading {
+    display: none;
+  }
+
+  .contact-form--submitting .contact-form__submit-text {
+    display: none;
+  }
+
+  .contact-form--submitting .contact-form__submit-loading {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
+
+  .contact-form__spinner {
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .contact-form__messages {
+    margin-top: var(--spacing-md);
+  }
+
+  /* Success state */
+  .contact-form--success .contact-form__submit {
+    background: #16a34a;
+  }
+
+  .contact-form--success .contact-form__submit:hover:not(:disabled) {
+    background: #15803d;
+  }
+
+  /* Error state - highlight submit button */
+  .contact-form--error .contact-form__submit {
+    background: #dc2626;
+  }
+
+  .contact-form--error .contact-form__submit:hover:not(:disabled) {
+    background: #b91c1c;
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .contact-form__submit {
+      border: 2px solid;
+      font-weight: 600;
+    }
+  }
+
+  /* Reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    .contact-form__submit {
+      transition: none;
+    }
+
+    .contact-form__submit:hover:not(:disabled) {
+      transform: none;
+    }
+
+    .contact-form__spinner {
+      animation: none;
+    }
+  }
+
+  /* Mobile optimizations */
+  @media (max-width: var(--breakpoint-sm)) {
+    .contact-form__actions {
+      justify-content: stretch;
+    }
+
+    .contact-form__submit {
+      width: 100%;
+      padding: var(--spacing-md);
+      font-size: var(--text-lg);
+    }
+  }
+</style>
+
+<script>
+  import { 
+    FormValidator, 
+    contactFormConfig, 
+    createSafeContactFormData,
+    type ContactFormData,
+    type ValidationResult 
+  } from './FormValidation';
+
+  /**
+   * Contact Form Handler with real-time validation
+   */
+  class ContactFormHandler {
+    private form: HTMLFormElement;
+    private validator: FormValidator;
+    private isSubmitting = false;
+    private fields: Map<string, HTMLElement> = new Map();
+    private submitButton: HTMLButtonElement;
+    private messagesContainer: HTMLElement;
+
+    constructor(formElement: HTMLFormElement) {
+      this.form = formElement;
+      this.validator = new FormValidator();
+      this.submitButton = this.form.querySelector('[data-submit-button]') as HTMLButtonElement;
+      this.messagesContainer = this.form.querySelector('[data-form-messages]') as HTMLElement;
+      
+      this.setupFields();
+      this.attachEventListeners();
+    }
+
+    private setupFields(): void {
+      contactFormConfig.forEach(config => {
+        const fieldContainer = this.form.querySelector(`[data-field-name="${config.name}"]`) as HTMLElement;
+        const fieldElement = fieldContainer?.querySelector('input, textarea, select') as HTMLElement;
+        
+        if (fieldElement) {
+          this.fields.set(config.name, fieldElement);
+        }
+      });
+    }
+
+    private attachEventListeners(): void {
+      // Form submission
+      this.form.addEventListener('submit', this.handleSubmit.bind(this));
+
+      // Real-time validation on blur and input
+      this.fields.forEach((field, name) => {
+        field.addEventListener('blur', () => this.validateField(name));
+        field.addEventListener('input', () => this.clearFieldError(name));
+      });
+    }
+
+    private async handleSubmit(event: SubmitEvent): Promise<void> {
+      event.preventDefault();
+      
+      if (this.isSubmitting) return;
+
+      // Client-side validation
+      const formData = new FormData(this.form);
+      const validation = this.validator.validateForm(formData, contactFormConfig);
+      
+      if (!validation.isValid) {
+        this.displayErrors(validation.errors);
+        this.focusFirstError();
+        return;
+      }
+
+      // Clear any previous errors
+      this.clearAllErrors();
+
+      // Submit to API
+      await this.submitToAPI(formData);
+    }
+
+    private async submitToAPI(formData: FormData): Promise<void> {
+      this.setSubmittingState(true);
+
+      try {
+        const contactData = createSafeContactFormData(Object.fromEntries(formData));
+        
+        const response = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: JSON.stringify(contactData)
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          this.showSuccessMessage(result.message || 'Message sent successfully!');
+          this.resetForm();
+          this.form.classList.add('contact-form--success');
+          
+          // Announce success to screen readers
+          this.announceToScreenReader('Message sent successfully');
+        } else {
+          // Handle API validation errors
+          if (result.errors) {
+            this.displayErrors(result.errors);
+          } else {
+            this.showErrorMessage(result.message || 'Failed to send message. Please try again.');
+          }
+          this.form.classList.add('contact-form--error');
+        }
+        
+      } catch (error) {
+        console.error('Contact form submission error:', error);
+        this.showErrorMessage('Network error. Please check your connection and try again.');
+        this.form.classList.add('contact-form--error');
+      } finally {
+        this.setSubmittingState(false);
+      }
+    }
+
+    private validateField(fieldName: string): void {
+      const fieldConfig = contactFormConfig.find(config => config.name === fieldName);
+      const fieldElement = this.fields.get(fieldName) as HTMLInputElement;
+      
+      if (!fieldConfig || !fieldElement) return;
+
+      const value = fieldElement.value;
+      const error = this.validator.validateField(value, fieldConfig.rules);
+
+      if (error) {
+        this.showFieldError(fieldName, error);
+      } else {
+        this.clearFieldError(fieldName);
+      }
+    }
+
+    private showFieldError(fieldName: string, errorMessage: string): void {
+      const fieldContainer = this.form.querySelector(`[data-field-name="${fieldName}"]`) as HTMLElement;
+      const errorElement = fieldContainer?.querySelector('.form-field__error') as HTMLElement;
+      
+      if (fieldContainer && errorElement) {
+        fieldContainer.classList.add('form-field--error');
+        errorElement.textContent = errorMessage;
+        errorElement.style.display = 'flex';
+      }
+    }
+
+    private clearFieldError(fieldName: string): void {
+      const fieldContainer = this.form.querySelector(`[data-field-name="${fieldName}"]`) as HTMLElement;
+      const errorElement = fieldContainer?.querySelector('.form-field__error') as HTMLElement;
+      
+      if (fieldContainer && errorElement) {
+        fieldContainer.classList.remove('form-field--error', 'form-field--valid');
+        errorElement.textContent = '';
+        errorElement.style.display = 'none';
+        
+        // Add valid state if field has content
+        const fieldElement = this.fields.get(fieldName) as HTMLInputElement;
+        if (fieldElement?.value.trim()) {
+          fieldContainer.classList.add('form-field--valid');
+        }
+      }
+    }
+
+    private displayErrors(errors: Record<string, string>): void {
+      Object.entries(errors).forEach(([fieldName, errorMessage]) => {
+        this.showFieldError(fieldName, errorMessage);
+      });
+    }
+
+    private clearAllErrors(): void {
+      this.fields.forEach((_, fieldName) => {
+        this.clearFieldError(fieldName);
+      });
+      this.messagesContainer.innerHTML = '';
+      this.form.classList.remove('contact-form--error', 'contact-form--success');
+    }
+
+    private focusFirstError(): void {
+      const firstErrorField = this.form.querySelector('.form-field--error input, .form-field--error textarea, .form-field--error select') as HTMLElement;
+      if (firstErrorField) {
+        firstErrorField.focus();
+      }
+    }
+
+    private showSuccessMessage(message: string): void {
+      const messageHTML = `
+        <div class="form-message form-message--success" role="status" aria-live="polite">
+          <div class="form-message__icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="form-message__content">
+            <p class="form-message__text">${message}</p>
+          </div>
+        </div>
+      `;
+      this.messagesContainer.innerHTML = messageHTML;
+    }
+
+    private showErrorMessage(message: string): void {
+      const messageHTML = `
+        <div class="form-message form-message--error" role="alert" aria-live="assertive">
+          <div class="form-message__icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="form-message__content">
+            <p class="form-message__text">${message}</p>
+          </div>
+        </div>
+      `;
+      this.messagesContainer.innerHTML = messageHTML;
+    }
+
+    private setSubmittingState(isSubmitting: boolean): void {
+      this.isSubmitting = isSubmitting;
+      this.submitButton.disabled = isSubmitting;
+      
+      if (isSubmitting) {
+        this.form.classList.add('contact-form--submitting');
+      } else {
+        this.form.classList.remove('contact-form--submitting');
+      }
+    }
+
+    private resetForm(): void {
+      this.form.reset();
+      this.clearAllErrors();
+    }
+
+    private announceToScreenReader(message: string): void {
+      // Create or find existing live region
+      let liveRegion = document.getElementById('form-live-region');
+      if (!liveRegion) {
+        liveRegion = document.createElement('div');
+        liveRegion.id = 'form-live-region';
+        liveRegion.setAttribute('aria-live', 'polite');
+        liveRegion.setAttribute('aria-atomic', 'true');
+        liveRegion.style.position = 'absolute';
+        liveRegion.style.left = '-10000px';
+        liveRegion.style.width = '1px';
+        liveRegion.style.height = '1px';
+        liveRegion.style.overflow = 'hidden';
+        document.body.appendChild(liveRegion);
+      }
+
+      // Clear and set message
+      liveRegion.textContent = '';
+      setTimeout(() => {
+        liveRegion.textContent = message;
+      }, 100);
+    }
+  }
+
+  // Initialize contact forms when DOM is ready
+  function initializeContactForms(): void {
+    const forms = document.querySelectorAll('[data-contact-form]') as NodeListOf<HTMLFormElement>;
+    forms.forEach(form => {
+      new ContactFormHandler(form);
+    });
+  }
+
+  // Initialize on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeContactForms);
+  } else {
+    initializeContactForms();
+  }
+</script>
