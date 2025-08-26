@@ -113,12 +113,28 @@ class ModalManager {
     // Restore focus
     const shouldRestoreFocus = modal.getAttribute('data-restore-focus') !== 'false';
     if (shouldRestoreFocus && this.previousFocus) {
-      // Use setTimeout to ensure modal is hidden before focusing
-      setTimeout(() => {
-        if (this.previousFocus && typeof this.previousFocus.focus === 'function') {
-          this.previousFocus.focus();
-        }
-      }, 100);
+      // Use requestAnimationFrame and setTimeout to ensure modal is fully hidden
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          try {
+            if (this.previousFocus && typeof this.previousFocus.focus === 'function') {
+              // Check if element is still in DOM and focusable
+              if (document.contains(this.previousFocus) && !this.previousFocus.disabled) {
+                this.previousFocus.focus();
+                
+                // Verify focus was restored
+                if (document.activeElement !== this.previousFocus) {
+                  console.warn('Modal focus management: Could not restore focus to original element');
+                  // Try to focus body as fallback
+                  document.body.focus();
+                }
+              }
+            }
+          } catch (error) {
+            console.error('Modal focus restoration error:', error);
+          }
+        }, 200);
+      });
     }
 
     // Clear references
@@ -170,15 +186,43 @@ class ModalManager {
     }
 
     if (!targetElement) {
-      // Focus the modal itself as last resort
-      modal.setAttribute('tabindex', '-1');
-      targetElement = modal;
+      // Try to find modal title for focus
+      targetElement = modal.querySelector('.modal__title');
+      if (targetElement) {
+        targetElement.setAttribute('tabindex', '-1');
+      }
+    }
+
+    if (!targetElement) {
+      // Focus the modal container as last resort
+      const container = modal.querySelector('.modal__content');
+      if (container) {
+        container.setAttribute('tabindex', '-1');
+        targetElement = container;
+      }
     }
 
     if (targetElement) {
-      setTimeout(() => {
-        targetElement.focus();
-      }, 100);
+      // Use requestAnimationFrame to ensure DOM is ready and modal is visible
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          try {
+            targetElement.focus();
+            
+            // Verify focus was set correctly
+            if (document.activeElement !== targetElement) {
+              console.warn('Modal focus management: Focus not set correctly, trying alternative');
+              // Try the close button as final fallback
+              const closeButton = modal.querySelector('[data-modal-close]');
+              if (closeButton) {
+                closeButton.focus();
+              }
+            }
+          } catch (error) {
+            console.error('Modal focus management error:', error);
+          }
+        }, 150);
+      });
     }
   }
 

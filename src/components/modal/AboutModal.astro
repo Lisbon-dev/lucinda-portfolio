@@ -261,6 +261,13 @@ const { class: className } = Astro.props;
     outline-offset: 2px;
   }
 
+  /* Ensure button stays interactive during modal transitions */
+  .about-cta__button {
+    pointer-events: auto;
+    position: relative;
+    z-index: 1;
+  }
+
   /* Mobile optimizations */
   @media (max-width: var(--breakpoint-sm)) {
     .about-hero {
@@ -314,27 +321,62 @@ const { class: className } = Astro.props;
 
 <script>
   // Handle modal switching from About to Contact
-  document.addEventListener('DOMContentLoaded', () => {
+  function initModalSwitching() {
     const switchButtons = document.querySelectorAll('[data-switch-modal]');
     
     switchButtons.forEach(button => {
-      button.addEventListener('click', (event) => {
-        event.preventDefault();
-        
-        const targetModalId = button.getAttribute('data-switch-modal');
-        if (!targetModalId) return;
-
-        // Import modal manager functions
-        import('../../scripts/modal-manager.js').then(({ closeModal, openModal }) => {
-          // Close current modal and open target modal
-          closeModal();
-          
-          // Small delay to allow first modal to close
-          setTimeout(() => {
-            openModal(targetModalId, button);
-          }, 100);
-        });
-      });
+      // Remove any existing listeners to prevent duplicates
+      button.removeEventListener('click', handleModalSwitch);
+      button.addEventListener('click', handleModalSwitch);
     });
+  }
+
+  async function handleModalSwitch(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const button = event.currentTarget;
+    const targetModalId = button.getAttribute('data-switch-modal');
+    
+    if (!targetModalId) return;
+
+    try {
+      // Disable button temporarily to prevent double-clicks
+      button.disabled = true;
+      button.style.pointerEvents = 'none';
+      
+      // Import modal manager functions
+      const { closeModal, openModal } = await import('../../scripts/modal-manager.js');
+      
+      // Close current modal
+      closeModal();
+      
+      // Wait for modal to close, then open target modal
+      setTimeout(() => {
+        openModal(targetModalId, button);
+        
+        // Re-enable button
+        button.disabled = false;
+        button.style.pointerEvents = 'auto';
+      }, 300);
+      
+    } catch (error) {
+      console.error('Modal switching error:', error);
+      // Re-enable button on error
+      button.disabled = false;
+      button.style.pointerEvents = 'auto';
+    }
+  }
+
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initModalSwitching);
+  } else {
+    initModalSwitching();
+  }
+
+  // Re-initialize when modal content is dynamically loaded
+  document.addEventListener('modal:opened', () => {
+    setTimeout(initModalSwitching, 100);
   });
 </script>
