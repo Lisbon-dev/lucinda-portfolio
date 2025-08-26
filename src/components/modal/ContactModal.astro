@@ -1,0 +1,198 @@
+---
+import Modal from './Modal.astro';
+import ContactForm from '../forms/ContactForm.astro';
+
+export interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<Modal
+  id="contact-modal"
+  title="Get in Touch"
+  size="md"
+  class={className}
+>
+  <div slot="description">
+    Send a message to discuss projects, collaborations, or general inquiries.
+  </div>
+
+  <div slot="content" class="contact-content">
+    <div class="contact-intro">
+      <p class="contact-intro__text">
+        I'd love to hear about your project or creative vision. Whether you're looking 
+        for illustration work, design direction, or just want to say hello, don't 
+        hesitate to reach out.
+      </p>
+      <div class="contact-intro__details">
+        <div class="contact-detail">
+          <span class="contact-detail__label">Response time:</span>
+          <span class="contact-detail__value">Usually within 24 hours</span>
+        </div>
+        <div class="contact-detail">
+          <span class="contact-detail__label">Based in:</span>
+          <span class="contact-detail__value">[Your Location]</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="contact-form-container">
+      <ContactForm />
+    </div>
+
+    <div class="contact-alternative">
+      <p class="contact-alternative__text">
+        Prefer email? You can also reach me directly at 
+        <a href="mailto:hello@lucindaburman.com" class="contact-email focusable">
+          hello@lucindaburman.com
+        </a>
+      </p>
+    </div>
+  </div>
+</Modal>
+
+<style>
+  .contact-content {
+    max-width: 100%;
+  }
+
+  .contact-intro {
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .contact-intro__text {
+    font-family: var(--font-alt-heading);
+    font-size: var(--text-base);
+    color: var(--color-text-primary);
+    font-weight: 300;
+    line-height: var(--leading-relaxed);
+    margin: 0 0 var(--spacing-md);
+  }
+
+  .contact-intro__details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+  }
+
+  .contact-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  @media (min-width: var(--breakpoint-sm)) {
+    .contact-detail {
+      flex-direction: row;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
+
+  .contact-detail__label {
+    font-family: var(--font-alt-heading);
+    font-size: var(--text-sm);
+    color: var(--color-primary);
+    font-weight: 400;
+  }
+
+  .contact-detail__value {
+    font-family: var(--font-alt-heading);
+    font-size: var(--text-sm);
+    color: rgba(0, 0, 0, 0.7);
+    font-weight: 300;
+  }
+
+  .contact-form-container {
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .contact-alternative {
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  .contact-alternative__text {
+    font-family: var(--font-alt-heading);
+    font-size: var(--text-sm);
+    color: rgba(0, 0, 0, 0.6);
+    font-weight: 300;
+    margin: 0;
+    line-height: var(--leading-normal);
+  }
+
+  .contact-email {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 400;
+    transition: all var(--transition-fast);
+    border-radius: 2px;
+    padding: 0.125rem 0.25rem;
+    margin: 0 -0.25rem;
+  }
+
+  .contact-email:hover {
+    color: var(--color-primary-hover);
+    background: rgba(50, 92, 89, 0.05);
+  }
+
+  .contact-email:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    background: rgba(50, 92, 89, 0.05);
+  }
+
+  /* Mobile optimizations */
+  @media (max-width: var(--breakpoint-sm)) {
+    .contact-intro__details {
+      flex-direction: column;
+      gap: var(--spacing-xs);
+    }
+
+    .contact-detail {
+      align-items: flex-start;
+    }
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .contact-email {
+      text-decoration: underline;
+      font-weight: 600;
+    }
+  }
+
+  /* Reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    .contact-email {
+      transition: none;
+    }
+  }
+
+  /* Dark mode support (if implemented) */
+  @media (prefers-color-scheme: dark) {
+    .contact-intro,
+    .contact-alternative {
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .contact-intro__text {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .contact-detail__value,
+    .contact-alternative__text {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .contact-email:hover,
+    .contact-email:focus {
+      background: rgba(50, 92, 89, 0.2);
+    }
+  }
+</style>
