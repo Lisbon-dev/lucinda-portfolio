@@ -68,11 +68,16 @@ class ModalManager {
     // Mark background content as inert
     this.setBackgroundInert(true);
 
-    // Set up focus management
-    this.setupFocusManagement(modal);
+    // Wait for modal to be visible before setting up focus
+    requestAnimationFrame(() => {
+      // Set up focus management
+      this.setupFocusManagement(modal);
 
-    // Set initial focus
-    this.setInitialFocus(modal);
+      // Set initial focus after a small delay
+      setTimeout(() => {
+        this.setInitialFocus(modal);
+      }, 100);
+    });
 
     // Add event listeners
     document.addEventListener('keydown', this.handleKeyDown);
@@ -110,31 +115,21 @@ class ModalManager {
     document.removeEventListener('keydown', this.handleKeyDown);
     modal.removeEventListener('click', this.handleClick);
 
-    // Restore focus
+    // Restore focus immediately after modal operations
     const shouldRestoreFocus = modal.getAttribute('data-restore-focus') !== 'false';
     if (shouldRestoreFocus && this.previousFocus) {
-      // Use requestAnimationFrame and setTimeout to ensure modal is fully hidden
-      requestAnimationFrame(() => {
-        setTimeout(() => {
-          try {
-            if (this.previousFocus && typeof this.previousFocus.focus === 'function') {
-              // Check if element is still in DOM and focusable
-              if (document.contains(this.previousFocus) && !this.previousFocus.disabled) {
-                this.previousFocus.focus();
-                
-                // Verify focus was restored
-                if (document.activeElement !== this.previousFocus) {
-                  console.warn('Modal focus management: Could not restore focus to original element');
-                  // Try to focus body as fallback
-                  document.body.focus();
-                }
-              }
-            }
-          } catch (error) {
-            console.error('Modal focus restoration error:', error);
+      try {
+        if (this.previousFocus && typeof this.previousFocus.focus === 'function') {
+          // Check if element is still in DOM and focusable
+          if (document.contains(this.previousFocus)) {
+            setTimeout(() => {
+              this.previousFocus.focus();
+            }, 50);
           }
-        }, 200);
-      });
+        }
+      } catch (error) {
+        console.error('Modal focus restoration error:', error);
+      }
     }
 
     // Clear references
@@ -167,62 +162,29 @@ class ModalManager {
    * Set initial focus based on modal configuration
    */
   setInitialFocus(modal) {
-    const initialFocusSelector = modal.getAttribute('data-initial-focus');
-    let targetElement = null;
-
-    if (initialFocusSelector) {
-      targetElement = modal.querySelector(initialFocusSelector);
+    // Simple, reliable focus setting
+    const closeButton = modal.querySelector('[data-modal-close]');
+    
+    if (closeButton) {
+      closeButton.focus();
+      console.log('Modal focus set to close button');
+      return;
     }
 
-    // Fallback hierarchy for initial focus
-    if (!targetElement) {
-      // Try to find the close button
-      targetElement = modal.querySelector('[data-modal-close]');
+    // If no close button, try first input
+    const firstInput = modal.querySelector('input, textarea, select, button:not([data-modal-close])');
+    if (firstInput) {
+      firstInput.focus();
+      console.log('Modal focus set to first input');
+      return;
     }
 
-    if (!targetElement) {
-      // Try first focusable element
-      targetElement = this.firstFocusableElement;
-    }
-
-    if (!targetElement) {
-      // Try to find modal title for focus
-      targetElement = modal.querySelector('.modal__title');
-      if (targetElement) {
-        targetElement.setAttribute('tabindex', '-1');
-      }
-    }
-
-    if (!targetElement) {
-      // Focus the modal container as last resort
-      const container = modal.querySelector('.modal__content');
-      if (container) {
-        container.setAttribute('tabindex', '-1');
-        targetElement = container;
-      }
-    }
-
-    if (targetElement) {
-      // Use requestAnimationFrame to ensure DOM is ready and modal is visible
-      requestAnimationFrame(() => {
-        setTimeout(() => {
-          try {
-            targetElement.focus();
-            
-            // Verify focus was set correctly
-            if (document.activeElement !== targetElement) {
-              console.warn('Modal focus management: Focus not set correctly, trying alternative');
-              // Try the close button as final fallback
-              const closeButton = modal.querySelector('[data-modal-close]');
-              if (closeButton) {
-                closeButton.focus();
-              }
-            }
-          } catch (error) {
-            console.error('Modal focus management error:', error);
-          }
-        }, 150);
-      });
+    // Last resort: focus the modal container
+    const container = modal.querySelector('.modal__content');
+    if (container) {
+      container.setAttribute('tabindex', '-1');
+      container.focus();
+      console.log('Modal focus set to container');
     }
   }
 
@@ -253,19 +215,27 @@ class ModalManager {
    * Handle tab navigation within modal (focus trapping)
    */
   handleTabNavigation(event) {
-    if (!this.firstFocusableElement || !this.lastFocusableElement) return;
+    // Refresh focusable elements in case DOM changed
+    const modal = document.getElementById(this.activeModal);
+    if (!modal) return;
+    
+    this.focusableElements = this.getFocusableElements(modal);
+    const firstFocusable = this.focusableElements[0];
+    const lastFocusable = this.focusableElements[this.focusableElements.length - 1];
+
+    if (!firstFocusable) return;
 
     if (event.shiftKey) {
       // Shift + Tab (backwards)
-      if (document.activeElement === this.firstFocusableElement) {
+      if (document.activeElement === firstFocusable || !modal.contains(document.activeElement)) {
         event.preventDefault();
-        this.lastFocusableElement.focus();
+        (lastFocusable || firstFocusable).focus();
       }
     } else {
-      // Tab (forwards)
-      if (document.activeElement === this.lastFocusableElement) {
+      // Tab (forwards)  
+      if (document.activeElement === lastFocusable || !modal.contains(document.activeElement)) {
         event.preventDefault();
-        this.firstFocusableElement.focus();
+        firstFocusable.focus();
       }
     }
   }
