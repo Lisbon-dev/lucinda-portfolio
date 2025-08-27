@@ -4,6 +4,8 @@ import BaseSection from "../../components/core/BaseSection.astro";
 import Container from "../../components/core/Container.astro";
 import Typography from "../../components/core/Typography.astro";
 import Header from "../../components/layout/Header.astro";
+import AboutDialog from "../../components/dialog/AboutDialog.astro";
+import ContactDialog from "../../components/dialog/ContactDialog.astro";
 import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
@@ -117,6 +119,10 @@ const nextProject = currentIndex < allProjects.length - 1 ? allProjects[currentI
       </div>
     </div>
   </main>
+  
+  <!-- Dialog Modals -->
+  <AboutDialog />
+  <ContactDialog />
 </Layout>
 
 <style>

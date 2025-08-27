@@ -1,8 +1,4 @@
 ---
-import AboutModal from '../modal/AboutModal.astro';
-import ContactModal from '../modal/ContactModal.astro';
-import ModalTrigger from '../modal/ModalTrigger.astro';
-
 export interface Props {
   class?: string;
 }
@@ -32,9 +28,12 @@ const headerClasses = [
   <!-- Slide-down header -->
   <header class="slide-header" id="slide-header" aria-hidden="true">
     <nav class="slide-nav" role="navigation" aria-label="Main navigation">
-      <ModalTrigger modalId="about-modal" variant="text" class="nav-button about-button">
+      <button 
+        class="nav-button about-button"
+        onclick="document.getElementById('about-dialog').showModal()"
+      >
         About
-      </ModalTrigger>
+      </button>
       <a 
         href="/projects"
         class="nav-button work-button"
@@ -42,22 +41,23 @@ const headerClasses = [
       >
         Work
       </a>
-      <ModalTrigger modalId="contact-modal" variant="text" class="nav-button contact-button">
+      <button 
+        class="nav-button contact-button"
+        onclick="document.getElementById('contact-dialog').showModal()"
+      >
         Contact
-      </ModalTrigger>
+      </button>
     </nav>
   </header>
-
-  <!-- Modal Components -->
-  <AboutModal />
-  <ContactModal />
 </div>
 
 <!-- Header functionality script -->
 <script>
-  import { isModalActive } from '../../scripts/modal-manager.js';
-
   class MinimalistHeader {
+    menuButton: HTMLElement | null;
+    slideHeader: HTMLElement | null;
+    isMenuOpen: boolean;
+
     constructor() {
       this.menuButton = document.querySelector('.menu-button');
       this.slideHeader = document.querySelector('.slide-header');
@@ -71,16 +71,9 @@ const headerClasses = [
         this.menuButton.addEventListener('click', () => this.toggleMenu());
       }
 
-      // Close menu on escape key (if no modal is open)
+      // Close menu on escape key
       document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && this.isMenuOpen && !isModalActive()) {
-          this.closeMenu();
-        }
-      });
-
-      // Close menu when a modal is opened
-      document.addEventListener('modal:opened', () => {
-        if (this.isMenuOpen) {
+        if (e.key === 'Escape' && this.isMenuOpen) {
           this.closeMenu();
         }
       });
@@ -114,7 +107,7 @@ const headerClasses = [
       this.announceToScreenReader('Navigation menu closed');
     }
 
-    announceToScreenReader(message) {
+    announceToScreenReader(message: string) {
       // Create or find existing live region for header announcements
       let liveRegion = document.getElementById('header-live-region');
       if (!liveRegion) {
@@ -236,22 +229,11 @@ const headerClasses = [
     width: 100%;
   }
 
-  /* Modal trigger styling - override ModalTrigger styles for nav context */
-  .nav-button.modal-trigger {
-    background: none !important;
-    color: var(--color-text-primary) !important;
-    padding: var(--spacing-xs) var(--spacing-md) !important;
-    font-family: var(--font-alt-heading) !important;
-    font-size: var(--text-lg) !important;
-    font-weight: 400 !important;
-    letter-spacing: var(--tracking-wider) !important;
-  }
-
-  .nav-button.modal-trigger:hover {
-    color: var(--color-primary) !important;
-    background: none !important;
-    transform: none !important;
-    box-shadow: none !important;
+  /* Button styling for nav context */
+  button.nav-button {
+    background: none;
+    border: none;
+    cursor: pointer;
   }
 
   /* Mobile responsive adjustments */
@@ -270,9 +252,9 @@ const headerClasses = [
       padding: var(--spacing-sm);
     }
 
-    .nav-button.modal-trigger {
-      font-size: var(--text-base) !important;
-      padding: var(--spacing-sm) !important;
+    button.nav-button {
+      font-size: var(--text-base);
+      padding: var(--spacing-sm);
     }
   }
 
