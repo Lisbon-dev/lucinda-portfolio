@@ -7,9 +7,13 @@ export interface Props {
 const { id, class: className } = Astro.props;
 ---
 
-<dialog id={id} class={`simple-dialog ${className || ''}`}>
+<dialog id={id} class={`simple-dialog ${className || ""}`}>
   <div class="dialog-content">
-    <button type="button" class="dialog-close" onclick="this.closest('dialog').close()">
+    <button
+      type="button"
+      class="dialog-close"
+      onclick="this.closest('dialog').close()"
+    >
       Close
     </button>
     <div class="content-area">
@@ -19,7 +23,12 @@ const { id, class: className } = Astro.props;
 </dialog>
 
 <style>
-  /* Native dialog styling with Naomi Wilkinson inspiration */
+  /* CSS Custom Properties for Transition Control */
+  :root {
+    --modal-transition-duration: 0.3s;
+    --modal-transition-easing: cubic-bezier(0.4, 0.0, 0.2, 1);
+  }
+
   .simple-dialog {
     /* Mobile-first: Full viewport */
     width: 100vw;
@@ -31,10 +40,30 @@ const { id, class: className } = Astro.props;
     border: none;
     background: var(--color-modal-bg, #f5f4f2);
     color: var(--color-text-primary, #000000);
+    
+    /* Initial hidden state */
+    opacity: 0;
+    transform: scale(0.95);
+    transition: 
+      opacity var(--modal-transition-duration) var(--modal-transition-easing),
+      transform var(--modal-transition-duration) var(--modal-transition-easing);
+    pointer-events: none;
   }
 
-  /* Remove default browser styling */
+  /* Open state with fade in */
+  .simple-dialog[open] {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+  }
+
+  /* Backdrop fade transition */
   .simple-dialog::backdrop {
+    background: rgba(0, 0, 0, 0);
+    transition: background var(--modal-transition-duration) var(--modal-transition-easing);
+  }
+
+  .simple-dialog[open]::backdrop {
     background: rgba(0, 0, 0, 0.4);
   }
 
@@ -83,11 +112,22 @@ const { id, class: className } = Astro.props;
     text-align: center;
     max-width: 100%;
     box-sizing: border-box;
+    
+    /* Content animation */
+    transform: translateY(10px);
+    transition: transform var(--modal-transition-duration) var(--modal-transition-easing);
+  }
+
+  .simple-dialog[open] .content-area {
+    transform: translateY(0);
   }
 
   /* Desktop: 50vw centered modal */
   @media (min-width: 768px) {
     .simple-dialog {
+      position: fixed;
+      inset: 0;
+      margin: auto;
       width: 50vw;
       height: 100vh;
       max-width: 600px;
@@ -96,9 +136,9 @@ const { id, class: className } = Astro.props;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     }
 
-    .simple-dialog::backdrop {
-      backdrop-filter: blur(5px);
+    .simple-dialog[open]::backdrop {
       background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(5px);
     }
 
     .content-area {
@@ -161,8 +201,17 @@ const { id, class: className } = Astro.props;
 
   /* Accessibility improvements */
   @media (prefers-reduced-motion: reduce) {
+    .simple-dialog,
+    .simple-dialog::backdrop,
+    .content-area,
     .dialog-close {
       transition: none;
+      animation: none;
+      transform: none;
+    }
+    
+    .simple-dialog[open] .content-area {
+      transform: none;
     }
   }
 
@@ -170,7 +219,7 @@ const { id, class: className } = Astro.props;
     .simple-dialog {
       border: 2px solid;
     }
-    
+
     .dialog-close {
       border: 1px solid;
     }
@@ -179,14 +228,14 @@ const { id, class: className } = Astro.props;
 
 <script>
   // Enhance accessibility for dialog
-  document.addEventListener('DOMContentLoaded', () => {
-    const dialogs = document.querySelectorAll('.simple-dialog');
-    
-    dialogs.forEach(dialog => {
+  document.addEventListener("DOMContentLoaded", () => {
+    const dialogs = document.querySelectorAll(".simple-dialog");
+
+    dialogs.forEach((dialog) => {
       // Focus the close button when dialog opens
-      dialog.addEventListener('show', () => {
+      dialog.addEventListener("show", () => {
         setTimeout(() => {
-          const closeButton = dialog.querySelector('.dialog-close');
+          const closeButton = dialog.querySelector(".dialog-close") as HTMLButtonElement;
           if (closeButton) {
             closeButton.focus();
           }
