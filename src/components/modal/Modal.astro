@@ -95,6 +95,11 @@ const {
     pointer-events: auto;
   }
 
+  /* Ensure modal content is focusable when active */
+  .modal--active * {
+    pointer-events: auto;
+  }
+
   .modal__backdrop {
     position: absolute;
     top: 0;

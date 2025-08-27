@@ -68,16 +68,14 @@ class ModalManager {
     // Mark background content as inert
     this.setBackgroundInert(true);
 
-    // Wait for modal to be visible before setting up focus
-    requestAnimationFrame(() => {
+    // Wait for modal animation to complete before setting focus
+    setTimeout(() => {
       // Set up focus management
       this.setupFocusManagement(modal);
 
-      // Set initial focus after a small delay
-      setTimeout(() => {
-        this.setInitialFocus(modal);
-      }, 100);
-    });
+      // Set initial focus after modal is fully visible
+      this.setInitialFocus(modal);
+    }, 350); // Wait longer for CSS transition to complete
 
     // Add event listeners
     document.addEventListener('keydown', this.handleKeyDown);
@@ -115,23 +113,10 @@ class ModalManager {
     document.removeEventListener('keydown', this.handleKeyDown);
     modal.removeEventListener('click', this.handleClick);
 
-    // Restore focus immediately after modal operations
+    // Clear references first to avoid null reference errors
     const shouldRestoreFocus = modal.getAttribute('data-restore-focus') !== 'false';
-    if (shouldRestoreFocus && this.previousFocus) {
-      try {
-        if (this.previousFocus && typeof this.previousFocus.focus === 'function') {
-          // Check if element is still in DOM and focusable
-          if (document.contains(this.previousFocus)) {
-            setTimeout(() => {
-              this.previousFocus.focus();
-            }, 50);
-          }
-        }
-      } catch (error) {
-        console.error('Modal focus restoration error:', error);
-      }
-    }
-
+    const focusTarget = this.previousFocus;
+    
     // Clear references
     const closedModalId = this.activeModal;
     this.activeModal = null;
@@ -139,6 +124,23 @@ class ModalManager {
     this.focusableElements = [];
     this.firstFocusableElement = null;
     this.lastFocusableElement = null;
+
+    // Restore focus after clearing references
+    if (shouldRestoreFocus && focusTarget) {
+      setTimeout(() => {
+        try {
+          if (focusTarget && typeof focusTarget.focus === 'function') {
+            // Check if element is still in DOM and focusable
+            if (document.contains(focusTarget)) {
+              focusTarget.focus();
+              console.log('Focus restored to:', focusTarget);
+            }
+          }
+        } catch (error) {
+          console.error('Modal focus restoration error:', error);
+        }
+      }, 100);
+    }
 
     // Announce to screen readers
     this.announceModalClosed();
@@ -162,20 +164,33 @@ class ModalManager {
    * Set initial focus based on modal configuration
    */
   setInitialFocus(modal) {
+    console.log('Setting initial focus for modal:', modal);
+    
     // Simple, reliable focus setting
     const closeButton = modal.querySelector('[data-modal-close]');
     
     if (closeButton) {
+      // Ensure the button is focusable
+      if (!closeButton.hasAttribute('tabindex')) {
+        closeButton.setAttribute('tabindex', '0');
+      }
       closeButton.focus();
-      console.log('Modal focus set to close button');
-      return;
+      console.log('Modal focus set to close button, activeElement is now:', document.activeElement);
+      
+      // Double-check focus was set
+      if (document.activeElement === closeButton) {
+        console.log('Focus successfully set to close button');
+        return;
+      } else {
+        console.warn('Focus was not set to close button, activeElement is:', document.activeElement);
+      }
     }
 
     // If no close button, try first input
     const firstInput = modal.querySelector('input, textarea, select, button:not([data-modal-close])');
     if (firstInput) {
       firstInput.focus();
-      console.log('Modal focus set to first input');
+      console.log('Modal focus set to first input:', firstInput);
       return;
     }
 
@@ -184,7 +199,7 @@ class ModalManager {
     if (container) {
       container.setAttribute('tabindex', '-1');
       container.focus();
-      console.log('Modal focus set to container');
+      console.log('Modal focus set to container:', container);
     }
   }
 
