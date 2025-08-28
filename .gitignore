@@ -33,3 +33,6 @@ project_issues.md
 
 # playwright
 .playwright-mcp
+
+# vercel
+.vercel/
