@@ -1,0 +1,246 @@
+---
+export interface Props {
+  id: string;
+  class?: string;
+}
+
+const { id, class: className } = Astro.props;
+---
+
+<dialog id={id} class={`simple-dialog ${className || ""}`}>
+  <div class="dialog-content">
+    <button
+      type="button"
+      class="dialog-close"
+      onclick="this.closest('dialog').close()"
+    >
+      Close
+    </button>
+    <div class="content-area">
+      <slot />
+    </div>
+  </div>
+</dialog>
+
+<style>
+  /* CSS Custom Properties for Transition Control */
+  :root {
+    --modal-transition-duration: 0.3s;
+    --modal-transition-easing: cubic-bezier(0.4, 0.0, 0.2, 1);
+  }
+
+  .simple-dialog {
+    /* Mobile-first: Full viewport */
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
+    max-height: none;
+    padding: 0;
+    margin: 0;
+    border: none;
+    background: var(--color-modal-bg, #f5f4f2);
+    color: var(--color-text-primary, #000000);
+    
+    /* Initial hidden state */
+    opacity: 0;
+    transform: scale(0.95);
+    transition: 
+      opacity var(--modal-transition-duration) var(--modal-transition-easing),
+      transform var(--modal-transition-duration) var(--modal-transition-easing);
+    pointer-events: none;
+  }
+
+  /* Open state with fade in */
+  .simple-dialog[open] {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+  }
+
+  /* Backdrop fade transition */
+  .simple-dialog::backdrop {
+    background: rgba(0, 0, 0, 0);
+    transition: background var(--modal-transition-duration) var(--modal-transition-easing);
+  }
+
+  .simple-dialog[open]::backdrop {
+    background: rgba(0, 0, 0, 0.4);
+  }
+
+  .dialog-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow-y: auto;
+  }
+
+  .dialog-close {
+    position: absolute;
+    top: var(--spacing-lg, 2.5rem);
+    right: var(--spacing-lg, 2.5rem);
+    background: none;
+    border: none;
+    color: var(--color-text-primary, #000000);
+    font-family: var(--font-alt-heading, serif);
+    font-size: var(--text-base, 1rem);
+    font-weight: 400;
+    cursor: pointer;
+    padding: var(--spacing-xs, 0.5rem);
+    line-height: 1;
+    z-index: 1;
+    transition: color var(--transition-fast, 0.2s ease);
+  }
+
+  .dialog-close:hover {
+    color: var(--color-primary, #325c59);
+  }
+
+  .content-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: var(--spacing-xl, 3.75rem);
+    text-align: center;
+    max-width: 100%;
+    box-sizing: border-box;
+    
+    /* Content animation */
+    transform: translateY(10px);
+    transition: transform var(--modal-transition-duration) var(--modal-transition-easing);
+  }
+
+  .simple-dialog[open] .content-area {
+    transform: translateY(0);
+  }
+
+  /* Desktop: 50vw centered modal */
+  @media (min-width: 768px) {
+    .simple-dialog {
+      position: fixed;
+      inset: 0;
+      margin: auto;
+      width: 50vw;
+      height: 100vh;
+      min-width: 400px;
+      border-radius: 0;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    /* Initial hidden state */
+    opacity: 0;
+    transform: scale(0.95);
+    transition: 
+      opacity var(--modal-transition-duration) var(--modal-transition-easing),
+      transform var(--modal-transition-duration) var(--modal-transition-easing);
+    }
+
+    .simple-dialog[open]::backdrop {
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(5px);
+    }
+
+    .content-area {
+      padding: var(--spacing-2xl, 5rem);
+    }
+  }
+
+  /* Large desktop refinements */
+  @media (min-width: 1024px) {
+    .content-area {
+      padding: 4rem 3rem;
+    }
+  }
+
+  /* Typography styles for content */
+  .content-area :global(h2) {
+    font-family: var(--font-alt-heading, serif);
+    font-size: var(--text-2xl, 2rem);
+    font-weight: 400;
+    color: var(--color-text-primary, #000000);
+    margin-bottom: var(--spacing-lg, 2.5rem);
+    line-height: var(--leading-tight, 1.25);
+  }
+
+  .content-area :global(p) {
+    font-family: var(--font-alt-heading, serif);
+    font-size: var(--text-base, 1rem);
+    font-weight: 300;
+    color: var(--color-text-primary, #000000);
+    line-height: var(--leading-relaxed, 1.625);
+    margin-bottom: var(--spacing-md, 1.5rem);
+    max-width: 65ch;
+  }
+
+  .content-area :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  /* Contact info styling */
+  .content-area :global(.contact-info) {
+    margin-top: var(--spacing-lg, 2.5rem);
+    padding-top: var(--spacing-md, 1.5rem);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .content-area :global(.contact-info p) {
+    font-size: var(--text-sm, 0.875rem);
+    margin-bottom: var(--spacing-xs, 0.5rem);
+  }
+
+  .content-area :global(a) {
+    color: var(--color-primary, #325c59);
+    text-decoration: none;
+    transition: opacity var(--transition-fast, 0.2s ease);
+  }
+
+  .content-area :global(a:hover) {
+    opacity: 0.8;
+  }
+
+  /* Accessibility improvements */
+  @media (prefers-reduced-motion: reduce) {
+    .simple-dialog,
+    .simple-dialog::backdrop,
+    .content-area,
+    .dialog-close {
+      transition: none;
+      animation: none;
+      transform: none;
+    }
+    
+    .simple-dialog[open] .content-area {
+      transform: none;
+    }
+  }
+
+  @media (prefers-contrast: high) {
+    .simple-dialog {
+      border: 2px solid;
+    }
+
+    .dialog-close {
+      border: 1px solid;
+    }
+  }
+</style>
+
+<script>
+  // Enhance accessibility for dialog
+  document.addEventListener("DOMContentLoaded", () => {
+    const dialogs = document.querySelectorAll(".simple-dialog");
+
+    dialogs.forEach((dialog) => {
+      // Focus the close button when dialog opens
+      dialog.addEventListener("show", () => {
+        setTimeout(() => {
+          const closeButton = dialog.querySelector(".dialog-close") as HTMLButtonElement;
+          if (closeButton) {
+            closeButton.focus();
+          }
+        }, 100);
+      });
+    });
+  });
+</script>
