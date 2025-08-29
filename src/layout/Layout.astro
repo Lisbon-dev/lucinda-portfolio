@@ -1,4 +1,6 @@
 ---
+import Footer from "../components/layout/Footer.astro";
+
 
 ---
 
@@ -32,14 +34,14 @@
     
     <!-- Google Fonts with optimized loading -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=optional"
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Unbounded:wght@200..900&display=optional"
       rel="stylesheet"
       media="print"
       onload="this.media='all'"
     />
     <noscript>
       <link
-        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Unbounded:wght@200..900&display=swap"
         rel="stylesheet"
       />
     </noscript>
@@ -48,6 +50,7 @@
   <body>
     <slot />
   </body>
+  <Footer />
 </html>
 
 <style is:global>
@@ -173,6 +176,7 @@
     --font-body: "ibm-plex-sans", "Montserrat", "Inter", sans-serif; /* Clean sans for body text */
     --font-heading: "Playfair Display", serif; /* Clean serif for body text */
     --font-alt-heading: "ivypresto-display", "Times New Roman", serif;
+    --font-lisbon-dev: "Unbounded", "Inter", sans-serif;
     
     /* Font fallback metrics for CLS prevention */
     --font-fallback-size-adjust: 100%;
@@ -213,6 +217,15 @@
     --color-text-secondary: rgb(50, 92, 89);
     --color-modal-bg: #f5f4f2;
     --color-overlay: rgba(0, 0, 0, 0.8);
+
+        /*
+     * Branding Accent 500 (Base)
+     * HSL(17, 72%, 48%) / #B83E1A
+     * Contrast vs. dark-bg: 3.4:1 (AA Large)
+     * Contrast vs. light-bg: 6.2:1 (AA)
+     * Usage: Key CTAs. Large text on dark, any text on light.
+     */
+    --color-lisbon-dev: hsl(17, 72%, 48%);
 
     /* Spacing System */
     --space-xxs: clamp(0.5rem, 1vw, 0.75rem);
