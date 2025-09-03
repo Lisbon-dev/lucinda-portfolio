@@ -1,0 +1,322 @@
+---
+export interface Props {
+  text: string;
+  className?: string;
+  tag?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  animationDelay?: number;
+}
+
+const { 
+  text, 
+  className = "", 
+  tag = "h1",
+  animationDelay = 0 
+} = Astro.props;
+
+const Tag = tag;
+---
+
+<div class={`header-animation ${className}`} data-text={text}>
+  <Tag class="animated-header" data-splittext data-animation-delay={animationDelay}>
+    {text}
+  </Tag>
+</div>
+
+<script>
+  import { animate } from "motion";
+
+  interface AnimationConfig {
+    opacity: [number, number];
+    x?: [number, number];
+    y: [number, number];
+    scale: [number, number];
+  }
+
+  interface AnimationOptions {
+    delay: number;
+    duration: number;
+    ease: string;
+  }
+
+  class HeaderAnimation {
+    private element: HTMLElement;
+    private headerEl: HTMLElement | null;
+    private syllables: HTMLElement[] = [];
+    private syllablePositions: Array<{ x: number; y: number; name: string }> = [];
+    private hasAnimated: boolean = false;
+    private observer: IntersectionObserver | null = null;
+
+    constructor(element: HTMLElement) {
+      this.element = element;
+      this.headerEl = element.querySelector('[data-splittext]');
+      
+      if (this.headerEl) {
+        this.init();
+      }
+    }
+
+    private async init(): Promise<void> {
+      if (!this.headerEl) return;
+      
+      await this.splitTextIntoSyllables();
+      this.setupIntersectionObserver();
+    }
+
+    private async splitTextIntoSyllables(): Promise<void> {
+      if (!this.headerEl) return;
+      
+      const text = this.headerEl.textContent || '';
+      this.headerEl.innerHTML = '';
+      
+      // Define syllable groups for "LUCINDA BURMAN"
+      const syllableGroups = ['LUC', 'I', 'N', 'DA', '\u00A0', 'B', 'URM', 'A', 'N'];
+      
+      // Create span elements for each syllable group
+      syllableGroups.forEach((syllable, index) => {
+        const span = document.createElement('span');
+        span.textContent = syllable;
+        span.className = 'syllable';
+        span.setAttribute('data-syllable-index', index.toString());
+        span.style.display = 'inline-block';
+        span.style.whiteSpace = 'nowrap'; // Keep syllables together
+        this.syllables.push(span);
+        this.headerEl!.appendChild(span);
+      });
+
+      // Set initial state - syllables positioned with criss-cross pattern
+      this.setSyllableInitialPositions();
+    }
+
+    private setSyllableInitialPositions(): void {
+      // Get container width for strategic positioning
+      const containerRect = this.headerEl!.getBoundingClientRect();
+      const containerWidth = containerRect.width || 500; // fallback width
+      
+      // Define criss-cross starting positions for each syllable and store for animation
+      this.syllablePositions = [
+        { x: containerWidth * 0.7, y: -40, name: 'LUC' },    // top-right
+        { x: -containerWidth * 0.1, y: -35, name: 'I' },     // top-left (negative X for left side)
+        { x: -containerWidth * 0.15, y: -45, name: 'N' },    // top-left (offset)
+        { x: containerWidth * 0.5, y: -40, name: 'DA' },     // top-middle
+        { x: 0, y: 0, name: 'SPACE' },                       // space (no movement)
+        { x: containerWidth * 0.8, y: -35, name: 'B' },      // top-right
+        { x: -containerWidth * 0.2, y: -40, name: 'URM' },   // top-left (negative X)
+        { x: containerWidth * 0.75, y: -45, name: 'A' },     // top-right (offset)
+        { x: -containerWidth * 0.25, y: -35, name: 'N' }     // top-left (negative X)
+      ];
+
+      this.syllables.forEach((syllable, index) => {
+        const position = this.syllablePositions[index];
+        if (position.name === 'SPACE') {
+          // Handle space differently - make it visible immediately
+          syllable.style.opacity = '1';
+          syllable.style.transform = 'translateX(0px) translateY(0px) scale(1)';
+        } else {
+          syllable.style.opacity = '0';
+          syllable.style.transform = `translateX(${position.x}px) translateY(${position.y}px) scale(0.9)`;
+        }
+      });
+    }
+
+    private setupIntersectionObserver(): void {
+      // Check for reduced motion preference
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      
+      this.observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && !this.hasAnimated) {
+            const animationDelay = parseInt(this.headerEl?.getAttribute('data-animation-delay') || '0');
+            setTimeout(() => {
+              this.playEntranceAnimation(prefersReducedMotion);
+            }, animationDelay);
+            this.hasAnimated = true;
+          }
+        });
+      }, { 
+        threshold: 0.3,
+        rootMargin: '0px 0px -10% 0px'
+      });
+      
+      this.observer.observe(this.element);
+    }
+
+    private async playEntranceAnimation(reducedMotion: boolean = false): Promise<void> {
+      if (this.syllables.length === 0) return;
+      
+      // Fallback: ensure text is visible even if animation fails
+      const ensureVisibility = () => {
+        this.syllables.forEach(syllable => {
+          syllable.style.opacity = '1';
+          syllable.style.transform = 'translateX(0px) translateY(0px) scale(1)';
+        });
+      };
+
+      // Set a fallback timeout
+      const fallbackTimeout = setTimeout(ensureVisibility, 2000);
+      
+      try {
+        if (reducedMotion) {
+          // Simple fade-in for users who prefer reduced motion
+          const animationConfig: AnimationConfig = {
+            opacity: [0, 1],
+            y: [0, 0],
+            scale: [1, 1]
+          };
+
+          const options: AnimationOptions = {
+            delay: 0,
+            duration: 0.3,
+            ease: "linear"
+          };
+
+          this.syllables.forEach((syllable, index) => {
+            // Skip the space element (index 4)
+            if (index === 4) return;
+            
+            animate(syllable, animationConfig, {
+              ...options,
+              delay: index * 0.1 // Slightly longer delay for syllables
+            } as any);
+          });
+          clearTimeout(fallbackTimeout);
+        } else {
+          // Syllable-based criss-cross flow animation
+          const baseOptions: AnimationOptions = {
+            delay: 0,
+            duration: 1.2,
+            ease: "easeOut"
+          };
+
+          this.syllables.forEach((syllable, index) => {
+            // Skip the space element (index 4)
+            if (index === 4) return;
+            
+            // Rhythmic flow timing with shorter delays for continuous flow
+            const staggerDelay = index * 0.12; // 120ms between syllable starts for flowy cadence
+            
+            // Get the actual starting position for this syllable
+            const startingPosition = this.syllablePositions[index];
+            
+            // Each syllable moves from its strategic position to final position (0, 0)
+            const animationConfig: AnimationConfig = {
+              opacity: [0, 1],
+              x: [startingPosition.x, 0], // From scattered X position to center
+              y: [startingPosition.y, 0], // From above Y position to baseline
+              scale: [0.9, 1]
+            };
+            
+            animate(syllable, animationConfig, {
+              ...baseOptions,
+              delay: staggerDelay
+            } as any).finished.then(() => {
+              // Clear fallback timeout when final syllable completes
+              if (index === this.syllables.length - 1) clearTimeout(fallbackTimeout);
+            }).catch(() => {
+              // On animation error, ensure visibility
+              ensureVisibility();
+              clearTimeout(fallbackTimeout);
+            });
+          });
+        }
+      } catch (error) {
+        console.warn('Header animation failed, falling back to static text:', error);
+        ensureVisibility();
+        clearTimeout(fallbackTimeout);
+      }
+    }
+
+    public destroy(): void {
+      if (this.observer) {
+        this.observer.disconnect();
+        this.observer = null;
+      }
+    }
+  }
+
+  // Initialize animations when DOM is ready
+  const initializeAnimations = () => {
+    const animationElements = document.querySelectorAll('.header-animation');
+    
+    animationElements.forEach(element => {
+      if (element instanceof HTMLElement) {
+        new HeaderAnimation(element);
+      }
+    });
+  };
+
+  // Initialize immediately if DOM is already loaded, otherwise wait
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeAnimations);
+  } else {
+    initializeAnimations();
+  }
+
+  // Re-initialize on navigation in Astro
+  document.addEventListener('astro:page-load', initializeAnimations);
+</script>
+
+<style>
+  .header-animation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 5rem;
+    overflow: hidden;
+  }
+
+  .animated-header {
+    font-family: var(--font-heading, 'Playfair Display', serif);
+    font-size: var(--text-4xl, clamp(3rem, 8vw, 6rem));
+    font-weight: 400;
+    color: var(--color-text-primary, #000000);
+    letter-spacing: var(--tracking-wide, 0.025em);
+    margin: 0;
+    line-height: var(--leading-tight, 1.2);
+    text-align: center;
+    overflow: visible;
+  }
+
+  .animated-header .syllable {
+    transition: transform 0.1s ease-out;
+    will-change: transform, opacity;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .animated-header {
+      font-size: var(--text-3xl, clamp(2rem, 10vw, 3rem));
+      letter-spacing: var(--tracking-normal, 0);
+    }
+    
+    .header-animation {
+      padding: var(--space-sm, 1rem);
+      min-height: 4rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .animated-header {
+      font-size: var(--text-2xl, clamp(1.5rem, 12vw, 2rem));
+    }
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .animated-header {
+      color: var(--color-text-primary, #000000);
+      font-weight: 500;
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    .header-animation {
+      min-height: auto;
+    }
+    
+    .animated-header .syllable {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+</style>
