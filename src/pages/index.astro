@@ -9,6 +9,7 @@ import MasonryGrid from "../components/portfolio/MasonryGrid.astro";
 import AboutDialog from "../components/dialog/AboutDialog.astro";
 import ContactDialog from "../components/dialog/ContactDialog.astro";
 import HeaderAnimation from "../components/ui/HeaderAnimation.astro";
+import LoadingOverlay from "../components/ui/LoadingOverlay.astro";
 import { getCollection } from 'astro:content';
 
 // Get all portfolio projects from content collection
@@ -29,6 +30,9 @@ const socialLinks = [
 ---
 
 <Layout>
+  <!-- Loading Overlay -->
+  <LoadingOverlay />
+  
   <!-- Minimalist Header with Menu -->
   <Header />
 

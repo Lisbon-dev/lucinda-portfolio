@@ -25,44 +25,29 @@ const Tag = tag;
 <script>
   import { animate } from "motion";
 
-  interface AnimationConfig {
-    opacity: [number, number];
-    x?: [number, number];
-    y: [number, number];
-    scale: [number, number];
-  }
-
-  interface AnimationOptions {
-    delay: number;
-    duration: number;
-    ease: string;
-  }
 
   class HeaderAnimation {
-    private element: HTMLElement;
-    private headerEl: HTMLElement | null;
-    private syllables: HTMLElement[] = [];
-    private syllablePositions: Array<{ x: number; y: number; name: string }> = [];
-    private hasAnimated: boolean = false;
-    private observer: IntersectionObserver | null = null;
-
-    constructor(element: HTMLElement) {
+    constructor(element) {
       this.element = element;
       this.headerEl = element.querySelector('[data-splittext]');
+      this.syllables = [];
+      this.syllablePositions = [];
+      this.hasAnimated = false;
+      this.observer = null;
       
       if (this.headerEl) {
         this.init();
       }
     }
 
-    private async init(): Promise<void> {
+    async init() {
       if (!this.headerEl) return;
       
       await this.splitTextIntoSyllables();
       this.setupIntersectionObserver();
     }
 
-    private async splitTextIntoSyllables(): Promise<void> {
+    async splitTextIntoSyllables() {
       if (!this.headerEl) return;
       
       const text = this.headerEl.textContent || '';
@@ -80,16 +65,16 @@ const Tag = tag;
         span.style.display = 'inline-block';
         span.style.whiteSpace = 'nowrap'; // Keep syllables together
         this.syllables.push(span);
-        this.headerEl!.appendChild(span);
+        this.headerEl.appendChild(span);
       });
 
       // Set initial state - syllables positioned with criss-cross pattern
       this.setSyllableInitialPositions();
     }
 
-    private setSyllableInitialPositions(): void {
+    setSyllableInitialPositions() {
       // Get container width for strategic positioning
-      const containerRect = this.headerEl!.getBoundingClientRect();
+      const containerRect = this.headerEl.getBoundingClientRect();
       const containerWidth = containerRect.width || 500; // fallback width
       
       // Define criss-cross starting positions for each syllable and store for animation
@@ -118,18 +103,21 @@ const Tag = tag;
       });
     }
 
-    private setupIntersectionObserver(): void {
-      // Check for reduced motion preference
-      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setupIntersectionObserver() {
+      // Listen for loading completion event
+      document.addEventListener('loadingComplete', this.startAnimation.bind(this));
       
+      // Fallback: If no loading overlay is present, use intersection observer as before
       this.observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting && !this.hasAnimated) {
-            const animationDelay = parseInt(this.headerEl?.getAttribute('data-animation-delay') || '0');
-            setTimeout(() => {
-              this.playEntranceAnimation(prefersReducedMotion);
-            }, animationDelay);
-            this.hasAnimated = true;
+            // Only trigger if loading overlay hasn't completed yet
+            const overlay = document.getElementById('loading-overlay');
+            const isOverlayActive = overlay && overlay.style.display !== 'none';
+            
+            if (!isOverlayActive) {
+              this.startAnimation();
+            }
           }
         });
       }, { 
@@ -140,7 +128,7 @@ const Tag = tag;
       this.observer.observe(this.element);
     }
 
-    private async playEntranceAnimation(reducedMotion: boolean = false): Promise<void> {
+    async playEntranceAnimation(reducedMotion = false) {
       if (this.syllables.length === 0) return;
       
       // Fallback: ensure text is visible even if animation fails
@@ -157,13 +145,13 @@ const Tag = tag;
       try {
         if (reducedMotion) {
           // Simple fade-in for users who prefer reduced motion
-          const animationConfig: AnimationConfig = {
+          const animationConfig = {
             opacity: [0, 1],
             y: [0, 0],
             scale: [1, 1]
           };
 
-          const options: AnimationOptions = {
+          const options = {
             delay: 0,
             duration: 0.3,
             ease: "linear"
@@ -176,12 +164,12 @@ const Tag = tag;
             animate(syllable, animationConfig, {
               ...options,
               delay: index * 0.1 // Slightly longer delay for syllables
-            } as any);
+            });
           });
           clearTimeout(fallbackTimeout);
         } else {
           // Syllable-based criss-cross flow animation
-          const baseOptions: AnimationOptions = {
+          const baseOptions = {
             delay: 0,
             duration: 1.2,
             ease: "easeOut"
@@ -198,7 +186,7 @@ const Tag = tag;
             const startingPosition = this.syllablePositions[index];
             
             // Each syllable moves from its strategic position to final position (0, 0)
-            const animationConfig: AnimationConfig = {
+            const animationConfig = {
               opacity: [0, 1],
               x: [startingPosition.x, 0], // From scattered X position to center
               y: [startingPosition.y, 0], // From above Y position to baseline
@@ -208,7 +196,7 @@ const Tag = tag;
             animate(syllable, animationConfig, {
               ...baseOptions,
               delay: staggerDelay
-            } as any).finished.then(() => {
+            }).finished.then(() => {
               // Clear fallback timeout when final syllable completes
               if (index === this.syllables.length - 1) clearTimeout(fallbackTimeout);
             }).catch(() => {
@@ -225,10 +213,23 @@ const Tag = tag;
       }
     }
 
-    public destroy(): void {
+    destroy() {
       if (this.observer) {
         this.observer.disconnect();
         this.observer = null;
+      }
+      // Clean up loading complete event listener
+      document.removeEventListener('loadingComplete', this.startAnimation.bind(this));
+    }
+    
+    startAnimation() {
+      if (!this.hasAnimated) {
+        const animationDelay = parseInt((this.headerEl && this.headerEl.getAttribute('data-animation-delay')) || '0');
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        setTimeout(() => {
+          this.playEntranceAnimation(prefersReducedMotion);
+        }, animationDelay);
+        this.hasAnimated = true;
       }
     }
   }

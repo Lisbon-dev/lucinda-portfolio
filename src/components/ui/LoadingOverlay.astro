@@ -1,0 +1,218 @@
+---
+// LoadingOverlay.astro - Elegant loading overlay with serif typography
+// Shows loading progress from 0% to 100% with smooth transitions
+
+export interface Props {
+  className?: string;
+}
+
+const { className = '' } = Astro.props;
+---
+
+<div id="loading-overlay" class={`loading-overlay ${className}`}>
+  <div class="loading-content">
+    <h1 class="loading-title">
+      <span class="loading-title-line">LUCINDA</span>
+      <span class="loading-title-line">BURMAN</span>
+    </h1>
+    <div class="loading-progress">
+      <span id="loading-percentage">0%</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const overlay = document.getElementById('loading-overlay');
+    const percentageElement = document.getElementById('loading-percentage');
+    
+    if (!overlay || !percentageElement) return;
+    
+    let currentProgress = 0;
+    let targetProgress = 0;
+    let animationFrame;
+    
+    // Smooth progress animation
+    function animateProgress() {
+      if (currentProgress < targetProgress) {
+        // Much faster animation for cached images (when jumping to 100% quickly)
+        const isCachedScenario = targetProgress >= 100 && currentProgress < 30;
+        const speed = isCachedScenario ? 0.4 : 0.15;
+        currentProgress += (targetProgress - currentProgress) * speed;
+        percentageElement.textContent = `${Math.floor(currentProgress)}%`;
+        
+        // Force completion if very close to target
+        if (currentProgress >= targetProgress - 1) {
+          currentProgress = targetProgress;
+          percentageElement.textContent = `${Math.floor(targetProgress)}%`;
+        }
+        
+        animationFrame = requestAnimationFrame(animateProgress);
+      } else if (currentProgress >= 100) {
+        // Ensure display shows 100%
+        percentageElement.textContent = '100%';
+        
+        // Fade out overlay when complete
+        setTimeout(() => {
+          overlay.classList.add('fade-out');
+          setTimeout(() => {
+            overlay.style.display = 'none';
+            document.body.classList.remove('loading');
+            // Trigger content reveal
+            document.dispatchEvent(new CustomEvent('loadingComplete'));
+          }, 600); // Match CSS transition duration
+        }, 200); // Shorter pause for better perceived performance
+      } else {
+        animationFrame = null;
+      }
+    }
+    
+    // Update progress function (called by other components)
+    function updateProgress(progress) {
+      targetProgress = Math.min(100, Math.max(0, progress));
+      if (!animationFrame) {
+        animateProgress();
+      }
+    }
+    
+    // Expose progress updater globally
+    window.updateLoadingProgress = updateProgress;
+    
+    // Initial setup
+    document.body.classList.add('loading');
+    
+    // Start with small progress to show activity
+    setTimeout(() => updateProgress(15), 100);
+    
+    // Aggressive fallback for cached images - complete loading after 800ms max
+    setTimeout(() => {
+      console.log('LoadingOverlay: Fallback timeout reached, forcing completion');
+      updateProgress(100);
+    }, 800);
+    
+    // Very quick completion for fully loaded pages (cached images)
+    if (document.readyState === 'complete') {
+      setTimeout(() => {
+        console.log('LoadingOverlay: Document already complete, fast completion');
+        updateProgress(100);
+      }, 200);
+    }
+  });
+</script>
+
+<style>
+  .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-background);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    transition: opacity 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+  }
+  
+  .loading-overlay.fade-out {
+    opacity: 0;
+  }
+  
+  .loading-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xl);
+  }
+  
+  .loading-title {
+    font-family: var(--font-alt-heading);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 300;
+    letter-spacing: var(--tracking-wider);
+    line-height: var(--leading-tight);
+    color: var(--color-text);
+    margin: 0;
+  }
+  
+  .loading-title-line {
+    display: block;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: titleReveal 0.8s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+  }
+  
+  .loading-title-line:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  
+  .loading-progress {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  #loading-percentage {
+    font-family: var(--font-alt-heading);
+    font-size: var(--text-xl);
+    font-weight: 300;
+    letter-spacing: var(--tracking-wide);
+    color: var(--color-text-secondary);
+    opacity: 0;
+    transform: translateY(10px);
+    animation: progressReveal 0.6s cubic-bezier(0.4, 0.0, 0.2, 1) 0.8s forwards;
+    
+    /* Monospace digits for consistent width */
+    font-variant-numeric: tabular-nums;
+  }
+  
+  @keyframes titleReveal {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes progressReveal {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Prevent scrolling while loading */
+  :global(body.loading) {
+    overflow: hidden;
+  }
+  
+  /* Mobile adjustments */
+  @media (max-width: 768px) {
+    .loading-content {
+      gap: var(--spacing-lg);
+    }
+    
+    .loading-title {
+      font-size: clamp(1.5rem, 8vw, 2.5rem);
+    }
+    
+    #loading-percentage {
+      font-size: var(--text-lg);
+    }
+  }
+  
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .loading-title-line,
+    #loading-percentage {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+    
+    .loading-overlay {
+      transition: none;
+    }
+  }
+</style>

@@ -1,8 +1,9 @@
 ---
-// MasonryGrid.astro - Responsive masonry grid component using Macy.js
-// Based on Task #23 requirements and TASK_007_#23_CLARIFICATIONS.md
+// MasonryGrid.astro - Astro-native masonry grid with Motion.js animations
+// Optimized for performance with fixed order and smooth animations
 
-import { Image } from 'astro:assets';
+import { Picture } from 'astro:assets';
+import { Masonry } from 'astro-masonry';
 import type { CollectionEntry } from 'astro:content';
 
 export interface Props {
@@ -11,26 +12,49 @@ export interface Props {
 }
 
 const { projects = [], className = '' } = Astro.props;
+
+// Generate unique ID for this masonry instance
+const uniqueId = `masonry-${Math.random().toString(36).substr(2, 9)}`;
+
+// Sort projects for fixed, consistent order (by featured status, then date)
+const sortedProjects = projects.sort((a, b) => {
+  // Featured projects first
+  if (a.data.featured && !b.data.featured) return -1;
+  if (!a.data.featured && b.data.featured) return 1;
+  
+  // Then by date (newest first)
+  const dateA = new Date(a.data.publishedDate || 0);
+  const dateB = new Date(b.data.publishedDate || 0);
+  return dateB.getTime() - dateA.getTime();
+});
 ---
 
-<div class={`masonry-container ${className}`}>
-  <div id="masonry-grid" class="masonry-grid">
-    {projects.flatMap((project, index) => 
-        <div class="masonry-item" data-project={project.slug} data-image={index}>
+<div class={`masonry-container ${className}`} id={uniqueId}>
+  <Masonry 
+    breakpointCols={{
+      default: 3,
+      1600: 3,
+      900: 2,
+      550: 1
+    }}
+  >
+    {sortedProjects.map((project, index) => 
+        <div class="masonry-item" data-project={project.slug} data-index={index} data-lazy={index >= 6 ? "true" : "false"}>
           <a href={`/projects/${project.slug}`} class="project-link" aria-label={`View ${project.data.title} project`}>
-            <div class="image-container">
-              <Image 
+            <div class="image-container" data-loaded="false">
+              <!-- Progressive loading placeholder -->
+              <Picture 
                 src={project.data.mainImage.src}
                 alt={project.data.mainImage.alt}
                 class="masonry-image"
-                width={project.data.mainImage.width || 800}
-                height={project.data.mainImage.height || 600}
-                format="webp"
-                quality={85}
-                loading={index < 4 ? "eager" : "lazy"}
+                widths={[320, 640, 768, 1024]}
+                sizes="(max-width: 550px) 100vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                formats={['avif', 'webp']}
+                fallbackFormat="webp"
+                quality={index < 3 ? 75 : 60}
+                loading={index < 3 ? "eager" : "lazy"}
                 decoding="async"
-                fetchpriority={index < 2 ? "high" : "low"}
-                densities={[1, 1.5, 2]}
+                fetchpriority={index < 3 ? "high" : "low"}
               />
               <div class="overlay">
                 <div class="overlay-content">
@@ -41,198 +65,246 @@ const { projects = [], className = '' } = Astro.props;
             </div>
           </a>
         </div>
-      ) || []
+      )
     }
-  </div>
+        {sortedProjects.map((project, index) => 
+        <div class="masonry-item" data-project={project.slug} data-index={index} data-lazy={index >= 6 ? "true" : "false"}>
+          <a href={`/projects/${project.slug}`} class="project-link" aria-label={`View ${project.data.title} project`}>
+            <div class="image-container" data-loaded="false">
+              <!-- Progressive loading placeholder -->
+              <Picture 
+                src={project.data.mainImage.src}
+                alt={project.data.mainImage.alt}
+                class="masonry-image"
+                widths={[320, 640, 768, 1024]}
+                sizes="(max-width: 550px) 100vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                formats={['avif', 'webp']}
+                fallbackFormat="webp"
+                quality={index < 3 ? 75 : 60}
+                loading={index < 3 ? "eager" : "lazy"}
+                decoding="async"
+                fetchpriority={index < 3 ? "high" : "low"}
+              />
+              <div class="overlay">
+                <div class="overlay-content">
+                  <h3 class="project-title">{project.data.title}</h3>
+                  <p class="project-category">{project.data.category}</p>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      )
+    }    {sortedProjects.map((project, index) => 
+        <div class="masonry-item" data-project={project.slug} data-index={index} data-lazy={index >= 6 ? "true" : "false"}>
+          <a href={`/projects/${project.slug}`} class="project-link" aria-label={`View ${project.data.title} project`}>
+            <div class="image-container" data-loaded="false">
+              <!-- Progressive loading placeholder -->
+              <Picture 
+                src={project.data.mainImage.src}
+                alt={project.data.mainImage.alt}
+                class="masonry-image"
+                widths={[320, 640, 768, 1024]}
+                sizes="(max-width: 550px) 100vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                formats={['avif', 'webp']}
+                fallbackFormat="webp"
+                quality={index < 3 ? 75 : 60}
+                loading={index < 3 ? "eager" : "lazy"}
+                decoding="async"
+                fetchpriority={index < 3 ? "high" : "low"}
+              />
+              <div class="overlay">
+                <div class="overlay-content">
+                  <h3 class="project-title">{project.data.title}</h3>
+                  <p class="project-category">{project.data.category}</p>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      )
+    }
+  </Masonry>
 </div>
 
-<!-- Macy.js CDN -->
-<script is:inline src="https://cdn.jsdelivr.net/npm/macy@2"></script>
+<!-- Native CSS animations with Cell Art style scroll reveals -->
 
-<script>
-  // Declare global types for TypeScript
-  declare global {
-    interface Window {
-      Macy: any;
-    }
-  }
-
-  // Initialize Macy.js masonry grid
+<script define:vars={{ uniqueId }}>
   document.addEventListener('DOMContentLoaded', () => {
-    const masonryContainer = document.getElementById('masonry-grid');
+    // Find the masonry grid for this specific component instance
+    const containerElement = document.getElementById(uniqueId);
+    if (!containerElement) return;
     
-    if (masonryContainer && window.Macy) {
-      let resizeTimeout: number;
+    const masonryContainer = containerElement.querySelector('.masonry-grid');
+    if (!masonryContainer) return;
 
-      // Initialize Macy.js with responsive breakpoint configuration
-      const macyInstance = new window.Macy({
-        container: '#masonry-grid',
-        trueOrder: false,
-        waitForImages: true,
-        useOwnImageLoader: false,
-        mobileFirst: true,
-        columns: 1,
-        margin: {
-          y: 24,
-          x: '3%'
-        },
-        breakAt: {
-          1600: {  // 4 columns for >1600px (matches design system --breakpoint-2xl)
-            columns: 4,
-            margin: { y: 66, x: '2.5%' }
-          },
-          768: {   // 3 columns for 768-1600px (matches design system --breakpoint-md)
-            columns: 3,
-            margin: { y: 66, x: '3%' }
-          },
-          550: {   // 2 columns for 550-768px (matches design system --breakpoint-base)
-            columns: 2,
-            margin: { y: 24, x: '3%' }
-          }
-          // 1 column for <550px (mobile-first default)
+    // Enhanced image loading with blur-to-sharp effect
+    let eagerImagesLoaded = 0;
+    const totalImages = masonryContainer.querySelectorAll('.masonry-image').length;
+    const eagerImages = Math.min(3, totalImages);
+    let animationsInitialized = false;
+    
+    console.log(`MasonryGrid: Found ${totalImages} images, ${eagerImages} eager images expected`);
+    
+    // Robust progress update with retry mechanism
+    function updateLoadingProgressSafely(progress, retries = 0) {
+      const maxRetries = 10;
+      const retryDelay = 50; // 50ms between retries
+      
+      if (window.updateLoadingProgress) {
+        console.log(`MasonryGrid: Successfully calling updateLoadingProgress(${progress})`);
+        window.updateLoadingProgress(progress);
+      } else if (retries < maxRetries) {
+        console.log(`MasonryGrid: Function not ready, retrying in ${retryDelay}ms (attempt ${retries + 1}/${maxRetries})`);
+        setTimeout(() => {
+          updateLoadingProgressSafely(progress, retries + 1);
+        }, retryDelay);
+      } else {
+        console.warn(`MasonryGrid: Failed to call updateLoadingProgress after ${maxRetries} retries`);
+      }
+    }
+
+    // Intersection Observer for scroll-based animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '50px 0px -50px 0px'
+    };
+
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+          const item = entry.target;
+          const itemIndex = parseInt(item.dataset.index || '0');
+          
+          // Add stagger delay based on item index
+          item.style.setProperty('--reveal-delay', `${itemIndex * 0.1}s`);
+          item.classList.add('reveal');
+          
+          revealObserver.unobserve(item);
         }
       });
+    }, observerOptions);
 
-      // Handle image loading with fade-in animation
-      macyInstance.runOnImageLoad(function() {
-        // Recalculate layout after images load
-        macyInstance.recalculate(true);
-      }, true);
-
-      // Enhanced staggered animation for masonry items
-      const animateItems = () => {
-        const items = masonryContainer.querySelectorAll('.masonry-item');
-        items.forEach((item, index) => {
-          setTimeout(() => {
-            item.classList.add('animated');
-          }, index * 100); // Stagger by 100ms for smooth cascade effect
-        });
-      };
-
-      // Enhanced Intersection Observer for advanced lazy loading and performance
-      if ('IntersectionObserver' in window) {
-        let ticking = false;
+    function handleImageLoad(img, isEager = false) {
+      const container = img.closest('.image-container');
+      const placeholder = container?.querySelector('.image-placeholder');
+      const masonryItem = container?.closest('.masonry-item');
+      
+      if (container) {
+        container.setAttribute('data-loaded', 'true');
+      }
+      
+      // Hide placeholder with blur-to-sharp effect
+      if (placeholder) {
+        placeholder.classList.add('fade-out');
+      }
+      
+      if (isEager) {
+        eagerImagesLoaded++;
+        console.log(`MasonryGrid: Eager image ${eagerImagesLoaded}/${eagerImages} loaded`);
         
-        const imageObserver = new IntersectionObserver((entries) => {
-          if (!ticking) {
-            requestAnimationFrame(() => {
-              entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                  const item = entry.target;
-                  const img = item.querySelector('.masonry-image');
-                  const container = item.querySelector('.image-container');
-                  
-                  // Progressive loading with performance optimizations
-                  if (img && container) {
-                    // Upgrade image importance when in viewport
-                    img.setAttribute('fetchpriority', 'high');
-                    (img as HTMLElement).style.contentVisibility = 'visible';
-                    
-                    // Add loading state
-                    container.classList.add('loading');
-                    
-                    // Mark as visible for animations
-                    item.classList.add('visible');
-                    
-                    // Stop observing this image
-                    imageObserver.unobserve(item);
-                  }
-                }
-              });
-              ticking = false;
-            });
-            ticking = true;
-          }
-        }, { 
-          rootMargin: '100px 0px', // Start loading 100px before viewport
-          threshold: [0, 0.25, 0.5, 0.75, 1] // Multiple thresholds for progressive loading
-        });
-
-        // Memory management observer for large grids
-        const memoryObserver = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            const item = entry.target;
-            const img = item.querySelector('.masonry-image');
-            
-            if (!entry.isIntersecting && img) {
-              // Unload images far from viewport to save memory
-              const rect = item.getBoundingClientRect();
-              if (Math.abs(rect.top) > window.innerHeight * 3) {
-                (img as HTMLElement).style.contentVisibility = 'auto';
-              }
-            }
-          });
-        }, {
-          rootMargin: '300% 0px' // Very large margin for memory management
-        });
-
-        // Observe all masonry items
-        const items = masonryContainer.querySelectorAll('.masonry-item');
-        items.forEach(item => {
-          imageObserver.observe(item);
-          memoryObserver.observe(item);
-        });
+        // Update loading progress - more generous progress calculation
+        const progress = Math.min(100, (eagerImagesLoaded / eagerImages) * 100);
+        console.log(`MasonryGrid: Updating progress to ${progress}%`);
+        updateLoadingProgressSafely(progress);
       }
 
-      // Handle resize events
-      window.addEventListener('resize', () => {
-        clearTimeout(resizeTimeout);
-        resizeTimeout = window.setTimeout(() => {
-          macyInstance.recalculate(true, true);
-        }, 250);
-      });
+      // Initialize animations after eager images load
+      if (eagerImagesLoaded >= eagerImages && !animationsInitialized) {
+        animationsInitialized = true;
+        
+        // Ensure we hit 100%
+        console.log(`MasonryGrid: Ensuring 100% completion`);
+        updateLoadingProgressSafely(100);
+        
+        setTimeout(() => {
+          // Reveal eager items immediately
+          const eagerItems = masonryContainer.querySelectorAll('.masonry-item:not([data-lazy="true"])');
+          eagerItems.forEach((item, index) => {
+            item.style.setProperty('--reveal-delay', `${index * 0.15}s`);
+            item.classList.add('reveal');
+          });
 
-      // Enhanced focus management for accessibility
-      const handleFocus = (event: FocusEvent) => {
-        const focusedItem = (event.target as Element).closest('.masonry-item');
-        if (focusedItem && !focusedItem.querySelector('img[src]')) {
-          // Ensure focusable elements have their images loaded immediately
-          const img = focusedItem.querySelector('.masonry-image') as HTMLImageElement;
-          const container = focusedItem.querySelector('.image-container');
-          if (img && container) {
-            img.setAttribute('fetchpriority', 'high');
-            container.classList.add('loading');
-          }
+          // Observe lazy items for scroll-based reveal
+          const lazyItems = masonryContainer.querySelectorAll('.masonry-item[data-lazy="true"]');
+          lazyItems.forEach(item => {
+            revealObserver.observe(item);
+          });
+        }, 100);
+      }
+
+      // For lazy images, observe for scroll reveal
+      if (masonryItem && !isEager && !masonryItem.classList.contains('reveal')) {
+        revealObserver.observe(masonryItem);
+      }
+    }
+
+    // Check for already loaded images (cached images)
+    const images = masonryContainer.querySelectorAll('.masonry-image');
+    let cachedEagerCount = 0;
+    
+    images.forEach((img, index) => {
+      const isEager = img.loading === 'eager';
+      if (img.complete && img.naturalWidth > 0) {
+        console.log(`MasonryGrid: Image ${index} already loaded (cached)`);
+        if (isEager) {
+          cachedEagerCount++;
         }
-      };
+        // Process cached image immediately - no timeout needed
+        handleImageLoad(img, isEager);
+      }
+    });
+    
+    console.log(`MasonryGrid: Found ${cachedEagerCount}/${eagerImages} cached eager images`);
 
-      // Add focus event listener for accessibility
-      masonryContainer.addEventListener('focusin', handleFocus);
+    // Listen for image load events
+    masonryContainer.addEventListener('load', (event) => {
+      const target = event.target;
+      if (target?.tagName === 'IMG' && target.classList.contains('masonry-image')) {
+        const isEager = target.loading === 'eager';
+        console.log(`MasonryGrid: Image load event fired`, target.src);
+        handleImageLoad(target, isEager);
+      }
+    }, true);
 
-      // Performance monitoring for Task-011 optimization
-      let imageLoadCount = 0;
-      const totalImages = masonryContainer.querySelectorAll('.masonry-image').length;
-      
-      masonryContainer.addEventListener('load', (event) => {
-        if (event.target && (event.target as HTMLElement).classList.contains('masonry-image')) {
-          imageLoadCount++;
-          console.log(`Image loaded: ${imageLoadCount}/${totalImages}`);
-          
-          if (imageLoadCount === totalImages) {
-            console.log('All masonry images loaded at:', performance.now(), 'ms');
-          }
+    // Focus management for accessibility
+    masonryContainer.addEventListener('focusin', (event) => {
+      const focusedItem = event.target.closest('.masonry-item');
+      if (focusedItem) {
+        const img = focusedItem.querySelector('.masonry-image');
+        if (img && img.loading === 'lazy') {
+          img.setAttribute('fetchpriority', 'high');
         }
-      }, true);
+      }
+    });
 
-      // Add loaded class to trigger CSS animations
-      // Use EVENT_RECALCULATED instead of EVENT_INITIALIZED because:
-      // EVENT_INITIALIZED fires immediately when instance is created, before layout
-      // EVENT_RECALCULATED fires after layout calculations are complete
-      macyInstance.on(macyInstance.constants.EVENT_RECALCULATED, () => {
-        if (!masonryContainer.classList.contains('masonry-initialized')) {
-          masonryContainer.classList.add('masonry-initialized');
-          // Start staggered animations after layout is complete
-          setTimeout(() => {
-            animateItems();
-          }, 200);
-        }
+    // Handle reduced motion preferences
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+      const items = masonryContainer.querySelectorAll('.masonry-item');
+      items.forEach(item => {
+        item.classList.add('no-animation');
       });
     }
+    
+    // Listen for loading complete event from overlay
+    document.addEventListener('loadingComplete', () => {
+      // Ensure content is visible and animations can start
+      if (!animationsInitialized) {
+        // Trigger reveal for all eager items if not already done
+        const eagerItems = masonryContainer.querySelectorAll('.masonry-item:not([data-lazy="true"])');
+        eagerItems.forEach((item, index) => {
+          item.style.setProperty('--reveal-delay', `${index * 0.15}s`);
+          item.classList.add('reveal');
+        });
+      }
+    });
   });
 </script>
 
 <style>
   .masonry-container {
+    min-height: 50dvh;
     width: 100%;
     margin: 0 auto;
     padding: 0 var(--spacing-container-mobile);
@@ -250,50 +322,76 @@ const { projects = [], className = '' } = Astro.props;
     }
   }
 
-  .masonry-grid {
-    /* Macy.js will manage the grid layout */
-    opacity: 0;
-    transition: opacity var(--transition-normal);
+    :global(.astro-masonry-grid_column) {
+      padding-left: calc(var(--spacing-grid-gap-mobile));
+      padding-right: calc(var(--spacing-grid-gap-mobile));
+    }
+
+  /* Responsive gap adjustments */
+  @media (min-width: 768px) {
+    :global(.astro-masonry-grid_column) {
+      padding-left: calc(var(--spacing-grid-gap-tablet) / 2);
+      padding-right: calc(var(--spacing-grid-gap-tablet) / 2);
+    }
   }
 
-
-  .masonry-grid.masonry-initialized {
-    opacity: 1;
+  @media (min-width: 1200px) {
+    :global(.astro-masonry-grid_column) {
+      padding-left: calc(var(--spacing-grid-gap-desktop) / 3);
+      padding-right: calc(var(--spacing-grid-gap-desktop) / 3);
+    }
   }
 
-
-  .masonry-item {
+  /* Global styles for JavaScript interaction */
+  :global(.masonry-item) {
     width: 100%;
-    margin-bottom: 0; /* Macy.js handles margins internally */
-    opacity: 0;
-    transform: translateY(30px) scale(0.95);
-    transition: 
-      opacity 0.6s cubic-bezier(0.4, 0.0, 0.2, 1),
-      transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1),
-      box-shadow var(--transition-normal);
-    will-change: opacity, transform;
+    margin-bottom: var(--spacing-grid-gap-mobile);
+    
+    /* Initial hidden state with Cell Art style */
+/*     opacity: 0;
+    clip-path: inset(100% 0% 0% 0%);
+    transform: translateY(20px) scale(0.95) translateZ(0); */
     
     /* Performance optimizations */
+    will-change: opacity, clip-path, transform;
     content-visibility: auto;
-    contain-intrinsic-size: 300px 400px; /* Estimated size for layout stability */
     contain: layout style;
+    
+    /* Transition properties */
+    transition: 
+      opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      clip-path 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      box-shadow var(--transition-normal);
   }
 
-  /* Fade in animation for items */
-  .masonry-initialized .masonry-item {
+  /* Cell Art style reveal animation */
+  :global(.masonry-item.reveal) {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    clip-path: inset(0% 0% 0% 0%);
+    transform: translateY(0) scale(1) translateZ(0);
+    transition-delay: var(--reveal-delay, 0s);
   }
 
-  /* Enhanced visibility animation */
-  .masonry-item.visible {
-    opacity: 1;
-    transform: translateY(0) scale(1);
+  /* No animation for reduced motion users */
+  :global(.masonry-item.no-animation) {
+    opacity: 1 !important;
+    clip-path: inset(0% 0% 0% 0%) !important;
+    transform: translateY(0) scale(1) translateZ(0) !important;
+    transition: none !important;
   }
 
-  .masonry-item.animated {
-    opacity: 1;
-    transform: translateY(0) scale(1);
+  /* Responsive margin adjustments */
+  @media (min-width: 768px) {
+    :global(.masonry-item) {
+      margin-bottom: var(--spacing-grid-gap-tablet);
+    }
+  }
+
+  @media (min-width: 1200px) {
+    :global(.masonry-item) {
+      margin-bottom: var(--spacing-grid-gap-desktop);
+    }
   }
 
   .project-link {
@@ -307,9 +405,32 @@ const { projects = [], className = '' } = Astro.props;
   .image-container {
     position: relative;
     overflow: hidden;
-    border-radius: 0; /* Clean, minimal aesthetic */
+    border-radius: 0;
     cursor: pointer;
     background-color: var(--color-surface);
+    width: 100%;
+    display: block;
+  }
+
+  /* Progressive loading placeholder - using simple approach */
+  :global(.image-placeholder) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-surface);
+    z-index: 2;
+    transition: opacity 0.4s ease;
+  }
+
+  /* Hide placeholder when image loads */
+  :global(.image-container[data-loaded="true"]) :global(.image-placeholder) {
+    opacity: 0;
+  }
+
+  :global(.image-placeholder.fade-out) {
+    opacity: 0;
   }
 
   .masonry-image {
@@ -321,44 +442,20 @@ const { projects = [], className = '' } = Astro.props;
     /* Performance and loading optimizations */
     content-visibility: auto;
     background-color: var(--color-surface);
-    aspect-ratio: attr(width) / attr(height); /* Maintain aspect ratio during loading */
+    
+    /* Hardware acceleration */
+    transform: translateZ(0);
+    will-change: transform;
   }
 
-  .masonry-image-picture {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-
-  /* Loading state styling */
-  .image-container.loading .masonry-image {
-    background: linear-gradient(90deg, var(--color-surface) 25%, rgba(255,255,255,0.3) 50%, var(--color-surface) 75%);
-    background-size: 200% 100%;
-    animation: loading-shimmer 1.5s infinite;
-  }
-
-  @keyframes loading-shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-  }
-
-  /* Stop shimmer when image loads */
-  .image-container.loading .masonry-image[src] {
-    animation: none;
-    background: none;
-  }
 
   /* Hover effects - only on non-touch devices */
   @media (hover: hover) and (pointer: fine) {
-    .masonry-item:hover {
+    :global(.masonry-item.reveal):hover {
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
     }
 
-    .masonry-item:hover .masonry-image {
-      transform: scale(1.03);
-    }
-
-    .masonry-item:hover .overlay {
+    :global(.masonry-item.reveal):hover .overlay {
       opacity: 1;
       visibility: visible;
     }
@@ -366,7 +463,7 @@ const { projects = [], className = '' } = Astro.props;
 
   /* Touch devices - show overlay on tap */
   @media (hover: none) and (pointer: coarse) {
-    .masonry-item:active .overlay {
+    :global(.masonry-item):active .overlay {
       opacity: 1;
       visibility: visible;
     }
@@ -421,7 +518,7 @@ const { projects = [], className = '' } = Astro.props;
   }
 
   /* Focus management for accessibility */
-  .masonry-item:focus-within {
+  :global(.masonry-item.reveal):focus-within {
     outline: 2px solid var(--color-primary);
     outline-offset: 4px;
   }
@@ -431,32 +528,30 @@ const { projects = [], className = '' } = Astro.props;
     outline-offset: 4px;
   }
 
-  .project-link:focus .overlay {
+  :global(.masonry-item.reveal) .project-link:focus .overlay {
     opacity: 1;
     visibility: visible;
   }
 
   /* Accessibility: Respect reduced motion preferences */
   @media (prefers-reduced-motion: reduce) {
-    .masonry-item {
+    :global(.masonry-item) {
       animation: none !important;
       transition: none !important;
       will-change: auto;
+      opacity: 1 !important;
+      clip-path: inset(0% 0% 0% 0%) !important;
+      transform: translateY(0) scale(1) translateZ(0) !important;
     }
 
     .masonry-grid {
       transition: none !important;
     }
-
-    .image-container.loading .masonry-image {
-      animation: none !important;
-      background: var(--color-surface) !important;
-    }
   }
 
   /* High contrast mode support */
   @media (prefers-contrast: high) {
-    .masonry-item {
+    :global(.masonry-item) {
       border: 2px solid ButtonText;
     }
     
@@ -468,7 +563,7 @@ const { projects = [], className = '' } = Astro.props;
 
   /* Performance optimizations for large screens */
   @media (min-width: 1600px) {
-    .masonry-item {
+    :global(.masonry-item) {
       contain-intrinsic-size: 382px 500px; /* Larger estimated size for desktop */
     }
   }
