@@ -71,8 +71,42 @@ const socialLinks = [
   <ContactDialog />
 </Layout>
 
-<!-- Performance Monitoring Script -->
+<!-- Lenis Smooth Scrolling & Performance Monitoring -->
 <script>
+  import Lenis from 'lenis';
+
+  // Initialize Lenis with optimized settings for masonry grid
+  const lenis = new Lenis({
+    lerp: 0.08, // Smooth interpolation
+    duration: 1.2, // Natural timing
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Custom easing curve
+    orientation: 'vertical',
+    gestureOrientation: 'vertical',
+    smoothWheel: true,
+    wheelMultiplier: 1,
+    touchMultiplier: 1,
+    autoResize: true
+  });
+
+  // Coordinated RAF loop for Lenis and Motion.js synchronization
+  function raf(time) {
+    lenis.raf(time);
+    requestAnimationFrame(raf);
+  }
+  requestAnimationFrame(raf);
+
+  // Make lenis available globally for masonry grid integration
+  window.lenis = lenis;
+
+  // Coordinate with loading overlay for smooth transition
+  document.addEventListener('loadingComplete', () => {
+    // Ensure Lenis is ready and smooth scrolling is active
+    setTimeout(() => {
+      lenis.start(); // Ensure Lenis is running
+      console.log('Lenis smooth scrolling activated after loading complete');
+    }, 100);
+  });
+
   // Core Web Vitals Monitoring for Task-009 optimization
   if ('PerformanceObserver' in window) {
     // Monitor LCP (Largest Contentful Paint)
@@ -111,6 +145,14 @@ const socialLinks = [
         console.log('Hero animation completed at:', performance.now(), 'ms');
       });
     }
+
+    // Monitor smooth scroll performance
+    lenis.on('scroll', () => {
+      // Log scroll performance occasionally
+      if (Math.random() < 0.01) { // 1% sampling rate
+        console.log('Smooth scroll active - Lenis velocity:', lenis.velocity);
+      }
+    });
   }
 </script>
 
