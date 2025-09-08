@@ -52,16 +52,18 @@ const { className = '' } = Astro.props;
         // Ensure display shows 100%
         percentageElement.textContent = '100%';
         
-        // Fade out overlay when complete
+        // Fade out overlay when complete with better timing
         setTimeout(() => {
+          console.log('LoadingOverlay: Starting fade out sequence...');
           overlay.classList.add('fade-out');
           setTimeout(() => {
             overlay.style.display = 'none';
             document.body.classList.remove('loading');
-            // Trigger content reveal
+            console.log('LoadingOverlay: Overlay hidden, dispatching loadingComplete event');
+            // Trigger content reveal - this coordinates with MasonryGrid animations
             document.dispatchEvent(new CustomEvent('loadingComplete'));
           }, 600); // Match CSS transition duration
-        }, 200); // Shorter pause for better perceived performance
+        }, 300); // Slightly longer pause to ensure images are visually ready
       } else {
         animationFrame = null;
       }
@@ -84,19 +86,14 @@ const { className = '' } = Astro.props;
     // Start with small progress to show activity
     setTimeout(() => updateProgress(15), 100);
     
-    // Aggressive fallback for cached images - complete loading after 800ms max
+    // More reasonable fallback timeout - wait longer for actual image loading
     setTimeout(() => {
-      console.log('LoadingOverlay: Fallback timeout reached, forcing completion');
+      console.log('LoadingOverlay: Extended fallback timeout reached (3s), forcing completion');
       updateProgress(100);
-    }, 800);
+    }, 3000);
     
-    // Very quick completion for fully loaded pages (cached images)
-    if (document.readyState === 'complete') {
-      setTimeout(() => {
-        console.log('LoadingOverlay: Document already complete, fast completion');
-        updateProgress(100);
-      }, 200);
-    }
+    // Don't auto-complete for fully loaded pages - wait for image loading coordination
+    // The MasonryGrid script will drive the progress updates based on actual image loading
   });
 </script>
 
