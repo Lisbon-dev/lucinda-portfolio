@@ -6,12 +6,12 @@ import Typography from "../../components/core/Typography.astro";
 import Header from "../../components/layout/Header.astro";
 import AboutDialog from "../../components/dialog/AboutDialog.astro";
 import ContactDialog from "../../components/dialog/ContactDialog.astro";
-import { getCollection } from 'astro:content';
-import { Image } from 'astro:assets';
-import type { CollectionEntry } from 'astro:content';
+import { getCollection } from "astro:content";
+import { Image } from "astro:assets";
+import type { CollectionEntry } from "astro:content";
 
 export async function getStaticPaths() {
-  const projects = await getCollection('projects');
+  const projects = await getCollection("projects");
   return projects.map((project) => ({
     params: { slug: project.slug },
     props: { project },
@@ -19,19 +19,42 @@ export async function getStaticPaths() {
 }
 
 interface Props {
-  project: CollectionEntry<'projects'>;
+  project: CollectionEntry<"projects">;
 }
 
 const { project } = Astro.props;
 
 // Get all projects for navigation carousel
-const allProjects = await getCollection('projects');
-const currentIndex = allProjects.findIndex(p => p.slug === project.slug);
-const previousProject = currentIndex > 0 ? allProjects[currentIndex - 1] : allProjects[allProjects.length - 1];
-const nextProject = currentIndex < allProjects.length - 1 ? allProjects[currentIndex + 1] : allProjects[0];
+const allProjects = await getCollection("projects");
+const currentIndex = allProjects.findIndex((p) => p.slug === project.slug);
+const previousProject =
+  currentIndex > 0
+    ? allProjects[currentIndex - 1]
+    : allProjects[allProjects.length - 1];
+const nextProject =
+  currentIndex < allProjects.length - 1
+    ? allProjects[currentIndex + 1]
+    : allProjects[0];
 
 const previousProjectUrl = `/projects/${previousProject.slug}`;
 const nextProjectUrl = `/projects/${nextProject.slug}`;
+
+// Logic for pagination dots
+const totalProjects = allProjects.length;
+const maxDots = 5;
+const numDots = Math.min(totalProjects, maxDots);
+
+let dotsStartIndex = 0;
+if (totalProjects > maxDots) {
+  dotsStartIndex = Math.max(0, currentIndex - Math.floor(maxDots / 2));
+  dotsStartIndex = Math.min(dotsStartIndex, totalProjects - maxDots);
+}
+
+const projectsForDots = allProjects.slice(
+  dotsStartIndex,
+  dotsStartIndex + numDots,
+);
+const activeDotIndex = currentIndex - dotsStartIndex;
 ---
 
 <Layout>
@@ -39,23 +62,63 @@ const nextProjectUrl = `/projects/${nextProject.slug}`;
   <Header />
 
   <!-- Main Project Content -->
-  <main class="project-page" id="top" data-prev-url={previousProjectUrl} data-next-url={nextProjectUrl}>
+  <main
+    class="project-page"
+    id="top"
+    data-prev-url={previousProjectUrl}
+    data-next-url={nextProjectUrl}
+  >
     <!-- Navigation Arrows positioned beside description -->
     <nav class="project-navigation" aria-label="Project navigation">
-      <a href={previousProjectUrl} class="nav-arrow nav-arrow--prev" aria-label={`Previous project: ${previousProject.data.title}`}>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <a
+        href={previousProjectUrl}
+        class="nav-arrow nav-arrow--prev"
+        aria-label={`Previous project: ${previousProject.data.title}`}
+      >
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M15 18L9 12L15 6"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"></path>
         </svg>
       </a>
-      <a href={nextProjectUrl} class="nav-arrow nav-arrow--next" aria-label={`Next project: ${nextProject.data.title}`}>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <a
+        href={nextProjectUrl}
+        class="nav-arrow nav-arrow--next"
+        aria-label={`Next project: ${nextProject.data.title}`}
+      >
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M9 18L15 12L9 6"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"></path>
         </svg>
       </a>
     </nav>
 
     <!-- Hero Section - Match landing page exactly -->
-    <BaseSection variant="hero" fullHeight={false} backgroundColor="background" padding="none">
+    <BaseSection
+      variant="hero"
+      fullHeight={false}
+      backgroundColor="background"
+      padding="none"
+    >
       <Container>
         <header class="project-hero">
           <a href="/" class="home-link" aria-label="Go to homepage">
@@ -63,9 +126,9 @@ const nextProjectUrl = `/projects/${nextProject.slug}`;
               LUCINDA BURMAN
             </Typography>
           </a>
-         
+
           <Typography as="p" variant="explanatory" tracking="wide">
-            {project.data.category} 
+            {project.data.category}
           </Typography>
         </header>
       </Container>
@@ -77,28 +140,17 @@ const nextProjectUrl = `/projects/${nextProject.slug}`;
         <!-- Project Description with Navigation -->
         <div class="description-with-navigation">
           <div class="project-description">
-             <Typography as="h2" variant="explanatory" tracking="wider">
-            {project.data.title} - {project.data.description}
-          </Typography>
+            <Typography as="h2" variant="explanatory" tracking="wider">
+              {project.data.title} - {project.data.description}
+            </Typography>
           </div>
-        </div>
-
-        <!-- Mobile Swipe Hint -->
-        <div class="mobile-swipe-hint" aria-hidden="true">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <Typography as="span" variant="nav" tracking="wider">SWIPE</Typography>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
         </div>
 
         <!-- Single Column Image Display -->
         <div class="project-images">
           <!-- Main Image -->
           <div class="image-wrapper">
-            <Image 
+            <Image
               src={project.data.mainImage.src}
               alt={project.data.mainImage.alt}
               class="project-image"
@@ -113,22 +165,30 @@ const nextProjectUrl = `/projects/${nextProject.slug}`;
           </div>
 
           <!-- Additional Images -->
-          {project.data.images && project.data.images.map((image: {src: any, alt: string, height?: number}, index: number) => (
-            <div class="image-wrapper">
-              <Image 
-                src={image.src}
-                alt={image.alt}
-                class="project-image"
-                width={695}
-                height={image.height || 600}
-                format="webp"
-                quality={85}
-                loading={index < 2 ? "eager" : "lazy"}
-                fetchpriority={index < 1 ? "high" : "low"}
-                densities={[1, 1.5, 2]}
-              />
-            </div>
-          ))}
+          {
+            project.data.images &&
+              project.data.images.map(
+                (
+                  image: { src: any; alt: string; height?: number },
+                  index: number
+                ) => (
+                  <div class="image-wrapper">
+                    <Image
+                      src={image.src}
+                      alt={image.alt}
+                      class="project-image"
+                      width={695}
+                      height={image.height || 600}
+                      format="webp"
+                      quality={85}
+                      loading={index < 2 ? "eager" : "lazy"}
+                      fetchpriority={index < 1 ? "high" : "low"}
+                      densities={[1, 1.5, 2]}
+                    />
+                  </div>
+                )
+              )
+          }
         </div>
 
         <!-- Back to Top Link -->
@@ -138,15 +198,48 @@ const nextProjectUrl = `/projects/${nextProject.slug}`;
       </div>
     </div>
   </main>
-  
+
+  <!-- Mobile Swipe Hint -->
+  <div class="mobile-swipe-hint" aria-hidden="true">
+    <div class="swipe-dots">
+      {
+        projectsForDots.map((_p, index) => (
+          <span class:list={["swipe-dot", { active: index === activeDotIndex }]} />
+        ))
+      }
+    </div>
+  </div>
+
   <!-- Dialog Modals -->
   <AboutDialog />
   <ContactDialog />
 </Layout>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const projectPage = document.querySelector('.project-page');
+  import Lenis from "lenis";
+
+  // Initialize Lenis with optimized settings
+  const lenis = new Lenis({
+    lerp: 0.08,
+    duration: 1.2,
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    orientation: "vertical",
+    gestureOrientation: "vertical",
+    smoothWheel: true,
+    wheelMultiplier: 1,
+    touchMultiplier: 1,
+    autoResize: true,
+  });
+
+  // Coordinated RAF loop for Lenis
+  function raf(time) {
+    lenis.raf(time);
+    requestAnimationFrame(raf);
+  }
+  requestAnimationFrame(raf);
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const projectPage = document.querySelector(".project-page");
     if (!projectPage) return;
 
     const prevUrl = projectPage.dataset.prevUrl;
@@ -158,14 +251,22 @@ const nextProjectUrl = `/projects/${nextProject.slug}`;
     let touchEndX = 0;
     const swipeThreshold = 50; // Minimum distance for a swipe
 
-    projectPage.addEventListener('touchstart', (event) => {
-      touchStartX = event.changedTouches[0].screenX;
-    }, { passive: true });
+    projectPage.addEventListener(
+      "touchstart",
+      (event) => {
+        touchStartX = event.changedTouches[0].screenX;
+      },
+      { passive: true }
+    );
 
-    projectPage.addEventListener('touchend', (event) => {
-      touchEndX = event.changedTouches[0].screenX;
-      handleSwipe();
-    }, { passive: true });
+    projectPage.addEventListener(
+      "touchend",
+      (event) => {
+        touchEndX = event.changedTouches[0].screenX;
+        handleSwipe();
+      },
+      { passive: true }
+    );
 
     function handleSwipe() {
       const deltaX = touchEndX - touchStartX;
@@ -182,6 +283,13 @@ const nextProjectUrl = `/projects/${nextProject.slug}`;
         window.location.href = prevUrl;
       }
     }
+
+    const backToTopLink = document.querySelector(".back-to-top-link");
+    backToTopLink?.addEventListener("click", (event) => {
+      event.preventDefault();
+      // Use the locally initialized lenis instance
+      lenis?.scrollTo("#top");
+    });
   });
 </script>
 
@@ -194,8 +302,8 @@ const nextProjectUrl = `/projects/${nextProject.slug}`;
   .project-hero {
     text-align: center;
     /* Fixed height approach - 318px baseline with responsive scaling */
-    height: 318px;
-    max-height: 318px;
+    /*     height: 318px;
+    max-height: 318px; */
     padding-top: 11.2vh;
     display: flex;
     flex-direction: column;
@@ -294,12 +402,34 @@ const nextProjectUrl = `/projects/${nextProject.slug}`;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: var(--spacing-sm);
     color: var(--color-text-secondary);
     opacity: 0.8;
     margin-bottom: var(--spacing-xl);
     user-select: none;
     -webkit-user-select: none;
+  }
+
+  .swipe-dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+
+  .swipe-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: currentColor;
+    opacity: 0.4;
+    transition:
+      opacity var(--transition-normal),
+      transform var(--transition-normal);
+  }
+
+  .swipe-dot.active {
+    opacity: 1;
+    transform: scale(1.1);
   }
 
   /* Back to Top Link */
@@ -380,12 +510,6 @@ const nextProjectUrl = `/projects/${nextProject.slug}`;
       height: 24px;
     }
 
-    .project-hero {
-      height: calc(318px * 0.8); /* Proportionally smaller for mobile */
-      max-height: calc(318px * 0.8);
-      padding-top: calc(110px * 0.8);
-    }
-
     .project-content-section {
       padding-top: calc(79px * 0.8); /* Adjusted mobile spacing */
     }
@@ -406,12 +530,6 @@ const nextProjectUrl = `/projects/${nextProject.slug}`;
   @media (max-width: 480px) {
     .project-description {
       padding: 0 var(--spacing-sm);
-    }
-
-    .project-hero {
-      height: calc(318px * 0.7); /* Even smaller for mobile */
-      max-height: calc(318px * 0.7);
-      padding-top: calc(110px * 0.7);
     }
 
     .project-content-section {
