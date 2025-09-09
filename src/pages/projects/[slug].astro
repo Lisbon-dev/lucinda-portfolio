@@ -29,6 +29,9 @@ const allProjects = await getCollection('projects');
 const currentIndex = allProjects.findIndex(p => p.slug === project.slug);
 const previousProject = currentIndex > 0 ? allProjects[currentIndex - 1] : allProjects[allProjects.length - 1];
 const nextProject = currentIndex < allProjects.length - 1 ? allProjects[currentIndex + 1] : allProjects[0];
+
+const previousProjectUrl = `/projects/${previousProject.slug}`;
+const nextProjectUrl = `/projects/${nextProject.slug}`;
 ---
 
 <Layout>
@@ -36,7 +39,21 @@ const nextProject = currentIndex < allProjects.length - 1 ? allProjects[currentI
   <Header />
 
   <!-- Main Project Content -->
-  <main class="project-page">
+  <main class="project-page" id="top" data-prev-url={previousProjectUrl} data-next-url={nextProjectUrl}>
+    <!-- Navigation Arrows positioned beside description -->
+    <nav class="project-navigation" aria-label="Project navigation">
+      <a href={previousProjectUrl} class="nav-arrow nav-arrow--prev" aria-label={`Previous project: ${previousProject.data.title}`}>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <a href={nextProjectUrl} class="nav-arrow nav-arrow--next" aria-label={`Next project: ${nextProject.data.title}`}>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </nav>
+
     <!-- Hero Section - Match landing page exactly -->
     <BaseSection variant="hero" fullHeight={false} backgroundColor="background" padding="none">
       <Container>
@@ -64,20 +81,17 @@ const nextProject = currentIndex < allProjects.length - 1 ? allProjects[currentI
             {project.data.title} - {project.data.description}
           </Typography>
           </div>
-          
-          <!-- Navigation Arrows positioned beside description -->
-          <nav class="project-navigation" aria-label="Project navigation">
-            <a href={`/projects/${previousProject.slug}`} class="nav-arrow nav-arrow--prev" aria-label={`Previous project: ${previousProject.data.title}`}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </a>
-            <a href={`/projects/${nextProject.slug}`} class="nav-arrow nav-arrow--next" aria-label={`Next project: ${nextProject.data.title}`}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </a>
-          </nav>
+        </div>
+
+        <!-- Mobile Swipe Hint -->
+        <div class="mobile-swipe-hint" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <Typography as="span" variant="nav" tracking="wider">SWIPE</Typography>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
 
         <!-- Single Column Image Display -->
@@ -116,6 +130,11 @@ const nextProject = currentIndex < allProjects.length - 1 ? allProjects[currentI
             </div>
           ))}
         </div>
+
+        <!-- Back to Top Link -->
+        <div class="back-to-top">
+          <a href="#top" class="back-to-top-link">BACK TO TOP</a>
+        </div>
       </div>
     </div>
   </main>
@@ -124,6 +143,47 @@ const nextProject = currentIndex < allProjects.length - 1 ? allProjects[currentI
   <AboutDialog />
   <ContactDialog />
 </Layout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const projectPage = document.querySelector('.project-page');
+    if (!projectPage) return;
+
+    const prevUrl = projectPage.dataset.prevUrl;
+    const nextUrl = projectPage.dataset.nextUrl;
+
+    if (!prevUrl || !nextUrl) return;
+
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const swipeThreshold = 50; // Minimum distance for a swipe
+
+    projectPage.addEventListener('touchstart', (event) => {
+      touchStartX = event.changedTouches[0].screenX;
+    }, { passive: true });
+
+    projectPage.addEventListener('touchend', (event) => {
+      touchEndX = event.changedTouches[0].screenX;
+      handleSwipe();
+    }, { passive: true });
+
+    function handleSwipe() {
+      const deltaX = touchEndX - touchStartX;
+
+      if (Math.abs(deltaX) < swipeThreshold) {
+        return; // Not a valid swipe
+      }
+
+      if (deltaX < 0) {
+        // Swiped left -> Next project
+        window.location.href = nextUrl;
+      } else {
+        // Swiped right -> Previous project
+        window.location.href = prevUrl;
+      }
+    }
+  });
+</script>
 
 <style>
   .project-page {
@@ -191,44 +251,83 @@ const nextProject = currentIndex < allProjects.length - 1 ? allProjects[currentI
 
   /* Navigation positioned beside description */
   .project-navigation {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: space-between;
-    pointer-events: none;
-    transform: translateY(-50%);
-    z-index: 10;
+    /* This container is now just a semantic wrapper for the arrows,
+       which handle their own fixed positioning. */
   }
 
   .nav-arrow {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+
     pointer-events: auto;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
-    background: var(--color-background);
-    border: 1px solid var(--color-text-secondary);
-    border-radius: 50%;
     color: var(--color-text-secondary);
     text-decoration: none;
     transition: all var(--transition-normal);
-    opacity: 0.8;
+    opacity: 0.7;
   }
 
   .nav-arrow:hover {
     opacity: 1;
-    background: var(--color-primary);
-    border-color: var(--color-primary);
-    color: white;
+    color: var(--color-text-primary);
     transform: scale(1.1);
   }
 
-  .nav-arrow:focus {
+  .nav-arrow--prev {
+    left: var(--spacing-container-desktop);
+  }
+
+  .nav-arrow--next {
+    right: var(--spacing-container-desktop);
+  }
+
+  .nav-arrow svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .mobile-swipe-hint {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-sm);
+    color: var(--color-text-secondary);
+    opacity: 0.8;
+    margin-bottom: var(--spacing-xl);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* Back to Top Link */
+  .back-to-top {
+    text-align: center;
+    margin-top: 66px;
+    padding-bottom: var(--spacing-xl);
+  }
+
+  .back-to-top-link {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: color var(--transition-normal);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-sm);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+  }
+
+  .back-to-top-link:hover,
+  .back-to-top-link:focus-visible {
+    color: var(--color-text-primary);
+  }
+
+  .back-to-top-link:focus-visible {
     outline: 2px solid var(--color-primary);
     outline-offset: 4px;
+    border-radius: var(--rounded-sm);
   }
 
   /* Single Column Images with proper gaps */
@@ -259,9 +358,28 @@ const nextProject = currentIndex < allProjects.length - 1 ? allProjects[currentI
     .project-content-container {
       padding: 0 var(--spacing-container-tablet);
     }
+    .nav-arrow--prev {
+      left: var(--spacing-container-tablet);
+    }
+    .nav-arrow--next {
+      right: var(--spacing-container-tablet);
+    }
   }
 
   @media (max-width: 768px) {
+    .nav-arrow--prev {
+      left: var(--spacing-container-mobile);
+    }
+
+    .nav-arrow--next {
+      right: var(--spacing-container-mobile);
+    }
+
+    .nav-arrow svg {
+      width: 24px;
+      height: 24px;
+    }
+
     .project-hero {
       height: calc(318px * 0.8); /* Proportionally smaller for mobile */
       max-height: calc(318px * 0.8);
@@ -286,11 +404,6 @@ const nextProject = currentIndex < allProjects.length - 1 ? allProjects[currentI
   }
 
   @media (max-width: 480px) {
-    .nav-arrow {
-      width: 40px;
-      height: 40px;
-    }
-
     .project-description {
       padding: 0 var(--spacing-sm);
     }
@@ -311,6 +424,20 @@ const nextProject = currentIndex < allProjects.length - 1 ? allProjects[currentI
 
     .description-with-navigation {
       margin-bottom: calc(66px * 0.7);
+    }
+  }
+
+  /* Hide swipe hint on larger screens where arrows are present */
+  @media (min-width: 1024px) {
+    .mobile-swipe-hint {
+      display: none;
+    }
+  }
+
+  /* Hide arrows on smaller screens where swipe is intended */
+  @media (max-width: 1023px) {
+    .nav-arrow {
+      display: none;
     }
   }
 
