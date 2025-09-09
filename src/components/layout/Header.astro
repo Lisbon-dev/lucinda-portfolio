@@ -57,19 +57,24 @@ const headerClasses = [
     menuButton: HTMLElement | null;
     slideHeader: HTMLElement | null;
     isMenuOpen: boolean;
+    boundToggleMenu: () => void;
 
     constructor() {
       this.menuButton = document.querySelector('.menu-button');
       this.slideHeader = document.querySelector('.slide-header');
       this.isMenuOpen = false;
+      this.boundToggleMenu = this.toggleMenu.bind(this);
       
       this.init();
     }
 
     init() {
-      if (this.menuButton && this.slideHeader) {
-        this.menuButton.addEventListener('click', () => this.toggleMenu());
-      }
+      if (!this.menuButton || !this.slideHeader) return;
+
+      const mediaQuery = window.matchMedia('(max-width: 768px)');
+      
+      this.handleViewportChange(mediaQuery); // Initial check
+      mediaQuery.addEventListener('change', (e) => this.handleViewportChange(e));
 
       // Close menu on escape key
       document.addEventListener('keydown', (e) => {
@@ -77,6 +82,26 @@ const headerClasses = [
           this.closeMenu();
         }
       });
+    }
+
+    handleViewportChange(e: MediaQueryList | MediaQueryListEvent) {
+      if (e.matches) {
+        // Mobile view: header is always visible
+        if (this.slideHeader) {
+          this.slideHeader.setAttribute('aria-hidden', 'false');
+          this.slideHeader.classList.remove('slide-header--open');
+        }
+        if (this.menuButton) {
+          this.menuButton.removeEventListener('click', this.boundToggleMenu);
+        }
+      } else {
+        // Desktop view: header is toggleable
+        if (this.menuButton) {
+          this.menuButton.addEventListener('click', this.boundToggleMenu);
+        }
+        // When switching to desktop, ensure menu is closed initially
+        this.closeMenu();
+      }
     }
 
     toggleMenu() {
@@ -239,8 +264,16 @@ const headerClasses = [
   /* Mobile responsive adjustments */
   @media (max-width: 768px) {
     .menu-button {
-      top: var(--spacing-md);
-      right: var(--spacing-md);
+      display: none;
+    }
+
+    .slide-header {
+      transform: translateY(0);
+      height: 65px;
+      background-color: var(--color-background);
+      backdrop-filter: none;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      transition: none;
     }
 
     .slide-nav {
@@ -255,25 +288,6 @@ const headerClasses = [
     button.nav-button {
       font-size: var(--text-base);
       padding: var(--spacing-sm);
-    }
-  }
-
-  @media (max-width: 480px) {
-    .menu-button {
-      top: var(--spacing-sm);
-      right: var(--spacing-sm);
-      padding: var(--spacing-xs);
-    }
-
-    .slide-nav {
-      flex-direction: column;
-      gap: var(--spacing-md);
-    }
-
-    .slide-header {
-      height: auto;
-      min-height: 8.66vh;
-      padding: var(--spacing-md) 0;
     }
   }
 
