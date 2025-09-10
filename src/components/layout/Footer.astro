@@ -1,0 +1,53 @@
+---
+
+---
+
+<footer>
+  <div class="copyright-container">
+    <span
+      >&copy;
+      {new Date().getFullYear()} Lucinda Burman. Created by <a
+        class="logo"
+        href="https://lisbon.dev">Lisbon<strong>.DEV</strong></a
+      ></span
+    >
+  </div>
+</footer>
+
+<style>
+  footer {
+    display: flex;
+    justify-content: center;
+  }
+
+  .copyright-container {
+    display: flex;
+    justify-content: center;
+    width: 80%;
+    margin-top: var(--space-lg);
+    padding-top: var(--space-md);
+    margin-bottom: var(--space-lg);
+    border-top: 1px solid hsla(0, 0%, 5%, 0.701);
+    font-size: var(--text-xs);
+    font-family: var(--font-body);
+  }
+
+  .copyright-container a{
+
+    text-decoration: none;
+  }
+
+  .logo {
+    font-size: var(--text-xs);
+    font-family: var(--font-lisbon-dev);
+    color: var(--color-text-primary);
+    letter-spacing: var(--tracking-wider);
+    font-weight: 900;
+  }
+
+  .logo strong{
+    color: var(--color-lisbon-dev);
+  }
+
+
+</style>

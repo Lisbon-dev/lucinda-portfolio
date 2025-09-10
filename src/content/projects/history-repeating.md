@@ -1,18 +1,18 @@
 ---
 title: "History Repeating"
-description: "Charcoal portrait series exploring historical themes and the cyclical nature of human experience."
-category: "Portrait Illustration"
+description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+category: "Editorial Illustration"
 featured: false
 publishedDate: 2023-06-10
 client: "Gallery Exhibition"
 year: 2023
 mainImage:
-    src: "History Repeating - Einsteen charcoal.png"
+    src: "../../assets/portfolio/History Repeating - Einsteen charcoal.png"
     alt: "Charcoal portrait of Einstein for History Repeating series"
 images:
-  - src: "History Repeating - Einsteen charcoal.png"
+  - src: "../../assets/portfolio/History Repeating - Einsteen charcoal.png"
     alt: "Charcoal portrait of Einstein for History Repeating series"
-  - src: "History Repeating.png"
+  - src: "../../assets/portfolio/History Repeating.png"
     alt: "History Repeating main artwork showing abstract historical themes"
 tags:
   - "charcoal"

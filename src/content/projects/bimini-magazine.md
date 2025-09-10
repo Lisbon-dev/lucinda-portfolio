@@ -1,18 +1,18 @@
 ---
 title: "Bimini Magazine"
-description: "Double-page spread designs for Bimini Magazine featuring bold typography and contemporary layout design."
-category: "Magazine Design"
+description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+category: "Editorial Illustration"
 featured: true
 publishedDate: 2023-07-22
 client: "Bimini Magazine"
 year: 2023
 mainImage: 
-    src: "Binimi SPEC MLK.png" 
+    src: "../../assets/portfolio/Binimi SPEC MLK.png" 
     alt: "Bimini Magazine MLK special edition spread with portrait illustration"
 images:
-  - src: "Bimini - double page spread.png"
+  - src: "../../assets/portfolio/Bimini - double page spread.png"
     alt: "Bimini Magazine double page spread with modern typography and clean layout"
-  - src: "Binimi SPEC MLK.png"
+  - src: "../../assets/portfolio/Binimi SPEC MLK.png"
     alt: "Bimini Magazine MLK special edition spread with portrait illustration"
 tags:
   - "magazine"

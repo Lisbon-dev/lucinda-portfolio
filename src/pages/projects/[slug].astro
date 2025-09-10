@@ -1,0 +1,582 @@
+---
+import Layout from "../../layout/Layout.astro";
+import BaseSection from "../../components/core/BaseSection.astro";
+import Container from "../../components/core/Container.astro";
+import Typography from "../../components/core/Typography.astro";
+import Header from "../../components/layout/Header.astro";
+import AboutDialog from "../../components/dialog/AboutDialog.astro";
+import ContactDialog from "../../components/dialog/ContactDialog.astro";
+import { getCollection } from "astro:content";
+import { Image } from "astro:assets";
+import type { CollectionEntry } from "astro:content";
+
+export async function getStaticPaths() {
+  const projects = await getCollection("projects");
+  return projects.map((project) => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}
+
+interface Props {
+  project: CollectionEntry<"projects">;
+}
+
+const { project } = Astro.props;
+
+// Get all projects for navigation carousel
+const allProjects = await getCollection("projects");
+const currentIndex = allProjects.findIndex((p) => p.slug === project.slug);
+const previousProject =
+  currentIndex > 0
+    ? allProjects[currentIndex - 1]
+    : allProjects[allProjects.length - 1];
+const nextProject =
+  currentIndex < allProjects.length - 1
+    ? allProjects[currentIndex + 1]
+    : allProjects[0];
+
+const previousProjectUrl = `/projects/${previousProject.slug}`;
+const nextProjectUrl = `/projects/${nextProject.slug}`;
+
+// Logic for pagination dots
+const totalProjects = allProjects.length;
+const maxDots = 5;
+const numDots = Math.min(totalProjects, maxDots);
+
+let dotsStartIndex = 0;
+if (totalProjects > maxDots) {
+  dotsStartIndex = Math.max(0, currentIndex - Math.floor(maxDots / 2));
+  dotsStartIndex = Math.min(dotsStartIndex, totalProjects - maxDots);
+}
+
+const projectsForDots = allProjects.slice(
+  dotsStartIndex,
+  dotsStartIndex + numDots,
+);
+const activeDotIndex = currentIndex - dotsStartIndex;
+---
+
+<Layout>
+  <!-- Reuse Header Component -->
+  <Header />
+
+  <!-- Main Project Content -->
+  <main
+    class="project-page"
+    id="top"
+    data-prev-url={previousProjectUrl}
+    data-next-url={nextProjectUrl}
+  >
+    <!-- Navigation Arrows positioned beside description -->
+    <nav class="project-navigation" aria-label="Project navigation">
+      <a
+        href={previousProjectUrl}
+        class="nav-arrow nav-arrow--prev"
+        aria-label={`Previous project: ${previousProject.data.title}`}
+      >
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M15 18L9 12L15 6"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"></path>
+        </svg>
+      </a>
+      <a
+        href={nextProjectUrl}
+        class="nav-arrow nav-arrow--next"
+        aria-label={`Next project: ${nextProject.data.title}`}
+      >
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M9 18L15 12L9 6"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"></path>
+        </svg>
+      </a>
+    </nav>
+
+    <!-- Hero Section - Match landing page exactly -->
+    <BaseSection
+      variant="hero"
+      fullHeight={false}
+      backgroundColor="background"
+      padding="none"
+    >
+      <Container>
+        <header class="project-hero">
+          <a href="/" class="home-link" aria-label="Go to homepage">
+            <Typography as="h1" variant="header" tracking="wider">
+              LUCINDA BURMAN
+            </Typography>
+          </a>
+
+          <Typography as="p" variant="explanatory" tracking="wide">
+            {project.data.category}
+          </Typography>
+        </header>
+      </Container>
+    </BaseSection>
+
+    <!-- Project Content Section -->
+    <div class="project-content-section">
+      <div class="container">
+        <!-- Project Description with Navigation -->
+        <div class="description-with-navigation">
+          <div class="project-description">
+            <Typography as="h2" variant="explanatory" tracking="wider">
+              {project.data.title} - {project.data.description}
+            </Typography>
+          </div>
+        </div>
+
+        <!-- Single Column Image Display -->
+        <div class="project-images">
+          <!-- Main Image -->
+          <div class="image-wrapper">
+            <Image
+              src={project.data.mainImage.src}
+              alt={project.data.mainImage.alt}
+              class="project-image"
+              width={695}
+              height={project.data.mainImage.height || 600}
+              format="webp"
+              quality={85}
+              loading="eager"
+              fetchpriority="high"
+              densities={[1, 1.5, 2]}
+            />
+          </div>
+
+          <!-- Additional Images -->
+          {
+            project.data.images &&
+              project.data.images.map(
+                (
+                  image: { src: any; alt: string; height?: number },
+                  index: number
+                ) => (
+                  <div class="image-wrapper">
+                    <Image
+                      src={image.src}
+                      alt={image.alt}
+                      class="project-image"
+                      width={695}
+                      height={image.height || 600}
+                      format="webp"
+                      quality={85}
+                      loading={index < 2 ? "eager" : "lazy"}
+                      fetchpriority={index < 1 ? "high" : "low"}
+                      densities={[1, 1.5, 2]}
+                    />
+                  </div>
+                )
+              )
+          }
+        </div>
+
+        <!-- Back to Top Link -->
+        <div class="back-to-top">
+          <a href="#top" class="back-to-top-link">BACK TO TOP</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Mobile Swipe Hint -->
+  <div class="mobile-swipe-hint" aria-hidden="true">
+    <div class="swipe-dots">
+      {
+        projectsForDots.map((_p, index) => (
+          <span class:list={["swipe-dot", { active: index === activeDotIndex }]} />
+        ))
+      }
+    </div>
+  </div>
+
+  <!-- Dialog Modals -->
+  <AboutDialog />
+  <ContactDialog />
+</Layout>
+
+<script>
+  import Lenis from "lenis";
+
+  // Initialize Lenis with optimized settings
+  const lenis = new Lenis({
+    lerp: 0.08,
+    duration: 1.2,
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    orientation: "vertical",
+    gestureOrientation: "vertical",
+    smoothWheel: true,
+    wheelMultiplier: 1,
+    touchMultiplier: 1,
+    autoResize: true,
+  });
+
+  // Coordinated RAF loop for Lenis
+  function raf(time) {
+    lenis.raf(time);
+    requestAnimationFrame(raf);
+  }
+  requestAnimationFrame(raf);
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const projectPage = document.querySelector(".project-page");
+    if (!projectPage) return;
+
+    const prevUrl = projectPage.dataset.prevUrl;
+    const nextUrl = projectPage.dataset.nextUrl;
+
+    if (!prevUrl || !nextUrl) return;
+
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const swipeThreshold = 50; // Minimum distance for a swipe
+
+    projectPage.addEventListener(
+      "touchstart",
+      (event) => {
+        touchStartX = event.changedTouches[0].screenX;
+      },
+      { passive: true }
+    );
+
+    projectPage.addEventListener(
+      "touchend",
+      (event) => {
+        touchEndX = event.changedTouches[0].screenX;
+        handleSwipe();
+      },
+      { passive: true }
+    );
+
+    function handleSwipe() {
+      const deltaX = touchEndX - touchStartX;
+
+      if (Math.abs(deltaX) < swipeThreshold) {
+        return; // Not a valid swipe
+      }
+
+      if (deltaX < 0) {
+        // Swiped left -> Next project
+        window.location.href = nextUrl;
+      } else {
+        // Swiped right -> Previous project
+        window.location.href = prevUrl;
+      }
+    }
+
+    const backToTopLink = document.querySelector(".back-to-top-link");
+    backToTopLink?.addEventListener("click", (event) => {
+      event.preventDefault();
+      // Use the locally initialized lenis instance
+      lenis?.scrollTo("#top");
+    });
+  });
+</script>
+
+<style>
+  .project-page {
+    position: relative;
+  }
+
+  /* Hero Section - Match landing page exactly */
+  .project-hero {
+    text-align: center;
+    /* Fixed height approach - 318px baseline with responsive scaling */
+    /*     height: 318px;
+    max-height: 318px; */
+    padding-top: 11.2vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    box-sizing: border-box;
+    overflow: hidden; /* Prevent content overflow */
+  }
+
+  .home-link {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .project-hero > :global(.typography:first-child) {
+    margin-bottom: var(--spacing-sm);
+    line-height: var(--leading-tight);
+  }
+
+  .project-hero > :global(.typography:last-child) {
+    opacity: 0.8;
+  }
+
+  /* Project Content Section */
+  .project-content-section {
+    /* Ensure 397px total from body top to first image */
+    /* 397px - 318px (hero) = 79px remaining */
+    padding-top: 79px;
+    background-color: var(--color-background);
+  }
+
+  .project-content-container {
+    max-width: 1512px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-container-desktop);
+    position: relative;
+  }
+
+  /* Description with Navigation */
+  .description-with-navigation {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: calc(66px / 982px * 100vh); /* 66px gap ratio */
+  }
+
+  .project-description {
+    max-width: calc(695px / 1512px * 100%); /* Match image width ratio */
+    text-align: center;
+    padding: 0 var(--spacing-md);
+  }
+
+  /* Navigation positioned beside description */
+  .project-navigation {
+    /* This container is now just a semantic wrapper for the arrows,
+       which handle their own fixed positioning. */
+  }
+
+  .nav-arrow {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: all var(--transition-normal);
+    opacity: 0.7;
+  }
+
+  .nav-arrow:hover {
+    opacity: 1;
+    color: var(--color-text-primary);
+  }
+
+  .nav-arrow--prev {
+    left: var(--spacing-container-desktop);
+  }
+
+  .nav-arrow--next {
+    right: var(--spacing-container-desktop);
+  }
+
+  .nav-arrow svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .mobile-swipe-hint {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--color-text-secondary);
+    opacity: 0.8;
+    margin-bottom: var(--spacing-xl);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .swipe-dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+
+  .swipe-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: currentColor;
+    opacity: 0.4;
+    transition:
+      opacity var(--transition-normal),
+      transform var(--transition-normal);
+  }
+
+  .swipe-dot.active {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+
+  /* Back to Top Link */
+  .back-to-top {
+    text-align: center;
+    margin-top: 66px;
+    padding-bottom: var(--spacing-xl);
+  }
+
+  .back-to-top-link {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: color var(--transition-normal);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-sm);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+  }
+
+  .back-to-top-link:hover,
+  .back-to-top-link:focus-visible {
+    color: var(--color-text-primary);
+  }
+
+  .back-to-top-link:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 4px;
+    border-radius: var(--rounded-sm);
+  }
+
+  /* Single Column Images with proper gaps */
+  .project-images {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .image-wrapper {
+    max-width: calc(695px / 1512px * 100%); /* 695px on 1512px viewport ratio */
+    width: 100%;
+  }
+
+  .image-wrapper:not(:last-child) {
+    margin-bottom: 66px; /* Fixed 66px gap between images as per wireframe */
+  }
+
+  .project-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 0; /* Clean, minimal aesthetic */
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 1512px) {
+    .project-content-container {
+      padding: 0 var(--spacing-container-tablet);
+    }
+    .nav-arrow--prev {
+      left: var(--spacing-container-tablet);
+    }
+    .nav-arrow--next {
+      right: var(--spacing-container-tablet);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .nav-arrow--prev {
+      left: var(--spacing-container-mobile);
+    }
+
+    .nav-arrow--next {
+      right: var(--spacing-container-mobile);
+    }
+
+    .nav-arrow svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .project-content-section {
+      padding-top: calc(79px * 0.8); /* Adjusted mobile spacing */
+    }
+
+    .project-content-container {
+      padding: 0 var(--spacing-container-mobile);
+    }
+
+    .image-wrapper:not(:last-child) {
+      margin-bottom: calc(66px * 0.8); /* Proportional gaps for mobile */
+    }
+
+    .description-with-navigation {
+      margin-bottom: calc(66px * 0.8);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .project-description {
+      padding: 0 var(--spacing-sm);
+    }
+
+    .project-content-section {
+      padding-top: calc(79px * 0.7);
+    }
+
+    .image-wrapper:not(:last-child) {
+      margin-bottom: calc(66px * 0.7); /* Consistent proportional gaps */
+    }
+
+    .description-with-navigation {
+      margin-bottom: calc(66px * 0.7);
+    }
+  }
+
+  /* Hide swipe hint on larger screens where arrows are present */
+  @media (min-width: 1024px) {
+    .mobile-swipe-hint {
+      display: none;
+    }
+  }
+
+  /* Hide arrows on smaller screens where swipe is intended */
+  @media (max-width: 1023px) {
+    .nav-arrow {
+      display: none;
+    }
+  }
+
+  /* Desktop measurements are now the default above */
+
+  /* Accessibility: Respect reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    .nav-arrow {
+      transition: none;
+    }
+
+    .nav-arrow:hover {
+      transform: none;
+    }
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .nav-arrow {
+      border: 2px solid ButtonText;
+      background: ButtonFace;
+      color: ButtonText;
+    }
+  }
+</style>

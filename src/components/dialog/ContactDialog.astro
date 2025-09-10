@@ -1,0 +1,43 @@
+---
+import SimpleDialog from './SimpleDialog.astro';
+import ContactForm from '../forms/ContactForm.astro';
+---
+
+<SimpleDialog id="contact-dialog" class="contact-dialog">
+  <h2>Get in Touch</h2>
+  
+  <p>Let's discuss your project and how we can work together.</p>
+  
+  <div class="form-container">
+    <ContactForm />
+  </div>
+</SimpleDialog>
+
+<style>
+  .contact-dialog :global(.form-container) {
+    width: 100%;
+    max-width: 400px;
+    margin-top: var(--spacing-lg, 2.5rem);
+  }
+
+  .contact-dialog :global(.contact-form) {
+    text-align: left;
+  }
+
+  .contact-dialog :global(.form-field) {
+    margin-bottom: var(--spacing-md, 1.5rem);
+  }
+
+  .contact-dialog :global(.form-actions) {
+    text-align: center;
+    margin-top: var(--spacing-lg, 2.5rem);
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 768px) {
+    .contact-dialog :global(.form-container) {
+      max-width: 100%;
+      margin-top: var(--spacing-xs, 1.5rem);
+    }
+  }
+</style>

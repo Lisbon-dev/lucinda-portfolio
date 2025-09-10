@@ -6,6 +6,10 @@ import Typography from "../components/core/Typography.astro";
 import Header from "../components/layout/Header.astro";
 import SocialLinks from "../components/layout/SocialLinks.astro";
 import MasonryGrid from "../components/portfolio/MasonryGrid.astro";
+import AboutDialog from "../components/dialog/AboutDialog.astro";
+import ContactDialog from "../components/dialog/ContactDialog.astro";
+import HeaderAnimation from "../components/ui/HeaderAnimation.astro";
+import LoadingOverlay from "../components/ui/LoadingOverlay.astro";
 import { getCollection } from 'astro:content';
 
 // Get all portfolio projects from content collection
@@ -26,6 +30,9 @@ const socialLinks = [
 ---
 
 <Layout>
+  <!-- Loading Overlay -->
+  <LoadingOverlay />
+  
   <!-- Minimalist Header with Menu -->
   <Header />
 
@@ -34,9 +41,12 @@ const socialLinks = [
     <BaseSection variant="hero" fullHeight={false} backgroundColor="background">
       <Container>
         <header class="hero-header">
-          <Typography as="h1" variant="header" tracking="wider">
-            LUCINDA BURMAN
-          </Typography>
+          <HeaderAnimation 
+            text="LUCINDA BURMAN" 
+            className="hero-title"
+            tag="h1"
+            animationDelay={300}
+          />
           <Container size="narrow">
             <Typography as="p" variant="explanatory" tracking="wide">
               Editorial Illustration  |  Branding & Interior Artwork  |  2D & 3D  |  
@@ -55,10 +65,99 @@ const socialLinks = [
 
   <!-- Fixed Social Links -->
  <!--  <SocialLinks links={socialLinks} /> -->
+  
+  <!-- Dialog Modals -->
+  <AboutDialog />
+  <ContactDialog />
 </Layout>
 
+<!-- Lenis Smooth Scrolling & Performance Monitoring -->
+<script>
+  import Lenis from 'lenis';
+
+  // Initialize Lenis with optimized settings for masonry grid
+  const lenis = new Lenis({
+    lerp: 0.08, // Smooth interpolation
+    duration: 1.2, // Natural timing
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Custom easing curve
+    orientation: 'vertical',
+    gestureOrientation: 'vertical',
+    smoothWheel: true,
+    wheelMultiplier: 1,
+    touchMultiplier: 1,
+    autoResize: true
+  });
+
+  // Coordinated RAF loop for Lenis and Motion.js synchronization
+  function raf(time) {
+    lenis.raf(time);
+    requestAnimationFrame(raf);
+  }
+  requestAnimationFrame(raf);
+
+  // Make lenis available globally for masonry grid integration
+  window.lenis = lenis;
+
+  // Coordinate with loading overlay for smooth transition
+  document.addEventListener('loadingComplete', () => {
+    // Ensure Lenis is ready and smooth scrolling is active
+    setTimeout(() => {
+      lenis.start(); // Ensure Lenis is running
+      console.log('Lenis smooth scrolling activated after loading complete');
+    }, 100);
+  });
+
+  // Core Web Vitals Monitoring for Task-009 optimization
+  if ('PerformanceObserver' in window) {
+    // Monitor LCP (Largest Contentful Paint)
+    new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        if (entry.entryType === 'largest-contentful-paint') {
+          console.log('LCP:', entry.startTime, 'ms');
+          // Track if hero text is the LCP element
+          if (entry.element && entry.element.closest('.hero-header')) {
+            console.log('Hero section is LCP element - optimizations working');
+          }
+        }
+      }
+    }).observe({ entryTypes: ['largest-contentful-paint'] });
+
+    // Monitor CLS (Cumulative Layout Shift)
+    let clsScore = 0;
+    new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        if (!entry.hadRecentInput) {
+          clsScore += entry.value;
+        }
+      }
+      console.log('CLS Score:', clsScore);
+    }).observe({ entryTypes: ['layout-shift'] });
+
+    // Monitor font loading performance
+    document.fonts.ready.then(() => {
+      console.log('Fonts loaded at:', performance.now(), 'ms');
+    });
+
+    // Track hero animation performance
+    const heroHeader = document.querySelector('.hero-header');
+    if (heroHeader) {
+      heroHeader.addEventListener('animationend', () => {
+        console.log('Hero animation completed at:', performance.now(), 'ms');
+      });
+    }
+
+    // Monitor smooth scroll performance
+    lenis.on('scroll', () => {
+      // Log scroll performance occasionally
+      if (Math.random() < 0.01) { // 1% sampling rate
+        console.log('Smooth scroll active - Lenis velocity:', lenis.velocity);
+      }
+    });
+  }
+</script>
+
 <style>
-  /* Viewport-relative spacing based on wireframe: 110px from top for 982px height = 11.2vh */
+  /* Performance-Optimized Hero Section */
   .hero-header {
     text-align: center;
     padding-top: 11.2vh; /* Based on 110px / 982px wireframe ratio */
@@ -66,6 +165,29 @@ const socialLinks = [
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
+    
+    /* Performance optimizations inherited from Layout.astro */
+    /* Animation setup for progressive enhancement */
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Progressive enhancement: Add animations only for capable devices */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-header {
+      animation: heroFadeIn 0.8s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+    }
+  }
+
+  @keyframes heroFadeIn {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   .hero-header > :global(.typography:first-child) {

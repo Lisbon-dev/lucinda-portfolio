@@ -1,18 +1,18 @@
 ---
 title: "Shadow of a Doubt"
-description: "Film-inspired editorial illustrations capturing noir atmosphere and psychological tension."
+description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
 category: "Editorial Illustration"
 featured: false
 publishedDate: 2023-10-05
 client: "Film Festival Program"
 year: 2023
 mainImage:
-    src: "Shadow of a doubt illustration.jpg"
+    src: "../../assets/portfolio/Shadow of a doubt illustration.jpg"
     alt: "Shadow of a doubt main illustration with dramatic lighting and shadows"
 images:
-  - src: "Shadow of a Doubt DP OCT 23 .jpg"
+  - src: "../../assets/portfolio/Shadow of a Doubt DP OCT 23 .jpg"
     alt: "Shadow of a Doubt October 2023 editorial spread with noir styling"
-  - src: "Shadow of a doubt illustration.jpg"
+  - src: "../../assets/portfolio/Shadow of a doubt illustration.jpg"
     alt: "Shadow of a doubt main illustration with dramatic lighting and shadows"
 tags:
   - "film"
