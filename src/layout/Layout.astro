@@ -49,10 +49,14 @@ const optimizedDescription = currentSEO.description.length > 155
   ? currentSEO.description.substring(0, 152) + "..."
   : currentSEO.description;
 
-// Create absolute URLs for social media
-const absoluteImage = currentSEO.image.startsWith('http') 
+// Create absolute URLs for social media - handle both string URLs and Astro image objects
+const imageUrl = typeof currentSEO.image === 'string' 
   ? currentSEO.image 
-  : new URL(currentSEO.image, Astro.site || Astro.url.origin).href;
+  : currentSEO.image?.src || defaultSEO.image;
+
+const absoluteImage = imageUrl.startsWith('http') 
+  ? imageUrl 
+  : new URL(imageUrl, Astro.site || Astro.url.origin).href;
 
 const absoluteCanonical = currentSEO.canonical.startsWith('http')
   ? currentSEO.canonical

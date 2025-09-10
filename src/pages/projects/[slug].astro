@@ -36,7 +36,7 @@ const projectSEO = {
     project.data.client ? `${project.data.client} project` : "portfolio project"
   ].filter(Boolean),
   type: "article" as const,
-  image: project.data.seo?.ogImage || project.data.mainImage.src,
+  image: project.data.seo?.ogImage || project.data.mainImage.src.src || project.data.mainImage.src,
   noindex: project.data.seo?.noindex || false
 };
 
