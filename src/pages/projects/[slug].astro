@@ -24,6 +24,22 @@ interface Props {
 
 const { project } = Astro.props;
 
+// Generate SEO data for this project
+const projectSEO = {
+  title: project.data.seo?.title || `${project.data.title} - ${project.data.category} by Lucinda Burman`,
+  description: project.data.seo?.description || `${project.data.description} ${project.data.category} project by Lucinda Burman, featuring ${project.data.tags?.join(", ") || "creative design"}.`,
+  keywords: project.data.seo?.keywords || [
+    ...project.data.tags || [],
+    project.data.category,
+    "editorial illustration",
+    "creative design",
+    project.data.client ? `${project.data.client} project` : "portfolio project"
+  ].filter(Boolean),
+  type: "article" as const,
+  image: project.data.seo?.ogImage || project.data.mainImage.src,
+  noindex: project.data.seo?.noindex || false
+};
+
 // Get all projects for navigation carousel
 const allProjects = await getCollection("projects");
 const currentIndex = allProjects.findIndex((p) => p.slug === project.slug);
@@ -57,7 +73,7 @@ const projectsForDots = allProjects.slice(
 const activeDotIndex = currentIndex - dotsStartIndex;
 ---
 
-<Layout>
+<Layout seo={projectSEO}>
   <!-- Reuse Header Component -->
   <Header />
 

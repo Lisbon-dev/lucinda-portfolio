@@ -1,20 +1,178 @@
 ---
 import Footer from "../components/layout/Footer.astro";
 
+// SEO Props Interface
+export interface SEOProps {
+  title?: string;
+  description?: string;
+  image?: string;
+  canonical?: string;
+  type?: 'website' | 'article';
+  noindex?: boolean;
+  keywords?: string[];
+}
+
+interface Props {
+  seo?: SEOProps;
+}
+
+// Extract SEO props with defaults
+const { seo = {} } = Astro.props as Props;
+
+// Default SEO values
+const defaultSEO = {
+  title: "Lucinda Burman - Editorial Illustration | Branding & Interior Artwork | 2D & 3D | Bespoke Commissions | Weddings & Events",
+  description: "Professional editorial illustration, branding, and interior artwork by Lucinda Burman. Specializing in 2D & 3D design, bespoke commissions, weddings, and events. View portfolio of creative work.",
+  image: "/portfolio-og-image.jpg", // We'll create this
+  type: "website" as const,
+  keywords: ["editorial illustration", "branding", "interior artwork", "2D design", "3D design", "bespoke commissions", "wedding illustration", "event design", "creative portfolio"]
+};
+
+// Merge props with defaults
+const currentSEO = {
+  title: seo.title || defaultSEO.title,
+  description: seo.description || defaultSEO.description,
+  image: seo.image || defaultSEO.image,
+  canonical: seo.canonical || Astro.url.href,
+  type: seo.type || defaultSEO.type,
+  noindex: seo.noindex || false,
+  keywords: seo.keywords || defaultSEO.keywords
+};
+
+// Ensure title is optimized for SEO (max 60 characters for optimal display)
+const optimizedTitle = currentSEO.title.length > 60 
+  ? currentSEO.title.substring(0, 57) + "..."
+  : currentSEO.title;
+
+// Ensure description is optimized for SEO (max 155 characters)
+const optimizedDescription = currentSEO.description.length > 155
+  ? currentSEO.description.substring(0, 152) + "..."
+  : currentSEO.description;
+
+// Create absolute URLs for social media
+const absoluteImage = currentSEO.image.startsWith('http') 
+  ? currentSEO.image 
+  : new URL(currentSEO.image, Astro.site || Astro.url.origin).href;
+
+const absoluteCanonical = currentSEO.canonical.startsWith('http')
+  ? currentSEO.canonical
+  : new URL(currentSEO.canonical, Astro.site || Astro.url.origin).href;
+
+// Structured Data - Person/CreativeWork Schema
+const personSchema = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Lucinda Burman",
+  "jobTitle": "Editorial Illustrator & Creative Designer",
+  "description": "Professional editorial illustrator specializing in branding, interior artwork, 2D & 3D design, bespoke commissions, weddings, and events.",
+  "url": Astro.site?.href || Astro.url.origin,
+  "image": absoluteImage,
+  "sameAs": [
+    // These will be updated with actual social media URLs
+    "https://www.behance.net/lucindaburman",
+    "https://www.linkedin.com/in/lucindaburman"
+  ],
+  "knowsAbout": [
+    "Editorial Illustration",
+    "Branding Design", 
+    "Interior Artwork",
+    "2D Design",
+    "3D Design",
+    "Wedding Illustration",
+    "Event Design",
+    "Bespoke Commissions"
+  ],
+  "hasOccupation": {
+    "@type": "Occupation",
+    "name": "Editorial Illustrator",
+    "occupationLocation": {
+      "@type": "Place",
+      "name": "United Kingdom"
+    }
+  }
+};
+
+// Website Schema
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Lucinda Burman Portfolio",
+  "description": optimizedDescription,
+  "url": Astro.site?.href || Astro.url.origin,
+  "creator": {
+    "@type": "Person",
+    "name": "Lucinda Burman"
+  },
+  "inLanguage": "en-GB"
+};
+
+// Organization Schema (for business inquiries)
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Lucinda Burman Creative Services",
+  "description": "Professional creative services specializing in editorial illustration, branding, and bespoke design work.",
+  "url": Astro.site?.href || Astro.url.origin,
+  "founder": {
+    "@type": "Person",
+    "name": "Lucinda Burman"
+  },
+  "serviceType": [
+    "Editorial Illustration",
+    "Branding Design",
+    "Interior Artwork", 
+    "Wedding Design",
+    "Event Illustration"
+  ]
+};
 
 ---
 
 <!doctype html>
-<html>
+<html lang="en-GB">
   <head>
+    <!-- Basic Meta Tags -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
-    <title>
-      Lucinda Burman - Editorial Illustration  |  Branding & Interior Artwork  |  2D & 3D  |  
-              Bespoke Commissions  |  Weddings & Events |
-      lucindaburman.com 
-    </title>
+    
+    <!-- SEO Meta Tags -->
+    <title>{optimizedTitle}</title>
+    <meta name="description" content={optimizedDescription} />
+    <meta name="keywords" content={currentSEO.keywords.join(", ")} />
+    <link rel="canonical" href={absoluteCanonical} />
+    
+    <!-- Robots Meta Tag -->
+    {currentSEO.noindex && <meta name="robots" content="noindex, nofollow" />}
+    {!currentSEO.noindex && <meta name="robots" content="index, follow" />}
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content={currentSEO.type} />
+    <meta property="og:url" content={absoluteCanonical} />
+    <meta property="og:title" content={optimizedTitle} />
+    <meta property="og:description" content={optimizedDescription} />
+    <meta property="og:image" content={absoluteImage} />
+    <meta property="og:image:alt" content="Lucinda Burman Portfolio - Editorial Illustration and Creative Design" />
+    <meta property="og:site_name" content="Lucinda Burman Portfolio" />
+    <meta property="og:locale" content="en_GB" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={absoluteCanonical} />
+    <meta property="twitter:title" content={optimizedTitle} />
+    <meta property="twitter:description" content={optimizedDescription} />
+    <meta property="twitter:image" content={absoluteImage} />
+    <meta property="twitter:image:alt" content="Lucinda Burman Portfolio - Editorial Illustration and Creative Design" />
+    
+    <!-- Additional Meta Tags -->
+    <meta name="author" content="Lucinda Burman" />
+    <meta name="theme-color" content="#325C59" />
+    <meta name="msapplication-TileColor" content="#325C59" />
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
 
     <!-- Critical Font Preloading & Optimization -->
     <!-- High-priority preconnects -->

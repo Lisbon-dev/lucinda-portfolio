@@ -1,0 +1,45 @@
+# Robots.txt for Lucinda Burman Portfolio
+# Allow all search engines to crawl the site
+
+User-agent: *
+Allow: /
+
+# Disallow API endpoints and private directories
+Disallow: /api/
+Disallow: /.well-known/
+Disallow: /admin/
+
+# Allow specific files even in disallowed directories
+Allow: /.well-known/security.txt
+
+# Sitemap location
+Sitemap: https://lucindaburman.com/sitemap.xml
+
+# Additional directives for specific bots
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# Social media crawlers
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+# Block unwanted bots (optional - adjust based on needs)
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /

@@ -27,9 +27,28 @@ const socialLinks = [
   { name: 'Behance', href: '#', external: true },
   { name: 'LinkedIn', href: '#', external: true }
 ];
+
+// Generate SEO data for homepage
+const homeSEO = {
+  title: "Lucinda Burman - Editorial Illustrator & Creative Designer",
+  description: "Discover Lucinda Burman's portfolio of editorial illustration, branding artwork, 2D & 3D design, bespoke commissions, and wedding & event illustrations.",
+  keywords: [
+    "editorial illustration",
+    "branding artwork", 
+    "2D design",
+    "3D design",
+    "bespoke commissions",
+    "wedding illustrations",
+    "event illustrations",
+    "creative designer",
+    "portfolio"
+  ],
+  type: "website" as const,
+  image: "/portfolio-og-image.jpg"
+};
 ---
 
-<Layout>
+<Layout seo={homeSEO}>
   <!-- Loading Overlay -->
   <LoadingOverlay />
   
