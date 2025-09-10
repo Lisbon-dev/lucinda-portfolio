@@ -91,6 +91,9 @@ const subjectOptions = [
 
   .contact-form__fields {
     margin-bottom: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
   }
 
   .contact-form__actions {
@@ -206,15 +209,30 @@ const subjectOptions = [
   }
 
   /* Mobile optimizations */
-  @media (max-width: var(--breakpoint-sm)) {
+  @media (max-width: 768px) {
+    .contact-form__fields {
+      gap: var(--spacing-xxs);
+      margin-bottom: var(--spacing-xxs);
+    }
+
+    .contact-form textarea[name="message"] {
+      min-height: 10vh;
+    }
+
+    /* Using :global to target a class from the FormField child component */
+    .contact-form :global(.form-field__help) {
+      font-size: var(--text-xs);
+      margin-top: var(--spacing-xxs);
+    }
+
     .contact-form__actions {
       justify-content: stretch;
     }
 
     .contact-form__submit {
       width: 100%;
-      padding: var(--spacing-md);
-      font-size: var(--text-lg);
+      padding: var(--spacing-sm); /* Compacted padding */
+      font-size: var(--text-base); /* Compacted font size */
     }
   }
 </style>
