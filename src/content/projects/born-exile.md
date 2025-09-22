@@ -10,8 +10,6 @@ mainImage:
     src: "../../assets/portfolio/thebornexile/The Born Exile image 1.png"
     alt: "The Born Exile main illustration exploring themes of displacement and identity"
 images:
-  - src: "../../assets/portfolio/thebornexile/The Born Exile image 1.png"
-    alt: "The Born Exile main illustration exploring themes of displacement and identity"
   - src: "../../assets/portfolio/thebornexile/The Born Exile 2.png"
     alt: "The Born Exile second illustration continuing the narrative of belonging and exile"
 tags:

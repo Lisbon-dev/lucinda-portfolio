@@ -10,8 +10,6 @@ mainImage:
     src: "../../assets/portfolio/pascalhuser/Pascal Huser Design & Build 1. Renato.png"
     alt: "Pascal Huser Design & Build first illustration by Renato showing architectural craftsmanship"
 images:
-  - src: "../../assets/portfolio/pascalhuser/Pascal Huser Design & Build 1. Renato.png"
-    alt: "Pascal Huser Design & Build first illustration by Renato showing architectural craftsmanship"
   - src: "../../assets/portfolio/pascalhuser/Pascal Huser Design & Build 2. - Renato.png"
     alt: "Pascal Huser Design & Build second illustration by Renato continuing the craftsmanship theme"
   - src: "../../assets/portfolio/pascalhuser/Pascal Huser Design & build 3. - Renato.png"

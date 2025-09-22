@@ -10,8 +10,6 @@ mainImage:
     src: "../../assets/portfolio/beautifulanddamned/Beautiful and Damned image 1.png"
     alt: "Beautiful and Damned main illustration with elegant figures and dramatic composition"
 images:
-  - src: "../../assets/portfolio/beautifulanddamned/Beautiful and Damned image 1.png"
-    alt: "Beautiful and Damned main illustration with elegant figures and dramatic composition"
   - src: "../../assets/portfolio/beautifulanddamned/Beautiful and damned 2.png"
     alt: "Beautiful and Damned second illustration continuing the series narrative"
 tags:

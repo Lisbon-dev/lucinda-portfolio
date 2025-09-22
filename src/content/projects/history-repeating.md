@@ -10,8 +10,6 @@ mainImage:
     src: "../../assets/portfolio/History Repeating - Einsteen charcoal.png"
     alt: "Charcoal portrait of Einstein for History Repeating series"
 images:
-  - src: "../../assets/portfolio/History Repeating - Einsteen charcoal.png"
-    alt: "Charcoal portrait of Einstein for History Repeating series"
   - src: "../../assets/portfolio/History Repeating.png"
     alt: "History Repeating main artwork showing abstract historical themes"
 tags:

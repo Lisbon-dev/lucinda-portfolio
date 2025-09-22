@@ -10,8 +10,6 @@ mainImage:
     src: "../../assets/portfolio/spectator/The Spectator - Kate & Naomi 1.png"
     alt: "The Spectator Kate and Naomi first illustration showing fashion editorial styling"
 images:
-  - src: "../../assets/portfolio/spectator/The Spectator - Kate & Naomi 1.png"
-    alt: "The Spectator Kate and Naomi first illustration showing fashion editorial styling"
   - src: "../../assets/portfolio/spectator/The Spectator - Naomi & Kate 2.png"
     alt: "The Spectator Naomi and Kate second illustration continuing the fashion editorial theme"
 tags:

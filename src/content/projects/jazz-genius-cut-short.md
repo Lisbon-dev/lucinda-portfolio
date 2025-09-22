@@ -10,8 +10,6 @@ mainImage:
     src: "../../assets/portfolio/jazzgenius/Jazz genius cut short 1.jpg"
     alt: "Jazz Genius Cut Short main illustration featuring musical themes and portrait elements"
 images:
-  - src: "../../assets/portfolio/jazzgenius/Jazz genius cut short 1.jpg"
-    alt: "Jazz Genius Cut Short main illustration featuring musical themes and portrait elements"
   - src: "../../assets/portfolio/jazzgenius/Jazz genius cut short spread 2.png"
     alt: "Jazz Genius Cut Short editorial spread with typography and musical imagery"
 tags:

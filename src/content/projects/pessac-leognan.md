@@ -10,8 +10,6 @@ mainImage:
     src: "../../assets/portfolio/pessac/The thoroughly underrated Pessac-Léognan image 1.png"
     alt: "Pessac-Léognan wine region illustration showing vineyard landscapes and wine culture"
 images:
-  - src: "../../assets/portfolio/pessac/The thoroughly underrated Pessac-Léognan image 1.png"
-    alt: "Pessac-Léognan wine region illustration showing vineyard landscapes and wine culture"
   - src: "../../assets/portfolio/pessac/The thoroughly underrated Pessac-Léognan Spread 2.png"
     alt: "Pessac-Léognan editorial spread with wine tasting notes and regional information"
 tags:

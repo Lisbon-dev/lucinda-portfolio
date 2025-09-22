@@ -9,9 +9,7 @@ year: 2023
 mainImage:
     src: "../../assets/portfolio/federica/Federica & Co. 1.png"
     alt: "Federica & Co brand illustration with modern aesthetic and clean lines"
-images:
-  - src: "../../assets/portfolio/federica/Federica & Co. 1.png"
-    alt: "Federica & Co brand illustration with modern aesthetic and clean lines"
+images: []
 tags:
   - "branding"
   - "fashion"

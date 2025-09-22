@@ -9,9 +9,7 @@ year: 2023
 mainImage:
     src: "../../assets/portfolio/battersea/Battersea Power Station 1.png"
     alt: "Battersea Power Station architectural illustration showing the iconic chimneys and industrial structure"
-images:
-  - src: "../../assets/portfolio/battersea/Battersea Power Station 1.png"
-    alt: "Battersea Power Station architectural illustration showing the iconic chimneys and industrial structure"
+images: []
 tags:
   - "architecture"
   - "industrial"

@@ -12,8 +12,6 @@ mainImage:
 images:
   - src: "../../assets/portfolio/Bimini - double page spread.png"
     alt: "Bimini Magazine double page spread with modern typography and clean layout"
-  - src: "../../assets/portfolio/Binimi SPEC MLK.png"
-    alt: "Bimini Magazine MLK special edition spread with portrait illustration"
 tags:
   - "magazine"
   - "editorial design"

@@ -10,8 +10,6 @@ mainImage:
     src: "../../assets/portfolio/hamptons/The Hamptons Collection, NYC 1.png"
     alt: "The Hamptons Collection first illustration showing luxury lifestyle and refined aesthetics"
 images:
-  - src: "../../assets/portfolio/hamptons/The Hamptons Collection, NYC 1.png"
-    alt: "The Hamptons Collection first illustration showing luxury lifestyle and refined aesthetics"
   - src: "../../assets/portfolio/hamptons/The Hamptons Collection, NYC 2.png"
     alt: "The Hamptons Collection second illustration continuing the luxury lifestyle theme"
 tags:

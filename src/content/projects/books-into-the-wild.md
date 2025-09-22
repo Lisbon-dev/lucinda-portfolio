@@ -12,8 +12,6 @@ mainImage:
 images:
   - src: "../../assets/portfolio/BOOKS INTO THE WILD single page spread.png"
     alt: "Books Into The Wild single page spread showing illustrated typography and wilderness imagery"
-  - src: "../../assets/portfolio/Into the wild.png"
-    alt: "Into the wild editorial illustration with nature elements and dramatic composition"
 tags:
   - "editorial"
   - "literary"
