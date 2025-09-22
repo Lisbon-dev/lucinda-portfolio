@@ -1,26 +1,24 @@
 ---
 title: "Battersea Power Station"
-description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-category: "Editorial Illustration"
+description: "Architectural illustration capturing the iconic industrial heritage of London's Battersea Power Station."
+category: "Architectural Illustration"
 featured: true
-publishedDate: 2023-07-22
-client: "Battersea Power Station"
+publishedDate: 2023-05-15
+client: "Architectural Heritage Project"
 year: 2023
 mainImage: 
     src: "../../assets/portfolio/battersea/Battersea Power Station 1.png" 
-    alt: "Bimini Magazine MLK special edition spread with portrait illustration"
+    alt: "Battersea Power Station architectural illustration showing the iconic chimneys and industrial structure"
 images:
-  - src: "../../assets/portfolio/Bimini - double page spread.png"
-    alt: "Bimini Magazine double page spread with modern typography and clean layout"
-  - src: "../../assets/portfolio/Binimi SPEC MLK.png"
-    alt: "Bimini Magazine MLK special edition spread with portrait illustration"
+  - src: "../../assets/portfolio/battersea/Battersea Power Station 1.png"
+    alt: "Battersea Power Station architectural illustration showing the iconic chimneys and industrial structure"
 tags:
-  - "magazine"
-  - "editorial design"
-  - "typography"
-  - "layout"
+  - "architecture"
+  - "industrial"
+  - "london"
+  - "heritage"
 ---
 
-A series of editorial spreads for Bimini Magazine, focusing on contemporary design principles and sophisticated typography. These designs showcase a minimalist approach that allows the content to breathe while maintaining visual interest through strategic use of whitespace and typography hierarchy.
+An architectural study of London's iconic Battersea Power Station, capturing the monumental scale and industrial beauty of this Art Deco masterpiece. The illustration emphasizes the building's distinctive four-chimney silhouette and the interplay of light and shadow across its brick facades.
 
-The project included both regular editorial content and special commemorative issues, requiring flexibility in design approach while maintaining brand consistency throughout the publication.
+This piece explores the tension between industrial function and architectural elegance, celebrating a structure that has become synonymous with London's skyline and cultural identity.
