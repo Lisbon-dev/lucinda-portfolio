@@ -453,27 +453,8 @@ const sortedProjects = projects.sort((a, b) => {
       const startItemAnimations = () => {
         console.log('🌟 Loading overlay complete, starting item reveals...');
         
-        // Show eager items with stagger
-        const eagerItems = Array.from(items).slice(0, 6);
-        const lazyItems = Array.from(items).slice(6);
-        
-        eagerItems.forEach((item, index) => {
-          animate(
-            item,
-            {
-              opacity: [0, 1],
-              transform: ['translate3d(0, 40px, 0) scale(0.95)', 'translate3d(0, 0, 0) scale(1)']
-            },
-            {
-              duration: 0.8,
-              ease: [0.25, 0.46, 0.45, 0.94],
-              delay: index * 0.15
-            }
-          );
-        });
-        
-        // Setup scroll reveals for lazy items
-        lazyItems.forEach((item, index) => {
+        // Use inView for all items to ensure consistent scroll-triggered animation
+        items.forEach((item, index) => {
           inView(
             item,
             () => {
@@ -486,7 +467,8 @@ const sortedProjects = projects.sort((a, b) => {
                 {
                   duration: 0.8,
                   ease: [0.25, 0.46, 0.45, 0.94],
-                  delay: index * 0.1
+                  // Stagger the animation delay for a cascade effect
+                  delay: (index % 9) * 0.1
                 }
               );
             },
