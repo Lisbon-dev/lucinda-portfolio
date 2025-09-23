@@ -28,6 +28,12 @@ const sortedProjects = projects.sort((a, b) => {
   const dateB = new Date(b.data.publishedDate || 0);
   return dateB.getTime() - dateA.getTime();
 });
+
+// Debug output to verify sorting is working (remove after confirming)
+console.log('🔍 MasonryGrid sorting debug:');
+sortedProjects.forEach((project, index) => {
+  console.log(`  ${index + 1}. ${project.data.title} (order: ${project.data.order || 'undefined'})`);
+});
 ---
 
 <div class={`masonry-container ${className}`} id={uniqueId}>
