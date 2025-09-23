@@ -1,7 +1,8 @@
 ---
-title: "History Repeating"
+title: "The Spectator - 'History Repeating'"
 description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
 category: "Editorial Illustration"
+order: 16
 featured: false
 publishedDate: 2023-06-10
 client: "Gallery Exhibition"
@@ -10,8 +11,6 @@ mainImage:
     src: "../../assets/portfolio/History Repeating - Einsteen charcoal.png"
     alt: "Charcoal portrait of Einstein for History Repeating series"
 images:
-  - src: "../../assets/portfolio/History Repeating - Einsteen charcoal.png"
-    alt: "Charcoal portrait of Einstein for History Repeating series"
   - src: "../../assets/portfolio/History Repeating.png"
     alt: "History Repeating main artwork showing abstract historical themes"
 tags:

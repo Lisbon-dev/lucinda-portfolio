@@ -16,17 +16,19 @@ const { projects = [], className = '' } = Astro.props;
 // Generate unique ID for this masonry instance
 const uniqueId = `masonry-${Math.random().toString(36).substr(2, 9)}`;
 
-// Sort projects for fixed, consistent order (by featured status, then date)
+// Sort projects for fixed, consistent order (by order, then date)
 const sortedProjects = projects.sort((a, b) => {
-  // Featured projects first
-  if (a.data.featured && !b.data.featured) return -1;
-  if (!a.data.featured && b.data.featured) return 1;
+  // Primary sort by order property (lower numbers first)
+  const orderA = a.data.order || 999;
+  const orderB = b.data.order || 999;
+  if (orderA !== orderB) return orderA - orderB;
   
-  // Then by date (newest first)
+  // Fallback to date (newest first)
   const dateA = new Date(a.data.publishedDate || 0);
   const dateB = new Date(b.data.publishedDate || 0);
   return dateB.getTime() - dateA.getTime();
 });
+
 ---
 
 <div class={`masonry-container ${className}`} id={uniqueId}>
@@ -451,27 +453,8 @@ const sortedProjects = projects.sort((a, b) => {
       const startItemAnimations = () => {
         console.log('🌟 Loading overlay complete, starting item reveals...');
         
-        // Show eager items with stagger
-        const eagerItems = Array.from(items).slice(0, 6);
-        const lazyItems = Array.from(items).slice(6);
-        
-        eagerItems.forEach((item, index) => {
-          animate(
-            item,
-            {
-              opacity: [0, 1],
-              transform: ['translate3d(0, 40px, 0) scale(0.95)', 'translate3d(0, 0, 0) scale(1)']
-            },
-            {
-              duration: 0.8,
-              ease: [0.25, 0.46, 0.45, 0.94],
-              delay: index * 0.15
-            }
-          );
-        });
-        
-        // Setup scroll reveals for lazy items
-        lazyItems.forEach((item, index) => {
+        // Use inView for all items to ensure consistent scroll-triggered animation
+        items.forEach((item, index) => {
           inView(
             item,
             () => {
@@ -484,7 +467,8 @@ const sortedProjects = projects.sort((a, b) => {
                 {
                   duration: 0.8,
                   ease: [0.25, 0.46, 0.45, 0.94],
-                  delay: index * 0.1
+                  // Stagger the animation delay for a cascade effect
+                  delay: (index % 9) * 0.1
                 }
               );
             },

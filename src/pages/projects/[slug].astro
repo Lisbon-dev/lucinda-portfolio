@@ -157,7 +157,7 @@ const activeDotIndex = currentIndex - dotsStartIndex;
         <div class="description-with-navigation">
           <div class="project-description">
             <Typography as="h2" variant="explanatory" tracking="wider">
-              {project.data.title} - {project.data.description}
+              {project.data.title}
             </Typography>
           </div>
         </div>
@@ -368,7 +368,6 @@ const activeDotIndex = currentIndex - dotsStartIndex;
   }
 
   .project-description {
-    max-width: calc(695px / 1512px * 100%); /* Match image width ratio */
     text-align: center;
     padding: 0 var(--spacing-md);
   }
@@ -483,7 +482,6 @@ const activeDotIndex = currentIndex - dotsStartIndex;
   }
 
   .image-wrapper {
-    max-width: calc(695px / 1512px * 100%); /* 695px on 1512px viewport ratio */
     width: 100%;
   }
 
