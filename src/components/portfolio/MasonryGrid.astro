@@ -16,18 +16,14 @@ const { projects = [], className = '' } = Astro.props;
 // Generate unique ID for this masonry instance
 const uniqueId = `masonry-${Math.random().toString(36).substr(2, 9)}`;
 
-// Sort projects for fixed, consistent order (by featured status, then order, then date)
+// Sort projects for fixed, consistent order (by order, then date)
 const sortedProjects = projects.sort((a, b) => {
-  // Featured projects first
-  if (a.data.featured && !b.data.featured) return -1;
-  if (!a.data.featured && b.data.featured) return 1;
-  
-  // Then by order property (lower numbers first)
+  // Primary sort by order property (lower numbers first)
   const orderA = a.data.order || 999;
   const orderB = b.data.order || 999;
   if (orderA !== orderB) return orderA - orderB;
   
-  // Finally by date (newest first)
+  // Fallback to date (newest first)
   const dateA = new Date(a.data.publishedDate || 0);
   const dateB = new Date(b.data.publishedDate || 0);
   return dateB.getTime() - dateA.getTime();
