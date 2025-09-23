@@ -1,7 +1,8 @@
 ---
-title: "Shadow of a Doubt"
+title: "The Spectator - 'Shadow of a Doubt'"
 description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
 category: "Editorial Illustration"
+order: 5
 featured: false
 publishedDate: 2023-10-05
 client: "Film Festival Program"

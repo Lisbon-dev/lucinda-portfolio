@@ -1,7 +1,8 @@
 ---
 title: "Battersea Power Station"
 description: "Architectural illustration capturing the iconic industrial heritage of London's Battersea Power Station."
-category: "Architectural Illustration"
+category: "Bespoke Commission"
+order: 6
 featured: false
 publishedDate: 2023-05-15
 client: "Architectural Heritage Project"

@@ -1,7 +1,8 @@
 ---
-title: "The Hamptons Collection"
+title: "The Hamptons Collection, NYC"
 description: "Luxury lifestyle illustrations capturing the refined elegance of Hamptons culture and aesthetic."
-category: "Lifestyle Illustration"
+category: "Exhibition"
+order: 13
 featured: false
 publishedDate: 2023-06-25
 client: "Luxury Lifestyle Magazine"

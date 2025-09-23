@@ -1,7 +1,8 @@
 ---
-title: "Federica & Co"
+title: "Federica & Co."
 description: "Brand illustration and visual identity work for contemporary fashion and lifestyle brand."
-category: "Brand Illustration"
+category: "Bespoke Commission"
+order: 17
 featured: false
 publishedDate: 2023-03-10
 client: "Federica & Co"

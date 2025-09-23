@@ -1,7 +1,8 @@
 ---
-title: "History Repeating"
+title: "The Spectator - 'History Repeating'"
 description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
 category: "Editorial Illustration"
+order: 16
 featured: false
 publishedDate: 2023-06-10
 client: "Gallery Exhibition"

@@ -1,7 +1,8 @@
 ---
-title: "Jazz Genius Cut Short"
+title: "The Spectator - 'Jazz genius cut short'"
 description: "Musical tribute illustration series celebrating jazz legends and their lasting cultural impact."
 category: "Editorial Illustration"
+order: 8
 featured: false
 publishedDate: 2023-02-14
 client: "Music Heritage Foundation"

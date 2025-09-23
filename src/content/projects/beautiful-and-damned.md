@@ -1,7 +1,8 @@
 ---
-title: "Beautiful and Damned"
+title: "The Spectator - 'Beautiful and damned'"
 description: "Editorial illustration series exploring themes of beauty, decadence, and moral complexity."
 category: "Editorial Illustration"
+order: 9
 featured: false
 publishedDate: 2023-04-20
 client: "Literary Magazine"

@@ -1,7 +1,8 @@
 ---
-title: "The Born Exile"
+title: "The Spectator - 'The Born Exile'"
 description: "Literary illustration series exploring themes of displacement, identity, and belonging in contemporary society."
-category: "Literary Illustration"
+category: "Editorial Illustration"
+order: 10
 featured: false
 publishedDate: 2023-12-08
 client: "Independent Literary Press"

@@ -1,7 +1,8 @@
 ---
 title: "Pascal Huser Design & Build"
 description: "Architectural and construction industry illustrations showcasing craftsmanship and design excellence."
-category: "Architectural Illustration"
+category: "Brand Storytelling"
+order: 14
 featured: false
 publishedDate: 2023-01-20
 client: "Pascal Huser Design & Build"
