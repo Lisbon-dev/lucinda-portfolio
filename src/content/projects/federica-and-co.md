@@ -5,7 +5,7 @@ category: "Bespoke Commission"
 order: 17
 featured: false
 publishedDate: 2023-03-10
-client: "Federica & Co"
+client: "Federica & Co."
 year: 2023
 mainImage:
     src: "../../assets/portfolio/federica/Federica & Co. 1.png"

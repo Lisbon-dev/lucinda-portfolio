@@ -1,7 +1,8 @@
 ---
-title: "Brew Dog Branding"
+title: "Brew Dog"
 description: "Dynamic brand illustrations for Brew Dog, capturing the craft beer brand's rebellious spirit and bold flavors."
-category: "Brand Illustration"
+category: "Brand Storytelling"
+order: 18
 featured: false
 publishedDate: 2024-03-20
 client: "Brew Dog"
@@ -14,6 +15,8 @@ images:
     alt: "Second brand illustration for Brew Dog, showcasing a different product line with unique artwork"
   - src: "../../assets/portfolio/brewdog/Brew Dog 3_.png"
     alt: "Third Brew Dog brand illustration, focusing on packaging details and vibrant colors"
+  - src: "../../assets/portfolio/brewdog/Brew Dog 4.webp"
+    alt: "Fourth Brew Dog brand illustration, focusing on packaging details and vibrant colors"
 tags:
   - "branding"
   - "packaging"

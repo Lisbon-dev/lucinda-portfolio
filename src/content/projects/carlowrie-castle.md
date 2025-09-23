@@ -1,10 +1,11 @@
 ---
-title: "Carlowrie Castle"
+title: "Carlowrie Group, Edinburgh"
 description: "Elegant illustrations for Carlowrie Castle, showcasing the historic venue's romantic architecture and picturesque grounds."
-category: "Venue Illustration"
+category: "Wedding & Events"
+order: 4
 featured: false
 publishedDate: 2024-04-15
-client: "Carlowrie Castle"
+client: "Carlowrie Group"
 year: 2024
 mainImage:
     src: "../../assets/portfolio/carlowrie/Carlowrie 1.png"

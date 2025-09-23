@@ -3,7 +3,7 @@ title: "The Spectator - 'Suffer little children'"
 description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
 category: "Editorial Illustration"
 order: 11
-featured: true
+featured: false
 publishedDate: 2023-09-18
 client: "Contemporary Culture Magazine"
 year: 2023
