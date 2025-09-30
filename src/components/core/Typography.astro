@@ -1,7 +1,7 @@
 ---
 export interface Props {
   as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span' | 'div';
-  variant?: 'header' | 'nav' | 'explanatory' | 'small' | 'body' | 'display';
+  variant?: 'header' | 'nav' | 'explanatory' | 'small' | 'body' | 'display' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
   size?: 'xxs' | 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl';
   weight?: '300' | '400' | '500' | '600' | '700';
   tracking?: 'tight' | 'normal' | 'wide' | 'wider' | 'widest';
@@ -30,7 +30,13 @@ const variantDefaults = {
   explanatory: { size: 'base', weight: '300', leading: 'relaxed' },
   small: { size: 'sm', weight: '300' },
   body: { size: 'base', weight: '400', leading: 'normal' },
-  display: { size: '5xl', weight: '300', tracking: 'tight', leading: 'tight' }
+  display: { size: '5xl', weight: '300', tracking: 'tight', leading: 'tight' },
+  h1: { size: '4xl', weight: '600', tracking: 'tight', leading: 'tight' },
+  h2: { size: '2xl', weight: '600', tracking: 'normal', leading: 'snug' },
+  h3: { size: 'xl', weight: '600', tracking: 'normal', leading: 'snug' },
+  h4: { size: 'lg', weight: '600', tracking: 'normal', leading: 'normal' },
+  h5: { size: 'base', weight: '600', tracking: 'normal', leading: 'normal' },
+  h6: { size: 'sm', weight: '600', tracking: 'normal', leading: 'normal' }
 };
 
 const defaults = variant ? variantDefaults[variant] : {};
@@ -101,7 +107,7 @@ const inlineStyles = customColor ? `color: ${customColor};` : '';
   .color--secondary { color: var(--color-text-secondary); }
 
   /* Variant-specific overrides */
-  .variant--header, .variant--display {
+  .variant--header, .variant--display, .variant--h1, .variant--h2, .variant--h3, .variant--h4, .variant--h5, .variant--h6 {
     font-family: var(--font-alt-heading);
   }
 </style>
