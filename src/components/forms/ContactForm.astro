@@ -588,22 +588,24 @@ const subjectOptions = [
     private showFieldError(fieldName: string, errorMessage: string): void {
       const fieldContainer = this.form.querySelector(`[data-field-name="${fieldName}"]`) as HTMLElement;
       const errorElement = fieldContainer?.querySelector('.form-field__error') as HTMLElement;
+      const errorContent = fieldContainer?.querySelector('.form-field__error-content') as HTMLElement;
       
-      if (fieldContainer && errorElement) {
+      if (fieldContainer && errorElement && errorContent) {
         fieldContainer.classList.add('form-field--error');
-        errorElement.textContent = errorMessage;
-        errorElement.style.display = 'flex';
+        errorContent.textContent = errorMessage;
+        
+        // Auto-hide error after 4 seconds
+        setTimeout(() => {
+          fieldContainer.classList.remove('form-field--error');
+        }, 4000);
       }
     }
 
     private clearFieldError(fieldName: string): void {
       const fieldContainer = this.form.querySelector(`[data-field-name="${fieldName}"]`) as HTMLElement;
-      const errorElement = fieldContainer?.querySelector('.form-field__error') as HTMLElement;
       
-      if (fieldContainer && errorElement) {
+      if (fieldContainer) {
         fieldContainer.classList.remove('form-field--error', 'form-field--valid');
-        errorElement.textContent = '';
-        errorElement.style.display = 'none';
         
         // Add valid state if field has content
         const fieldElement = this.fields.get(fieldName) as HTMLInputElement;
