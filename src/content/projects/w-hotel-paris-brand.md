@@ -23,6 +23,13 @@ images:
     alt: "W Hotel Paris complete brand story"
   - src: "../../assets/portfolio/whotel/Whotel 8.png"
     alt: "W Hotel Paris brand implementation"
+videos:
+  - src: "/src/assets/portfolio/whotel/FINAL SCULPTURE VIDEO-optimized"
+    poster: "../../assets/portfolio/whotel/FINAL SCULPTURE VIDEO-poster.png"
+    alt: "W Hotel Paris sculpture installation video showcasing the dynamic 3D art piece in motion"
+    width: 695
+    height: 391
+    position: 4
 tags: ["brand-storytelling", "hospitality", "luxury", "paris", "w-hotel", "narrative-design"]
 client: "W Hotel Paris"
 year: 2023
