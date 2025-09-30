@@ -352,15 +352,37 @@ const sortedProjects = projects.sort((a, b) => {
     }
     
     // Get all eager images (first 3-6 items based on loading="eager")
-    const eagerImages = container.querySelectorAll('img[loading="eager"]');
-    totalEagerImages = eagerImages.length;
+    const eagerImages = container.querySelectorAll('img[loading="eager"], img[fetchpriority="high"]');
+    const allImages = container.querySelectorAll('img');
     
-    console.log('📸 Found eager images to track:', totalEagerImages);
-    
-    if (totalEagerImages === 0) {
-      console.log('⚡ No eager images found, proceeding with animations immediately');
-      startAnimations();
-      return;
+    // Fallback to first N images if no eager images found
+    if (eagerImages.length === 0 && allImages.length > 0) {
+      totalEagerImages = Math.min(3, allImages.length);
+      console.log('⚡ No eager images found, using first', totalEagerImages, 'images as critical');
+      
+      // Track first 3 images instead
+      for (let i = 0; i < totalEagerImages; i++) {
+        const img = allImages[i];
+        if (img.complete && img.naturalWidth > 0) {
+          console.log(`🔄 Image already cached: ${img.src.split('/').pop()}`);
+          handleImageLoad(img);
+        } else {
+          img.addEventListener('load', () => handleImageLoad(img));
+          img.addEventListener('error', () => {
+            console.warn(`❌ Image failed to load: ${img.src.split('/').pop()}`);
+            handleImageLoad(img);
+          });
+        }
+      }
+    } else {
+      totalEagerImages = eagerImages.length;
+      console.log('📸 Found eager images to track:', totalEagerImages);
+      
+      if (totalEagerImages === 0) {
+        console.log('⚡ No images found, proceeding with animations immediately');
+        startAnimations();
+        return;
+      }
     }
     
     // Track loading progress of eager images
@@ -394,19 +416,32 @@ const sortedProjects = projects.sort((a, b) => {
       updateLoadingProgress();
     }
     
-    // Check for already loaded images and add event listeners
-    eagerImages.forEach(img => {
-      if (img.complete && img.naturalWidth > 0) {
-        console.log(`🔄 Image already cached: ${img.src.split('/').pop()}`);
-        handleImageLoad(img);
-      } else {
-        img.addEventListener('load', () => handleImageLoad(img));
-        img.addEventListener('error', () => {
-          console.warn(`❌ Image failed to load: ${img.src.split('/').pop()}`);
-          handleImageLoad(img); // Count failed images as "loaded" to avoid blocking
-        });
+    // Check for already loaded images and add event listeners (only if we have eager images)
+    if (eagerImages.length > 0) {
+      eagerImages.forEach(img => {
+        if (img.complete && img.naturalWidth > 0) {
+          console.log(`🔄 Image already cached: ${img.src.split('/').pop()}`);
+          handleImageLoad(img);
+        } else {
+          img.addEventListener('load', () => handleImageLoad(img));
+          img.addEventListener('error', () => {
+            console.warn(`❌ Image failed to load: ${img.src.split('/').pop()}`);
+            handleImageLoad(img); // Count failed images as "loaded" to avoid blocking
+          });
+        }
+      });
+    }
+    
+    // Add debugging for stuck loading
+    setTimeout(() => {
+      if (eagerImagesLoaded < totalEagerImages) {
+        console.warn(`🚨 Loading stuck: ${eagerImagesLoaded}/${totalEagerImages} images loaded`);
+        const remainingImages = eagerImages.length > 0 
+          ? Array.from(eagerImages).filter(img => !img.complete).map(img => img.src)
+          : Array.from(allImages).slice(0, totalEagerImages).filter(img => !img.complete).map(img => img.src);
+        console.warn('Remaining images:', remainingImages);
       }
-    });
+    }, 2000);
     
     // Fallback timeout - ensure animations start even if images fail
     setTimeout(() => {
