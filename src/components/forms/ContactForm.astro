@@ -67,7 +67,6 @@ const subjectOptions = [
           name="privacy_consent" 
           class="privacy-consent__checkbox"
           required
-          aria-describedby="privacy-consent-help"
         />
         <span class="privacy-consent__checkmark" aria-hidden="true"></span>
         <span class="privacy-consent__text">
@@ -75,10 +74,11 @@ const subjectOptions = [
           and <a href="/terms" target="_blank" rel="noopener" class="privacy-link">Terms & Conditions</a>
         </span>
       </label>
-      <div id="privacy-consent-help" class="privacy-consent__help">
-        Required to process your inquiry and respond to your message.
+      <div class="privacy-consent__error" role="alert" aria-live="polite">
+        <div class="privacy-consent__error-content">
+          You must agree to the Privacy Policy and Terms & Conditions to continue.
+        </div>
       </div>
-      <div class="privacy-consent__error" role="alert" aria-live="polite"></div>
     </div>
   </div>
 
@@ -225,19 +225,17 @@ const subjectOptions = [
   .privacy-consent__checkmark::after {
     content: '';
     position: absolute;
-    left: 5px;
-    top: 2px;
-    width: 4px;
-    height: 8px;
-    border: solid white;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
+    top: 3px;
+    left: 3px;
+    right: 3px;
+    bottom: 3px;
+    background: var(--color-primary);
+    border-radius: 1px;
     opacity: 0;
     transition: opacity var(--transition-fast);
   }
 
   .privacy-consent__checkbox:checked + .privacy-consent__checkmark {
-    background: var(--color-primary);
     border-color: var(--color-primary);
   }
 
@@ -270,28 +268,59 @@ const subjectOptions = [
     border-radius: 2px;
   }
 
-  .privacy-consent__help {
-    margin-top: var(--spacing-xs);
-    margin-left: calc(18px + var(--spacing-sm));
-    font-size: var(--text-xs);
-    color: var(--color-text-tertiary);
-    line-height: 1.4;
+  .privacy-consent__error {
+    position: absolute;
+    top: -8px;
+    left: 28px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all var(--transition-fast);
+    pointer-events: none;
   }
 
-  .privacy-consent__error {
-    margin-top: var(--spacing-xs);
-    margin-left: calc(18px + var(--spacing-sm));
+  .privacy-consent__error-content {
+    background: rgba(220, 38, 38, 0.95);
+    color: white;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: 6px;
     font-size: var(--text-xs);
-    color: var(--color-error);
-    display: none;
+    line-height: 1.4;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    position: relative;
+    backdrop-filter: blur(4px);
+  }
+
+  .privacy-consent__error-content::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -6px;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 6px 6px 6px 0;
+    border-color: transparent rgba(220, 38, 38, 0.95) transparent transparent;
   }
 
   .privacy-consent--error .privacy-consent__checkmark {
     border-color: var(--color-error);
+    animation: shake 0.5s ease-in-out;
   }
 
   .privacy-consent--error .privacy-consent__error {
-    display: block;
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
   }
 
   /* Success state */
@@ -378,8 +407,10 @@ const subjectOptions = [
       font-size: var(--text-xs);
     }
 
-    .privacy-consent__help {
+    .privacy-consent__error-content {
       font-size: 11px;
+      white-space: normal;
+      max-width: 200px;
     }
   }
 </style>
@@ -437,9 +468,14 @@ const subjectOptions = [
         field.addEventListener('input', () => this.clearFieldError(name));
       });
 
-      // Privacy consent validation
+      // Privacy consent validation - only clear error on change, don't validate
       if (this.privacyConsent) {
-        this.privacyConsent.addEventListener('change', this.validatePrivacyConsent.bind(this));
+        this.privacyConsent.addEventListener('change', () => {
+          const consentContainer = this.form.querySelector('.privacy-consent') as HTMLElement;
+          if (this.privacyConsent?.checked) {
+            consentContainer?.classList.remove('privacy-consent--error');
+          }
+        });
       }
     }
 
@@ -472,20 +508,19 @@ const subjectOptions = [
 
     private validatePrivacyConsent(): boolean {
       const consentContainer = this.form.querySelector('.privacy-consent') as HTMLElement;
-      const errorElement = consentContainer?.querySelector('.privacy-consent__error') as HTMLElement;
       
       if (!this.privacyConsent?.checked) {
         consentContainer?.classList.add('privacy-consent--error');
-        if (errorElement) {
-          errorElement.textContent = 'You must agree to the Privacy Policy and Terms & Conditions to continue.';
-        }
         this.privacyConsent?.focus();
+        
+        // Auto-hide error after 4 seconds
+        setTimeout(() => {
+          consentContainer?.classList.remove('privacy-consent--error');
+        }, 4000);
+        
         return false;
       } else {
         consentContainer?.classList.remove('privacy-consent--error');
-        if (errorElement) {
-          errorElement.textContent = '';
-        }
         return true;
       }
     }
