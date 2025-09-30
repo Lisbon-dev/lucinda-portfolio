@@ -8,19 +8,19 @@ publishedDate: 2023-09-18
 client: "Contemporary Culture Magazine"
 year: 2023
 mainImage:
-    src: "../../assets/portfolio/sufferlittlechildren/Suffer little children Arnie 5.png"
-    alt: "Arnold Schwarzenegger portrait illustration for Suffer Little Children series"
+    src: "../../assets/portfolio/sufferlittlechildren/Suffer little children Madonna 1.png"
+    alt: "Madonna portrait illustration for Suffer Little Children series"
 images:
   - src: "../../assets/portfolio/sufferlittlechildren/Suffer little children 1st page spread 2.png"
     alt: "Suffer Little Children first page spread with dramatic typography"
-  - src: "../../assets/portfolio/sufferlittlechildren/Suffer little children 2nd page 6.png"
-    alt: "Suffer Little Children second page layout with editorial content"
   - src: "../../assets/portfolio/sufferlittlechildren/Suffer little children David W 3.png"
     alt: "David Bowie portrait illustration for Suffer Little Children series"
   - src: "../../assets/portfolio/sufferlittlechildren/Suffer little children Kanye 4.png"
     alt: "Kanye West portrait illustration for Suffer Little Children series"
-  - src: "../../assets/portfolio/sufferlittlechildren/Suffer little children Madonna 1.png"
-    alt: "Madonna portrait illustration for Suffer Little Children series"
+  - src: "../../assets/portfolio/sufferlittlechildren/Suffer little children Arnie 5.png"
+    alt: "Arnold Schwarzenegger portrait illustration for Suffer Little Children series"
+  - src: "../../assets/portfolio/sufferlittlechildren/Suffer little children 2nd page 6.png"
+    alt: "Suffer Little Children second page layout with editorial content"
 tags:
   - "editorial series"
   - "celebrity"
