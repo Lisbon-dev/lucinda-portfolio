@@ -6,11 +6,17 @@
   <div class="copyright-container">
     <span
       >&copy;
-      {new Date().getFullYear()} Lucinda Burman. Created by <a
+      {new Date().getFullYear()} Lucinda Burman. Website created by <a
         class="logo"
-        href="https://lisbon.dev">Lisbon<strong>.DEV</strong></a
+        href="https://lisbon.dev">LISBON<strong>.DEV</strong></a
       ></span
     >
+    
+    <div class="legal-links">
+      <a href="/privacy" class="legal-link">Privacy Policy</a>
+      <span class="legal-separator">•</span>
+      <a href="/terms" class="legal-link">Terms & Conditions</a>
+    </div>
   </div>
 </footer>
 
@@ -22,7 +28,9 @@
 
   .copyright-container {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
     width: 80%;
     margin-top: var(--space-lg);
     padding-top: var(--space-md);
@@ -32,22 +40,70 @@
     font-family: var(--font-body);
   }
 
-  .copyright-container a{
-
+  .copyright-container a {
     text-decoration: none;
   }
 
   .logo {
-    font-size: var(--text-xs);
+    font-size: 0.75rem;
     font-family: var(--font-lisbon-dev);
     color: var(--color-text-primary);
     letter-spacing: var(--tracking-wider);
-    font-weight: 900;
+    font-weight: 300;
   }
 
-  .logo strong{
+  .logo strong {
     color: var(--color-lisbon-dev);
   }
 
+  .legal-links {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-xxs);
+  }
 
+  .legal-link {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-size: var(--text-xs);
+    transition: color var(--transition-fast);
+  }
+
+  .legal-link:hover {
+    color: var(--color-primary-hover);
+    text-decoration: underline;
+  }
+
+  .legal-link:focus {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  .legal-separator {
+    color: var(--color-text-secondary);
+    font-size: var(--text-xs);
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .legal-link {
+      text-decoration: underline;
+      font-weight: 600;
+    }
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 480px) {
+    .copyright-container {
+      width: 90%;
+      text-align: center;
+    }
+
+    .legal-links {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
 </style>

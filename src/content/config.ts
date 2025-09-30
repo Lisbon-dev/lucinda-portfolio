@@ -21,6 +21,15 @@ const projects = defineCollection({
       width: z.number().optional(),
       height: z.number().optional(),
     })).optional(),
+    // New video support
+    videos: z.array(z.object({
+      src: z.string(), // Path to video file
+      poster: image().optional(), // Optional poster image
+      alt: z.string(), // Description for accessibility
+      width: z.number().optional(),
+      height: z.number().optional(),
+      position: z.number().optional(), // Position in image sequence (0-based)
+    })).optional(),
     tags: z.array(z.string()).optional(),
     client: z.string().optional(),
     year: z.number().optional(),

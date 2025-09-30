@@ -38,4 +38,5 @@ project_issues.md
 .vercel/
 
 # aider
+.aider/
 .aider*

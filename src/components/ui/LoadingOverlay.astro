@@ -86,11 +86,15 @@ const { className = '' } = Astro.props;
     // Start with small progress to show activity
     setTimeout(() => updateProgress(15), 100);
     
-    // More reasonable fallback timeout - wait longer for actual image loading
+    // Add safety checkpoints to prevent sticking
+    setTimeout(() => updateProgress(30), 500);
+    setTimeout(() => updateProgress(50), 1000);
+    
+    // Reduced fallback timeout for better UX
     setTimeout(() => {
-      console.log('LoadingOverlay: Extended fallback timeout reached (3s), forcing completion');
+      console.log('LoadingOverlay: Fallback timeout reached (1.5s), forcing completion');
       updateProgress(100);
-    }, 3000);
+    }, 1500);
     
     // Don't auto-complete for fully loaded pages - wait for image loading coordination
     // The MasonryGrid script will drive the progress updates based on actual image loading

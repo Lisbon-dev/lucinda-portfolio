@@ -1,0 +1,278 @@
+---
+import Layout from "../layout/Layout.astro";
+import BaseSection from "../components/core/BaseSection.astro";
+import Container from "../components/core/Container.astro";
+import Typography from "../components/core/Typography.astro";
+import Header from "../components/layout/Header.astro";
+import AboutDialog from "../components/dialog/AboutDialog.astro";
+import ContactDialog from "../components/dialog/ContactDialog.astro";
+
+const seo = {
+  title: "Terms & Conditions | Lucinda Burman",
+  description: "Terms and conditions for using Lucinda Burman's portfolio website and services.",
+  keywords: ["terms and conditions", "terms of use", "legal terms", "website terms"],
+  noindex: false,
+};
+---
+
+<Layout seo={seo}>
+  <Header />
+  <AboutDialog />
+  <ContactDialog />
+
+  <main>
+    <BaseSection class="terms-conditions">
+      <Container size="narrow">
+        <div class="legal-content">
+          <Typography variant="h1" class="legal-title">
+            Terms & Conditions
+          </Typography>
+          
+          <div class="legal-meta">
+            <p>Last updated: {new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+          </div>
+
+          <div class="legal-body">
+            <Typography variant="h2">1. Introduction</Typography>
+            <p>
+              Welcome to Lucinda Burman's portfolio website ("Website"). These Terms and Conditions ("Terms") govern 
+              your use of our Website and services. By accessing or using our Website, you agree to be bound by these Terms.
+            </p>
+
+            <Typography variant="h2">2. Definitions</Typography>
+            <ul>
+              <li><strong>"We", "us", "our":</strong> Lucinda Burman</li>
+              <li><strong>"You", "your":</strong> The user of this Website</li>
+              <li><strong>"Services":</strong> Design, art, and creative services offered by Lucinda Burman</li>
+              <li><strong>"Content":</strong> All materials, images, text, and information on this Website</li>
+            </ul>
+
+            <Typography variant="h2">3. Use of Website</Typography>
+            <Typography variant="h3">3.1 Permitted Use</Typography>
+            <p>You may use this Website for:</p>
+            <ul>
+              <li>Viewing our portfolio and services</li>
+              <li>Contacting us for legitimate business inquiries</li>
+              <li>Learning about our work and capabilities</li>
+            </ul>
+
+            <Typography variant="h3">3.2 Prohibited Use</Typography>
+            <p>You may not:</p>
+            <ul>
+              <li>Use the Website for any unlawful purpose</li>
+              <li>Attempt to gain unauthorized access to our systems</li>
+              <li>Reproduce, distribute, or modify our content without permission</li>
+              <li>Use automated systems to access or scrape the Website</li>
+              <li>Submit false, misleading, or spam content through our forms</li>
+              <li>Interfere with the Website's functionality or security</li>
+            </ul>
+
+            <Typography variant="h2">4. Intellectual Property Rights</Typography>
+            <Typography variant="h3">4.1 Our Content</Typography>
+            <p>
+              All content on this Website, including but not limited to artwork, designs, photographs, text, graphics, 
+              logos, and layout, is the intellectual property of Lucinda Burman and is protected by copyright, trademark, 
+              and other intellectual property laws.
+            </p>
+
+            <Typography variant="h3">4.2 Client Work</Typography>
+            <p>
+              Portfolio pieces displayed on this Website may be subject to additional intellectual property rights of 
+              our clients. Such work is displayed with permission for portfolio purposes only.
+            </p>
+
+            <Typography variant="h3">4.3 Usage Rights</Typography>
+            <p>
+              You may not use, reproduce, distribute, or create derivative works from any content on this Website 
+              without our express written permission.
+            </p>
+
+            <Typography variant="h2">5. Services and Inquiries</Typography>
+            <Typography variant="h3">5.1 Portfolio Display</Typography>
+            <p>
+              The work displayed in our portfolio is for demonstration purposes only and does not constitute an offer 
+              to provide identical services or guarantee specific outcomes.
+            </p>
+
+            <Typography variant="h3">5.2 Contact and Inquiries</Typography>
+            <p>
+              Contacting us through our Website does not create a client relationship or obligation to provide services. 
+              All project terms, timelines, and pricing are subject to separate written agreements.
+            </p>
+
+            <Typography variant="h3">5.3 No Guarantee of Availability</Typography>
+            <p>
+              We reserve the right to decline projects or services at our discretion. Submission of an inquiry does not 
+              guarantee acceptance or response.
+            </p>
+
+            <Typography variant="h2">6. User-Generated Content</Typography>
+            <p>
+              By submitting content through our contact forms or communications, you grant us the right to use such 
+              content for the purpose of responding to your inquiry and providing requested services.
+            </p>
+
+            <Typography variant="h2">7. Privacy and Data Protection</Typography>
+            <p>
+              Your privacy is important to us. Please review our <a href="/privacy">Privacy Policy</a> to understand 
+              how we collect, use, and protect your personal information.
+            </p>
+
+            <Typography variant="h2">8. Disclaimers</Typography>
+            <Typography variant="h3">8.1 Website Availability</Typography>
+            <p>
+              We strive to maintain Website availability but do not guarantee uninterrupted access. The Website may be 
+              temporarily unavailable due to maintenance, updates, or technical issues.
+            </p>
+
+            <Typography variant="h3">8.2 Content Accuracy</Typography>
+            <p>
+              While we endeavor to keep information current and accurate, we make no warranties about the completeness, 
+              reliability, or accuracy of Website content.
+            </p>
+
+            <Typography variant="h3">8.3 External Links</Typography>
+            <p>
+              Our Website may contain links to external websites. We are not responsible for the content, privacy 
+              practices, or terms of use of external sites.
+            </p>
+
+            <Typography variant="h2">9. Limitation of Liability</Typography>
+            <p>
+              To the fullest extent permitted by law, Lucinda Burman shall not be liable for any indirect, incidental, 
+              special, consequential, or punitive damages arising from your use of this Website or services.
+            </p>
+
+            <Typography variant="h2">10. Indemnification</Typography>
+            <p>
+              You agree to indemnify and hold harmless Lucinda Burman from any claims, damages, or expenses arising 
+              from your use of the Website or violation of these Terms.
+            </p>
+
+            <Typography variant="h2">11. Modifications to Terms</Typography>
+            <p>
+              We reserve the right to modify these Terms at any time. Changes will be effective immediately upon posting 
+              on this page. Your continued use of the Website constitutes acceptance of modified Terms.
+            </p>
+
+            <Typography variant="h2">12. Termination</Typography>
+            <p>
+              We may terminate or suspend your access to the Website at any time, without prior notice, for conduct 
+              that violates these Terms or is harmful to other users or our business.
+            </p>
+
+            <Typography variant="h2">13. Governing Law</Typography>
+            <p>
+              These Terms are governed by and construed in accordance with the laws of England and Wales. Any disputes 
+              shall be subject to the exclusive jurisdiction of the courts of England and Wales.
+            </p>
+
+            <Typography variant="h2">14. Severability</Typography>
+            <p>
+              If any provision of these Terms is found to be unenforceable, the remaining provisions shall remain in 
+              full force and effect.
+            </p>
+
+            <Typography variant="h2">15. Contact Information</Typography>
+            <p>
+              If you have questions about these Terms, please contact us at:
+            </p>
+            <ul>
+              <li>Email: hello@lucindaburman.com</li>
+              <li>Subject line: "Terms & Conditions Inquiry"</li>
+            </ul>
+
+            <Typography variant="h2">16. Entire Agreement</Typography>
+            <p>
+              These Terms, together with our Privacy Policy, constitute the entire agreement between you and Lucinda 
+              Burman regarding the use of this Website.
+            </p>
+          </div>
+        </div>
+      </Container>
+    </BaseSection>
+  </main>
+</Layout>
+
+<style>
+  .terms-conditions {
+    padding-top: var(--spacing-xl);
+    padding-bottom: var(--spacing-xl);
+  }
+
+  .legal-content {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .legal-title {
+    margin-bottom: var(--spacing-lg);
+    text-align: center;
+  }
+
+  .legal-meta {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
+  }
+
+  .legal-body {
+    line-height: 1.7;
+  }
+
+  .legal-body h2 {
+    margin-top: var(--spacing-xl);
+    margin-bottom: var(--spacing-md);
+    color: var(--color-text-primary);
+  }
+
+  .legal-body h3 {
+    margin-top: var(--spacing-lg);
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-text-primary);
+  }
+
+  .legal-body p {
+    margin-bottom: var(--spacing-md);
+    color: var(--color-text-secondary);
+  }
+
+  .legal-body ul {
+    margin-bottom: var(--spacing-md);
+    padding-left: var(--spacing-lg);
+  }
+
+  .legal-body li {
+    margin-bottom: var(--spacing-xs);
+    color: var(--color-text-secondary);
+  }
+
+  .legal-body strong {
+    color: var(--color-text-primary);
+  }
+
+  .legal-body a {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+
+  .legal-body a:hover {
+    color: var(--color-primary-hover);
+  }
+
+  @media (max-width: 768px) {
+    .terms-conditions {
+      padding-top: var(--spacing-lg);
+      padding-bottom: var(--spacing-lg);
+    }
+
+    .legal-body {
+      font-size: var(--text-sm);
+    }
+
+    .legal-body ul {
+      padding-left: var(--spacing-md);
+    }
+  }
+</style>

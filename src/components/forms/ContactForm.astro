@@ -58,6 +58,28 @@ const subjectOptions = [
         Share details about your project, timeline, and any specific requirements.
       </div>
     </FormField>
+
+    <!-- Privacy consent checkbox -->
+    <div class="privacy-consent">
+      <label class="privacy-consent__label">
+        <input 
+          type="checkbox" 
+          name="privacy_consent" 
+          class="privacy-consent__checkbox"
+          required
+        />
+        <span class="privacy-consent__checkmark" aria-hidden="true"></span>
+        <span class="privacy-consent__text">
+          I agree to the <a href="/privacy" target="_blank" rel="noopener" class="privacy-link">Privacy Policy</a> 
+          and <a href="/terms" target="_blank" rel="noopener" class="privacy-link">Terms & Conditions</a>
+        </span>
+      </label>
+      <div class="privacy-consent__error" role="alert" aria-live="polite">
+        <div class="privacy-consent__error-content">
+          You must agree to the Privacy Policy and Terms & Conditions to continue.
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="contact-form__actions">
@@ -129,7 +151,7 @@ const subjectOptions = [
   }
 
   .contact-form__submit:focus {
-    outline: 2px solid var(--color-primary);
+    outline: 2px solid transparent;
     outline-offset: 2px;
   }
 
@@ -167,6 +189,141 @@ const subjectOptions = [
     margin-top: var(--spacing-md);
   }
 
+  /* Privacy consent styling */
+  .privacy-consent {
+    margin-top: var(--spacing-sm);
+    position: relative;
+  }
+
+  .privacy-consent__label {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+    cursor: pointer;
+    font-size: var(--text-sm);
+    line-height: 1.5;
+  }
+
+  .privacy-consent__checkbox {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+  }
+
+  .privacy-consent__checkmark {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--color-border);
+    border-radius: 3px;
+    background: var(--color-background);
+    position: relative;
+    transition: all var(--transition-fast);
+    margin-top: 2px;
+  }
+
+  .privacy-consent__checkmark::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    right: 3px;
+    bottom: 3px;
+    background: var(--color-primary);
+    border-radius: 1px;
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+  }
+
+  .privacy-consent__checkbox:checked + .privacy-consent__checkmark {
+    border-color: var(--color-primary);
+  }
+
+  .privacy-consent__checkbox:checked + .privacy-consent__checkmark::after {
+    opacity: 1;
+  }
+
+  .privacy-consent__checkbox:focus + .privacy-consent__checkmark {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+  }
+
+  .privacy-consent__text {
+    color: var(--color-text-secondary);
+  }
+
+  .privacy-link {
+    color: var(--color-primary);
+    text-decoration: underline;
+    transition: color var(--transition-fast);
+  }
+
+  .privacy-link:hover {
+    color: var(--color-primary-hover);
+  }
+
+  .privacy-link:focus {
+    outline: 2px solid transparent;
+    outline-offset: 1px;
+    border-radius: 2px;
+  }
+
+  .privacy-consent__error {
+    position: absolute;
+    top: -12px;
+    left: 30px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all var(--transition-fast);
+    pointer-events: none;
+  }
+
+  .privacy-consent__error-content {
+    background: rgba(50, 92, 89, 0.92);
+    color: white;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: 6px;
+    font-size: var(--text-xs);
+    line-height: 1.4;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    position: relative;
+    backdrop-filter: blur(4px);
+  }
+
+  .privacy-consent__error-content::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -6px;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 6px 6px 6px 0;
+    border-color: transparent rgba(50, 92, 89, 0.92) transparent transparent;
+  }
+
+  .privacy-consent--error .privacy-consent__checkmark {
+    border-color: var(--color-primary);
+    animation: shake 0.5s ease-in-out;
+  }
+
+  .privacy-consent--error .privacy-consent__error {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
+  }
+
   /* Success state */
   .contact-form--success .contact-form__submit {
     background: #16a34a;
@@ -191,6 +348,14 @@ const subjectOptions = [
       border: 2px solid;
       font-weight: 600;
     }
+
+    .privacy-consent__checkmark {
+      border-width: 3px;
+    }
+
+    .privacy-link {
+      font-weight: 600;
+    }
   }
 
   /* Reduced motion preferences */
@@ -205,6 +370,10 @@ const subjectOptions = [
 
     .contact-form__spinner {
       animation: none;
+    }
+
+    .privacy-consent__checkmark {
+      transition: none;
     }
   }
 
@@ -234,6 +403,16 @@ const subjectOptions = [
       padding: var(--spacing-sm); /* Compacted padding */
       font-size: var(--text-base); /* Compacted font size */
     }
+
+    .privacy-consent__label {
+      font-size: var(--text-xs);
+    }
+
+    .privacy-consent__error-content {
+      font-size: 11px;
+      white-space: normal;
+      max-width: 200px;
+    }
   }
 </style>
 
@@ -256,12 +435,14 @@ const subjectOptions = [
     private fields: Map<string, HTMLElement> = new Map();
     private submitButton: HTMLButtonElement;
     private messagesContainer: HTMLElement;
+    private privacyConsent: HTMLInputElement;
 
     constructor(formElement: HTMLFormElement) {
       this.form = formElement;
       this.validator = new FormValidator();
       this.submitButton = this.form.querySelector('[data-submit-button]') as HTMLButtonElement;
       this.messagesContainer = this.form.querySelector('[data-form-messages]') as HTMLElement;
+      this.privacyConsent = this.form.querySelector('input[name="privacy_consent"]') as HTMLInputElement;
       
       this.setupFields();
       this.attachEventListeners();
@@ -287,12 +468,27 @@ const subjectOptions = [
         field.addEventListener('blur', () => this.validateField(name));
         field.addEventListener('input', () => this.clearFieldError(name));
       });
+
+      // Privacy consent validation - only clear error on change, don't validate
+      if (this.privacyConsent) {
+        this.privacyConsent.addEventListener('change', () => {
+          const consentContainer = this.form.querySelector('.privacy-consent') as HTMLElement;
+          if (this.privacyConsent?.checked) {
+            consentContainer?.classList.remove('privacy-consent--error');
+          }
+        });
+      }
     }
 
     private async handleSubmit(event: SubmitEvent): Promise<void> {
       event.preventDefault();
       
       if (this.isSubmitting) return;
+
+      // Validate privacy consent first
+      if (!this.validatePrivacyConsent()) {
+        return;
+      }
 
       // Client-side validation
       const formData = new FormData(this.form);
@@ -309,6 +505,25 @@ const subjectOptions = [
 
       // Submit to API
       await this.submitToAPI(formData);
+    }
+
+    private validatePrivacyConsent(): boolean {
+      const consentContainer = this.form.querySelector('.privacy-consent') as HTMLElement;
+      
+      if (!this.privacyConsent?.checked) {
+        consentContainer?.classList.add('privacy-consent--error');
+        this.privacyConsent?.focus();
+        
+        // Auto-hide error after 4 seconds
+        setTimeout(() => {
+          consentContainer?.classList.remove('privacy-consent--error');
+        }, 4000);
+        
+        return false;
+      } else {
+        consentContainer?.classList.remove('privacy-consent--error');
+        return true;
+      }
     }
 
     private async submitToAPI(formData: FormData): Promise<void> {
@@ -373,22 +588,24 @@ const subjectOptions = [
     private showFieldError(fieldName: string, errorMessage: string): void {
       const fieldContainer = this.form.querySelector(`[data-field-name="${fieldName}"]`) as HTMLElement;
       const errorElement = fieldContainer?.querySelector('.form-field__error') as HTMLElement;
+      const errorContent = fieldContainer?.querySelector('.form-field__error-content') as HTMLElement;
       
-      if (fieldContainer && errorElement) {
+      if (fieldContainer && errorElement && errorContent) {
         fieldContainer.classList.add('form-field--error');
-        errorElement.textContent = errorMessage;
-        errorElement.style.display = 'flex';
+        errorContent.textContent = errorMessage;
+        
+        // Auto-hide error after 4 seconds
+        setTimeout(() => {
+          fieldContainer.classList.remove('form-field--error');
+        }, 4000);
       }
     }
 
     private clearFieldError(fieldName: string): void {
       const fieldContainer = this.form.querySelector(`[data-field-name="${fieldName}"]`) as HTMLElement;
-      const errorElement = fieldContainer?.querySelector('.form-field__error') as HTMLElement;
       
-      if (fieldContainer && errorElement) {
+      if (fieldContainer) {
         fieldContainer.classList.remove('form-field--error', 'form-field--valid');
-        errorElement.textContent = '';
-        errorElement.style.display = 'none';
         
         // Add valid state if field has content
         const fieldElement = this.fields.get(fieldName) as HTMLInputElement;
@@ -410,10 +627,14 @@ const subjectOptions = [
       });
       this.messagesContainer.innerHTML = '';
       this.form.classList.remove('contact-form--error', 'contact-form--success');
+      
+      // Clear privacy consent error
+      const consentContainer = this.form.querySelector('.privacy-consent') as HTMLElement;
+      consentContainer?.classList.remove('privacy-consent--error');
     }
 
     private focusFirstError(): void {
-      const firstErrorField = this.form.querySelector('.form-field--error input, .form-field--error textarea, .form-field--error select') as HTMLElement;
+      const firstErrorField = this.form.querySelector('.form-field--error input, .form-field--error textarea, .form-field--error select, .privacy-consent--error input') as HTMLElement;
       if (firstErrorField) {
         firstErrorField.focus();
       }
