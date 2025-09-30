@@ -58,6 +58,28 @@ const subjectOptions = [
         Share details about your project, timeline, and any specific requirements.
       </div>
     </FormField>
+
+    <!-- Privacy consent checkbox -->
+    <div class="privacy-consent">
+      <label class="privacy-consent__label">
+        <input 
+          type="checkbox" 
+          name="privacy_consent" 
+          class="privacy-consent__checkbox"
+          required
+          aria-describedby="privacy-consent-help"
+        />
+        <span class="privacy-consent__checkmark" aria-hidden="true"></span>
+        <span class="privacy-consent__text">
+          I agree to the <a href="/privacy" target="_blank" rel="noopener" class="privacy-link">Privacy Policy</a> 
+          and <a href="/terms" target="_blank" rel="noopener" class="privacy-link">Terms & Conditions</a>
+        </span>
+      </label>
+      <div id="privacy-consent-help" class="privacy-consent__help">
+        Required to process your inquiry and respond to your message.
+      </div>
+      <div class="privacy-consent__error" role="alert" aria-live="polite"></div>
+    </div>
   </div>
 
   <div class="contact-form__actions">
@@ -167,6 +189,111 @@ const subjectOptions = [
     margin-top: var(--spacing-md);
   }
 
+  /* Privacy consent styling */
+  .privacy-consent {
+    margin-top: var(--spacing-sm);
+  }
+
+  .privacy-consent__label {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+    cursor: pointer;
+    font-size: var(--text-sm);
+    line-height: 1.5;
+  }
+
+  .privacy-consent__checkbox {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+  }
+
+  .privacy-consent__checkmark {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--color-border);
+    border-radius: 3px;
+    background: var(--color-background);
+    position: relative;
+    transition: all var(--transition-fast);
+    margin-top: 2px;
+  }
+
+  .privacy-consent__checkmark::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 4px;
+    height: 8px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+  }
+
+  .privacy-consent__checkbox:checked + .privacy-consent__checkmark {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+
+  .privacy-consent__checkbox:checked + .privacy-consent__checkmark::after {
+    opacity: 1;
+  }
+
+  .privacy-consent__checkbox:focus + .privacy-consent__checkmark {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  .privacy-consent__text {
+    color: var(--color-text-secondary);
+  }
+
+  .privacy-link {
+    color: var(--color-primary);
+    text-decoration: underline;
+    transition: color var(--transition-fast);
+  }
+
+  .privacy-link:hover {
+    color: var(--color-primary-hover);
+  }
+
+  .privacy-link:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 1px;
+    border-radius: 2px;
+  }
+
+  .privacy-consent__help {
+    margin-top: var(--spacing-xs);
+    margin-left: calc(18px + var(--spacing-sm));
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    line-height: 1.4;
+  }
+
+  .privacy-consent__error {
+    margin-top: var(--spacing-xs);
+    margin-left: calc(18px + var(--spacing-sm));
+    font-size: var(--text-xs);
+    color: var(--color-error);
+    display: none;
+  }
+
+  .privacy-consent--error .privacy-consent__checkmark {
+    border-color: var(--color-error);
+  }
+
+  .privacy-consent--error .privacy-consent__error {
+    display: block;
+  }
+
   /* Success state */
   .contact-form--success .contact-form__submit {
     background: #16a34a;
@@ -191,6 +318,14 @@ const subjectOptions = [
       border: 2px solid;
       font-weight: 600;
     }
+
+    .privacy-consent__checkmark {
+      border-width: 3px;
+    }
+
+    .privacy-link {
+      font-weight: 600;
+    }
   }
 
   /* Reduced motion preferences */
@@ -205,6 +340,10 @@ const subjectOptions = [
 
     .contact-form__spinner {
       animation: none;
+    }
+
+    .privacy-consent__checkmark {
+      transition: none;
     }
   }
 
@@ -234,6 +373,14 @@ const subjectOptions = [
       padding: var(--spacing-sm); /* Compacted padding */
       font-size: var(--text-base); /* Compacted font size */
     }
+
+    .privacy-consent__label {
+      font-size: var(--text-xs);
+    }
+
+    .privacy-consent__help {
+      font-size: 11px;
+    }
   }
 </style>
 
@@ -256,12 +403,14 @@ const subjectOptions = [
     private fields: Map<string, HTMLElement> = new Map();
     private submitButton: HTMLButtonElement;
     private messagesContainer: HTMLElement;
+    private privacyConsent: HTMLInputElement;
 
     constructor(formElement: HTMLFormElement) {
       this.form = formElement;
       this.validator = new FormValidator();
       this.submitButton = this.form.querySelector('[data-submit-button]') as HTMLButtonElement;
       this.messagesContainer = this.form.querySelector('[data-form-messages]') as HTMLElement;
+      this.privacyConsent = this.form.querySelector('input[name="privacy_consent"]') as HTMLInputElement;
       
       this.setupFields();
       this.attachEventListeners();
@@ -287,12 +436,22 @@ const subjectOptions = [
         field.addEventListener('blur', () => this.validateField(name));
         field.addEventListener('input', () => this.clearFieldError(name));
       });
+
+      // Privacy consent validation
+      if (this.privacyConsent) {
+        this.privacyConsent.addEventListener('change', this.validatePrivacyConsent.bind(this));
+      }
     }
 
     private async handleSubmit(event: SubmitEvent): Promise<void> {
       event.preventDefault();
       
       if (this.isSubmitting) return;
+
+      // Validate privacy consent first
+      if (!this.validatePrivacyConsent()) {
+        return;
+      }
 
       // Client-side validation
       const formData = new FormData(this.form);
@@ -309,6 +468,26 @@ const subjectOptions = [
 
       // Submit to API
       await this.submitToAPI(formData);
+    }
+
+    private validatePrivacyConsent(): boolean {
+      const consentContainer = this.form.querySelector('.privacy-consent') as HTMLElement;
+      const errorElement = consentContainer?.querySelector('.privacy-consent__error') as HTMLElement;
+      
+      if (!this.privacyConsent?.checked) {
+        consentContainer?.classList.add('privacy-consent--error');
+        if (errorElement) {
+          errorElement.textContent = 'You must agree to the Privacy Policy and Terms & Conditions to continue.';
+        }
+        this.privacyConsent?.focus();
+        return false;
+      } else {
+        consentContainer?.classList.remove('privacy-consent--error');
+        if (errorElement) {
+          errorElement.textContent = '';
+        }
+        return true;
+      }
     }
 
     private async submitToAPI(formData: FormData): Promise<void> {
@@ -410,10 +589,14 @@ const subjectOptions = [
       });
       this.messagesContainer.innerHTML = '';
       this.form.classList.remove('contact-form--error', 'contact-form--success');
+      
+      // Clear privacy consent error
+      const consentContainer = this.form.querySelector('.privacy-consent') as HTMLElement;
+      consentContainer?.classList.remove('privacy-consent--error');
     }
 
     private focusFirstError(): void {
-      const firstErrorField = this.form.querySelector('.form-field--error input, .form-field--error textarea, .form-field--error select') as HTMLElement;
+      const firstErrorField = this.form.querySelector('.form-field--error input, .form-field--error textarea, .form-field--error select, .privacy-consent--error input') as HTMLElement;
       if (firstErrorField) {
         firstErrorField.focus();
       }

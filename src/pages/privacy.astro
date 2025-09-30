@@ -1,0 +1,252 @@
+---
+import Layout from "../layout/Layout.astro";
+import BaseSection from "../components/core/BaseSection.astro";
+import Container from "../components/core/Container.astro";
+import Typography from "../components/core/Typography.astro";
+import Header from "../components/layout/Header.astro";
+import AboutDialog from "../components/dialog/AboutDialog.astro";
+import ContactDialog from "../components/dialog/ContactDialog.astro";
+
+const seo = {
+  title: "Privacy Policy | Lucinda Burman",
+  description: "Privacy policy for Lucinda Burman's portfolio website. Learn how we collect, use, and protect your personal information.",
+  keywords: ["privacy policy", "data protection", "GDPR", "personal information"],
+  noindex: false,
+};
+---
+
+<Layout seo={seo}>
+  <Header />
+  <AboutDialog />
+  <ContactDialog />
+
+  <main>
+    <BaseSection class="privacy-policy">
+      <Container size="narrow">
+        <div class="legal-content">
+          <Typography variant="h1" class="legal-title">
+            Privacy Policy
+          </Typography>
+          
+          <div class="legal-meta">
+            <p>Last updated: {new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+          </div>
+
+          <div class="legal-body">
+            <Typography variant="h2">1. Introduction</Typography>
+            <p>
+              Lucinda Burman ("we", "our", or "us") respects your privacy and is committed to protecting your personal data. 
+              This privacy policy explains how we collect, use, and safeguard your information when you visit our portfolio 
+              website or contact us through our forms.
+            </p>
+
+            <Typography variant="h2">2. Data Controller</Typography>
+            <p>
+              Lucinda Burman is the data controller responsible for your personal data. You can contact us at:
+            </p>
+            <ul>
+              <li>Email: hello@lucindaburman.com</li>
+              <li>Website: lucindaburman.com</li>
+            </ul>
+
+            <Typography variant="h2">3. Information We Collect</Typography>
+            <Typography variant="h3">3.1 Information You Provide</Typography>
+            <p>When you contact us through our website, we may collect:</p>
+            <ul>
+              <li>Your name</li>
+              <li>Email address</li>
+              <li>Subject of inquiry</li>
+              <li>Message content</li>
+              <li>Any additional information you choose to provide</li>
+            </ul>
+
+            <Typography variant="h3">3.2 Automatically Collected Information</Typography>
+            <p>We may automatically collect certain technical information, including:</p>
+            <ul>
+              <li>IP address (for rate limiting and security purposes)</li>
+              <li>Browser type and version</li>
+              <li>Device information</li>
+              <li>Pages visited and time spent on our website</li>
+              <li>Referring website</li>
+            </ul>
+
+            <Typography variant="h2">4. How We Use Your Information</Typography>
+            <p>We use your personal data for the following purposes:</p>
+            <ul>
+              <li>To respond to your inquiries and communications</li>
+              <li>To discuss potential projects and collaborations</li>
+              <li>To provide information about our services</li>
+              <li>To improve our website and user experience</li>
+              <li>To comply with legal obligations</li>
+              <li>To protect against fraud and ensure website security</li>
+            </ul>
+
+            <Typography variant="h2">5. Legal Basis for Processing</Typography>
+            <p>Under GDPR, we process your personal data based on:</p>
+            <ul>
+              <li><strong>Consent:</strong> When you voluntarily submit information through our contact form</li>
+              <li><strong>Legitimate interests:</strong> For website security, analytics, and business communications</li>
+              <li><strong>Legal obligation:</strong> When required to comply with applicable laws</li>
+            </ul>
+
+            <Typography variant="h2">6. Data Sharing and Disclosure</Typography>
+            <p>
+              We do not sell, trade, or rent your personal information to third parties. We may share your data only in 
+              the following circumstances:
+            </p>
+            <ul>
+              <li>With your explicit consent</li>
+              <li>To comply with legal obligations or court orders</li>
+              <li>To protect our rights, property, or safety</li>
+              <li>With trusted service providers who assist in website operations (under strict confidentiality agreements)</li>
+            </ul>
+
+            <Typography variant="h2">7. Data Retention</Typography>
+            <p>
+              We retain your personal data only for as long as necessary to fulfill the purposes outlined in this policy:
+            </p>
+            <ul>
+              <li>Contact form submissions: 3 years from last communication</li>
+              <li>Technical logs: 12 months maximum</li>
+              <li>Email communications: Until you request deletion or withdraw consent</li>
+            </ul>
+
+            <Typography variant="h2">8. Your Rights Under GDPR</Typography>
+            <p>You have the following rights regarding your personal data:</p>
+            <ul>
+              <li><strong>Right of access:</strong> Request copies of your personal data</li>
+              <li><strong>Right to rectification:</strong> Request correction of inaccurate data</li>
+              <li><strong>Right to erasure:</strong> Request deletion of your personal data</li>
+              <li><strong>Right to restrict processing:</strong> Request limitation of data processing</li>
+              <li><strong>Right to data portability:</strong> Request transfer of your data</li>
+              <li><strong>Right to object:</strong> Object to processing based on legitimate interests</li>
+              <li><strong>Right to withdraw consent:</strong> Withdraw consent at any time</li>
+            </ul>
+            <p>To exercise these rights, contact us at hello@lucindaburman.com.</p>
+
+            <Typography variant="h2">9. Cookies and Tracking</Typography>
+            <p>
+              Our website uses minimal tracking technologies. We do not use advertising cookies or third-party tracking. 
+              Any technical cookies used are essential for website functionality and security.
+            </p>
+
+            <Typography variant="h2">10. Data Security</Typography>
+            <p>
+              We implement appropriate technical and organizational measures to protect your personal data against 
+              unauthorized access, alteration, disclosure, or destruction. However, no internet transmission is 
+              completely secure, and we cannot guarantee absolute security.
+            </p>
+
+            <Typography variant="h2">11. International Data Transfers</Typography>
+            <p>
+              Your data may be processed in countries outside the European Economic Area. When this occurs, we ensure 
+              adequate protection through appropriate safeguards such as standard contractual clauses or adequacy decisions.
+            </p>
+
+            <Typography variant="h2">12. Children's Privacy</Typography>
+            <p>
+              Our website is not intended for children under 16 years of age. We do not knowingly collect personal 
+              information from children under 16.
+            </p>
+
+            <Typography variant="h2">13. Changes to This Policy</Typography>
+            <p>
+              We may update this privacy policy from time to time. We will notify you of any material changes by 
+              posting the new policy on this page with an updated "Last updated" date.
+            </p>
+
+            <Typography variant="h2">14. Contact Information</Typography>
+            <p>
+              If you have questions about this privacy policy or wish to exercise your rights, please contact us at:
+            </p>
+            <ul>
+              <li>Email: hello@lucindaburman.com</li>
+              <li>Subject line: "Privacy Policy Inquiry"</li>
+            </ul>
+
+            <Typography variant="h2">15. Supervisory Authority</Typography>
+            <p>
+              You have the right to lodge a complaint with a supervisory authority if you believe your data protection 
+              rights have been violated. You can contact your local data protection authority or the Information 
+              Commissioner's Office (ICO) in the UK.
+            </p>
+          </div>
+        </div>
+      </Container>
+    </BaseSection>
+  </main>
+</Layout>
+
+<style>
+  .privacy-policy {
+    padding-top: var(--spacing-xl);
+    padding-bottom: var(--spacing-xl);
+  }
+
+  .legal-content {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .legal-title {
+    margin-bottom: var(--spacing-lg);
+    text-align: center;
+  }
+
+  .legal-meta {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
+  }
+
+  .legal-body {
+    line-height: 1.7;
+  }
+
+  .legal-body h2 {
+    margin-top: var(--spacing-xl);
+    margin-bottom: var(--spacing-md);
+    color: var(--color-text-primary);
+  }
+
+  .legal-body h3 {
+    margin-top: var(--spacing-lg);
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-text-primary);
+  }
+
+  .legal-body p {
+    margin-bottom: var(--spacing-md);
+    color: var(--color-text-secondary);
+  }
+
+  .legal-body ul {
+    margin-bottom: var(--spacing-md);
+    padding-left: var(--spacing-lg);
+  }
+
+  .legal-body li {
+    margin-bottom: var(--spacing-xs);
+    color: var(--color-text-secondary);
+  }
+
+  .legal-body strong {
+    color: var(--color-text-primary);
+  }
+
+  @media (max-width: 768px) {
+    .privacy-policy {
+      padding-top: var(--spacing-lg);
+      padding-bottom: var(--spacing-lg);
+    }
+
+    .legal-body {
+      font-size: var(--text-sm);
+    }
+
+    .legal-body ul {
+      padding-left: var(--spacing-md);
+    }
+  }
+</style>

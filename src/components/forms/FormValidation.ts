@@ -93,7 +93,16 @@ export class FormValidator {
    */
   private getValue(data: FormData | Record<string, any>, name: string): string {
     if (data instanceof FormData) {
-      return (data.get(name) as string) || '';
+      const value = data.get(name);
+      // Handle checkbox values
+      if (name === 'privacy_consent') {
+        return value === 'on' || value === 'true' ? 'true' : '';
+      }
+      return (value as string) || '';
+    }
+    // Handle checkbox values in object data
+    if (name === 'privacy_consent') {
+      return data[name] ? 'true' : '';
     }
     return data[name] || '';
   }
@@ -170,6 +179,13 @@ export const contactFormConfig: FieldConfig[] = [
       ValidationRules.maxLength(1000, 'Message must be less than 1000 characters'),
     ],
   },
+  {
+    name: 'privacy_consent',
+    label: 'Privacy Consent',
+    rules: [
+      ValidationRules.required('You must agree to the Privacy Policy and Terms & Conditions'),
+    ],
+  },
 ];
 
 /**
@@ -180,6 +196,7 @@ export interface ContactFormData {
   email: string;
   subject: string;
   message: string;
+  privacy_consent?: boolean;
 }
 
 /**
@@ -212,5 +229,6 @@ export function createSafeContactFormData(rawData: Record<string, any>): Contact
     email: sanitizeInput(rawData.email || ''),
     subject: sanitizeInput(rawData.subject || ''),
     message: sanitizeInput(rawData.message || ''),
+    privacy_consent: Boolean(rawData.privacy_consent),
   };
 }
