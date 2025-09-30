@@ -192,6 +192,7 @@ const subjectOptions = [
   /* Privacy consent styling */
   .privacy-consent {
     margin-top: var(--spacing-sm);
+    position: relative;
   }
 
   .privacy-consent__label {
@@ -270,18 +271,18 @@ const subjectOptions = [
 
   .privacy-consent__error {
     position: absolute;
-    top: -8px;
-    left: 28px;
+    top: -12px;
+    left: 30px;
     z-index: 1000;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-10px);
+    transform: translateY(-8px);
     transition: all var(--transition-fast);
     pointer-events: none;
   }
 
   .privacy-consent__error-content {
-    background: rgba(220, 38, 38, 0.95);
+    background: rgba(50, 92, 89, 0.92);
     color: white;
     padding: var(--spacing-xs) var(--spacing-sm);
     border-radius: 6px;
@@ -303,11 +304,11 @@ const subjectOptions = [
     height: 0;
     border-style: solid;
     border-width: 6px 6px 6px 0;
-    border-color: transparent rgba(220, 38, 38, 0.95) transparent transparent;
+    border-color: transparent rgba(50, 92, 89, 0.92) transparent transparent;
   }
 
   .privacy-consent--error .privacy-consent__checkmark {
-    border-color: var(--color-error);
+    border-color: var(--color-primary);
     animation: shake 0.5s ease-in-out;
   }
 
