@@ -21,6 +21,13 @@ images:
     alt: "W Hotel Paris sculpture in context"
   - src: "../../assets/portfolio/wsculpture/7 - W Hotel Sculpture 5.png"
     alt: "W Hotel Paris sculpture final installation"
+videos:
+  - src: "/src/assets/portfolio/wsculpture/FINAL SCULPTURE VIDEO-optimized"
+    poster: "../../assets/portfolio/wsculpture/FINAL SCULPTURE VIDEO-poster.png"
+    alt: "W Hotel Paris sculpture installation video showcasing the dynamic 3D art piece in motion"
+    width: 695
+    height: 391
+    position: 0
 tags: ["3d-sculpture", "installation-art", "hospitality-design", "contemporary-art", "w-hotel", "paris"]
 client: "W Hotel Paris"
 year: 2023
