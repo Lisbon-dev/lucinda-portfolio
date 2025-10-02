@@ -8,9 +8,7 @@ publishedDate: 2023-05-20
 mainImage:
   src: "../../assets/portfolio/paris/Paris Renato.png"
   alt: "Place Kings Road London exhibition artwork"
-images:
-  - src: "../../assets/portfolio/paris/Paris Renato.png"
-    alt: "Place Kings Road exhibition featured artwork"
+images: []
 tags: ["exhibition", "contemporary-art", "place-based-art", "london", "kings-road", "cultural-identity"]
 client: "Kings Road Gallery"
 year: 2023

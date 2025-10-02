@@ -9,8 +9,6 @@ mainImage:
   src: "../../assets/portfolio/motcombs/Motcombs, Mayfair London 1.png"
   alt: "Motcombs London brand storytelling design"
 images:
-  - src: "../../assets/portfolio/motcombs/Motcombs, Mayfair London 1.png"
-    alt: "Motcombs London brand storytelling overview"
   - src: "../../assets/portfolio/motcombs/Motcombs, Mayfair London 2.png"
     alt: "Motcombs London narrative design elements"
   - src: "../../assets/portfolio/motcombs/Motcombs, Mayfair London 3.png"
