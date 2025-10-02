@@ -173,6 +173,9 @@ const activeDotIndex = currentIndex - dotsStartIndex;
             <Typography as="h2" variant="explanatory" tracking="wider">
               {project.data.title}
             </Typography>
+            <Typography as="p" variant="small" tracking="wider">
+              {project.data.description}
+            </Typography>
           </div>
         </div>
 
@@ -464,7 +467,7 @@ const activeDotIndex = currentIndex - dotsStartIndex;
 
   .project-description {
     text-align: center;
-    padding: 0 var(--spacing-md);
+    padding: 0 var(--spacing-xs);
   }
 
   /* Navigation positioned beside description */
