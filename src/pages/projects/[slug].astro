@@ -384,6 +384,27 @@ const activeDotIndex = currentIndex - dotsStartIndex;
 </script>
 
 <style>
+  /* Client feedback: Typography adjustments to match homepage */
+  .project-hero :global(.typography[variant="header"]) {
+    font-family: "IVY PRESTO DISPLAY", serif;
+    font-weight: 400; /* Regular */
+    font-size: 36px; /* Mobile first */
+  }
+  .project-hero :global(.typography[variant="explanatory"]) {
+    font-family: "IVY PRESTO DISPLAY", serif;
+    font-weight: 300; /* Light */
+    font-size: 14px; /* Mobile first */
+  }
+
+  @media (min-width: 768px) {
+    .project-hero :global(.typography[variant="header"]) {
+      font-size: 60px;
+    }
+    .project-hero :global(.typography[variant="explanatory"]) {
+      font-size: 16px;
+    }
+  }
+
   .project-page {
     position: relative;
   }
