@@ -29,19 +29,33 @@ const sortedProjects = projects.sort((a, b) => {
   return dateB.getTime() - dateA.getTime();
 });
 
+// To create anchor links for categories
+const processedCategories = new Set();
+
 ---
 
 <div class={`masonry-container ${className}`} id={uniqueId}>
   <Masonry 
     breakpointCols={{
       default: 3,
-      1600: 3,
-      900: 2,
-      550: 1
+      767: 2,
+      500: 1
     }}
   >
-    {sortedProjects.map((project, index) => 
-        <div class="masonry-item" data-project={project.slug} data-index={index} data-lazy={index >= 6 ? "true" : "false"}>
+    {sortedProjects.map((project, index) => {
+        const categorySlug = project.data.category.toLowerCase().replace(/\s+/g, '-').replace(/&/g, 'and');
+        const isFirstOfCategory = !processedCategories.has(categorySlug);
+        if (isFirstOfCategory) {
+          processedCategories.add(categorySlug);
+        }
+        return (
+        <div 
+          class="masonry-item" 
+          data-project={project.slug} 
+          data-index={index} 
+          data-lazy={index >= 6 ? "true" : "false"}
+          id={isFirstOfCategory ? `category-${categorySlug}` : undefined}
+         >
           <a href={`/projects/${project.slug}`} class="project-link" aria-label={`View ${project.data.title} project`}>
             <div class="image-container" data-loaded="false">
               <!-- Progressive loading placeholder -->
@@ -67,8 +81,8 @@ const sortedProjects = projects.sort((a, b) => {
             </div>
           </a>
         </div>
-      )
-    }
+      )}
+    )}
   </Masonry>
 </div>
 
@@ -80,35 +94,32 @@ const sortedProjects = projects.sort((a, b) => {
     padding: 0 var(--spacing-container-mobile);
   }
 
+  :global(.astro-masonry-grid) {
+    display: flex;
+    margin-left: calc(-1 * var(--spacing-grid-gap-mobile)); /* gutter size offset */
+    width: auto;
+  }
+
+  :global(.astro-masonry-grid_column) {
+    padding-left: var(--spacing-grid-gap-mobile); /* gutter size */
+    background-clip: padding-box;
+  }
+
   @media (min-width: 768px) {
     .masonry-container {
       padding: 0 var(--spacing-container-tablet);
     }
+    :global(.astro-masonry-grid) {
+      margin-left: -66px;
+    }
+    :global(.astro-masonry-grid_column) {
+      padding-left: 66px;
+    }
   }
 
-  @media (min-width: 1200px) {
+  @media (min-width: 1512px) { /* Target client's screen size for specific margin */
     .masonry-container {
-      padding: 0 var(--spacing-container-desktop);
-    }
-  }
-
-    :global(.astro-masonry-grid_column) {
-      padding-left: calc(var(--spacing-grid-gap-mobile));
-      padding-right: calc(var(--spacing-grid-gap-mobile));
-    }
-
-  /* Responsive gap adjustments */
-  @media (min-width: 768px) {
-    :global(.astro-masonry-grid_column) {
-      padding-left: calc(var(--spacing-grid-gap-tablet) / 2);
-      padding-right: calc(var(--spacing-grid-gap-tablet) / 2);
-    }
-  }
-
-  @media (min-width: 1200px) {
-    :global(.astro-masonry-grid_column) {
-      padding-left: calc(var(--spacing-grid-gap-desktop) / 3);
-      padding-right: calc(var(--spacing-grid-gap-desktop) / 3);
+      padding: 0 121px;
     }
   }
 
@@ -140,13 +151,7 @@ const sortedProjects = projects.sort((a, b) => {
   /* Responsive margin adjustments */
   @media (min-width: 768px) {
     :global(.masonry-item) {
-      margin-bottom: var(--spacing-grid-gap-tablet);
-    }
-  }
-
-  @media (min-width: 1200px) {
-    :global(.masonry-item) {
-      margin-bottom: var(--spacing-grid-gap-desktop);
+      margin-bottom: 66px;
     }
   }
 

@@ -552,6 +552,18 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     }
   }
 
+  @media (min-width: 1512px) { /* Target client's screen size for specific margin */
+    .project-content-container {
+      padding: 0 410px;
+    }
+    .nav-arrow--prev {
+      left: calc(410px - 50px);
+    }
+    .nav-arrow--next {
+      right: calc(410px - 50px);
+    }
+  }
+
   @media (max-width: 768px) {
     .nav-arrow--prev {
       left: var(--spacing-container-mobile);

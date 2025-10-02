@@ -28,6 +28,16 @@ const socialLinks = [
   { name: 'LinkedIn', href: '#', external: true }
 ];
 
+// Define categories for clickable sub-header
+const categories = [
+  { name: 'Illustration' },
+  { name: 'Editorial' },
+  { name: 'Brand Storytelling' },
+  { name: 'Installations' },
+  { name: 'Bespoke Commissions' },
+  { name: 'Events' }
+];
+
 // Generate SEO data for homepage
 const homeSEO = {
   title: "Lucinda Burman - Editorial Illustrator & Creative Designer",
@@ -67,10 +77,16 @@ const homeSEO = {
             animationDelay={300}
           />
           <Container size="narrow">
-            <Typography as="p" variant="explanatory" tracking="wide">
-              Editorial Illustration  |  Branding & Interior Artwork  |  2D & 3D  |  
-              Bespoke Commissions  |  Weddings & Events
-            </Typography>
+            <div class="explanatory-text-links">
+              {categories.map((category, index) => (
+                <>
+                  <a href={`#category-${category.name.toLowerCase().replace(/\s+/g, '-').replace(/&/g, 'and')}`} class="category-link">
+                    {category.name}
+                  </a>
+                  {index < categories.length - 1 && <span class="separator">|</span>}
+                </>
+              ))}
+            </div>
           </Container>
         </header>
       </Container>
@@ -176,6 +192,61 @@ const homeSEO = {
 </script>
 
 <style>
+  /* Client feedback: Typography adjustments */
+  .hero-header :global(.hero-title .animated-header) {
+    font-family: "IVY PRESTO DISPLAY", serif;
+    font-weight: 400; /* Regular */
+    font-size: 36px; /* Mobile first */
+  }
+
+  .explanatory-text-links {
+    font-family: "IVY PRESTO DISPLAY", serif;
+    font-weight: 300; /* Light */
+    font-size: 14px;
+    letter-spacing: var(--tracking-wide);
+    color: var(--color-text-primary);
+    opacity: 0.8;
+  }
+  
+  .category-link {
+    text-decoration: none;
+    color: inherit;
+    transition: color var(--transition-normal);
+    padding: 0 0.25em;
+  }
+
+  .category-link:hover {
+    color: var(--color-primary);
+  }
+
+  .separator {
+    margin: 0 0.5em;
+    user-select: none;
+  }
+
+  @media (min-width: 768px) {
+    .hero-header :global(.hero-title .animated-header) {
+      font-size: 60px;
+    }
+    .explanatory-text-links {
+      font-size: 16px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .explanatory-text-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .separator {
+      display: none;
+    }
+    .category-link {
+      padding: 0.2em 0.5em;
+    }
+  }
+
   /* Performance-Optimized Hero Section */
   .hero-header {
     text-align: center;
