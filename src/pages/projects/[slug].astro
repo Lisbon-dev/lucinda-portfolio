@@ -13,7 +13,15 @@ import type { CollectionEntry } from "astro:content";
 
 export async function getStaticPaths() {
   const projects = await getCollection("projects");
-  return projects.map((project) => ({
+  // Sort projects to ensure previous/next navigation is in the correct order
+  const sortedProjects = projects.sort((a, b) => {
+    const orderA = a.data.order ?? 999;
+    const orderB = b.data.order ?? 999;
+    if (orderA !== orderB) return orderA - orderB;
+    return new Date(b.data.publishedDate).getTime() - new Date(a.data.publishedDate).getTime();
+  });
+
+  return sortedProjects.map((project) => ({
     params: { slug: project.slug },
     props: { project },
   }));
@@ -42,7 +50,12 @@ const projectSEO = {
 };
 
 // Get all projects for navigation carousel
-const allProjects = await getCollection("projects");
+const allProjects = (await getCollection("projects")).sort((a, b) => {
+  const orderA = a.data.order ?? 999;
+  const orderB = b.data.order ?? 999;
+  if (orderA !== orderB) return orderA - orderB;
+  return new Date(b.data.publishedDate).getTime() - new Date(a.data.publishedDate).getTime();
+});
 const currentIndex = allProjects.findIndex((p) => p.slug === project.slug);
 const previousProject =
   currentIndex > 0
@@ -308,12 +321,21 @@ const activeDotIndex = currentIndex - dotsStartIndex;
 
     let touchStartX = 0;
     let touchEndX = 0;
+    let touchStartY = 0;
+    let touchEndY = 0;
     const swipeThreshold = 50; // Minimum distance for a swipe
 
     projectPage.addEventListener(
       "touchstart",
       (event) => {
+        // Ignore if it's not a single touch
+        if (event.touches.length !== 1) {
+          touchStartX = 0;
+          touchStartY = 0;
+          return;
+        }
         touchStartX = event.changedTouches[0].screenX;
+        touchStartY = event.changedTouches[0].screenY;
       },
       { passive: true }
     );
@@ -321,16 +343,25 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     projectPage.addEventListener(
       "touchend",
       (event) => {
-        touchEndX = event.changedTouches[0].screenX;
-        handleSwipe();
+        // Ignore if there are still touches on screen (e.g., pinch-to-zoom)
+        if (event.touches.length > 0) {
+          return;
+        }
+        if (touchStartX !== 0) {
+          touchEndX = event.changedTouches[0].screenX;
+          touchEndY = event.changedTouches[0].screenY;
+          handleSwipe();
+        }
       },
       { passive: true }
     );
 
     function handleSwipe() {
       const deltaX = touchEndX - touchStartX;
-
-      if (Math.abs(deltaX) < swipeThreshold) {
+      const deltaY = touchEndY - touchStartY;
+      
+      // Ensure it's a horizontal swipe and not a vertical scroll or too small
+      if (Math.abs(deltaX) < swipeThreshold || Math.abs(deltaX) < Math.abs(deltaY)) {
         return; // Not a valid swipe
       }
 

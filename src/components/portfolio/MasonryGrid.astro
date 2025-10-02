@@ -224,9 +224,14 @@ const processedCategories = new Set();
 
   /* Touch devices - show overlay on tap */
   @media (hover: none) and (pointer: coarse) {
-    :global(.masonry-item):active .overlay {
+    /* Handled by JS adding 'mobile-overlay-active' class */
+    :global(.masonry-item.mobile-overlay-active) .overlay {
       opacity: 1;
       visibility: visible;
+    }
+
+    :global(.masonry-item):active .overlay {
+      opacity: 0; /* Prevent flash on tap before JS logic runs */
     }
   }
 
@@ -404,6 +409,7 @@ const processedCategories = new Set();
       if (eagerImagesLoaded >= totalEagerImages && !animationsReady) {
         console.log('🎬 All eager images loaded, preparing animations...');
         setTimeout(() => {
+          setupTouchInteractions();
           startAnimations();
         }, 200); // Small delay to ensure overlay completes first
       }
@@ -455,6 +461,7 @@ const processedCategories = new Set();
         if (window.updateLoadingProgress) {
           window.updateLoadingProgress(100);
         }
+        setupTouchInteractions();
         startAnimations();
       }
     }, 3000);
@@ -462,6 +469,42 @@ const processedCategories = new Set();
     // Initialize immediately if images are already cached
     if (eagerImagesLoaded >= totalEagerImages) {
       updateLoadingProgress();
+    }
+
+    function setupTouchInteractions() {
+      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      if (!isTouchDevice) return;
+
+      const masonryItems = document.querySelectorAll('.masonry-item');
+      let tappedItem = null;
+
+      masonryItems.forEach(item => {
+        const link = item.querySelector('.project-link');
+
+        link.addEventListener('click', (e) => {
+          if (item !== tappedItem) {
+            e.preventDefault();
+
+            // Remove active class from previously tapped item
+            if (tappedItem) {
+              tappedItem.classList.remove('mobile-overlay-active');
+            }
+            
+            // Add active class to current item and set it as tapped
+            item.classList.add('mobile-overlay-active');
+            tappedItem = item;
+          }
+          // If it's the second tap, the default link behavior will proceed
+        });
+      });
+
+      // Add a listener to the document to close the overlay if tapping outside
+      document.addEventListener('click', (e) => {
+        if (tappedItem && !tappedItem.contains(e.target)) {
+          tappedItem.classList.remove('mobile-overlay-active');
+          tappedItem = null;
+        }
+      });
     }
   }
   
@@ -521,6 +564,11 @@ const processedCategories = new Set();
       
       // Listen for loading complete event from overlay
       document.addEventListener('loadingComplete', startItemAnimations);
+
+      // Also ensure touch interactions are set up after animations start
+      document.addEventListener('loadingComplete', () => {
+        setupTouchInteractions();
+      });
       
       // Fallback: start animations after a delay if event doesn't fire
       setTimeout(() => {
