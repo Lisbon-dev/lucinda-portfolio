@@ -1,6 +1,6 @@
 ---
 title: "W Hotel Paris"
-description: "3D illustrative sculpture installation for W Hotel Paris, combining contemporary art with hospitality design to create an iconic focal point"
+description: "Sculptural artwork for W Hotel Paris, Marriott, conveying the brand’s story in 3D form, inspired by its Parisian context."
 category: "3D Illustrative Sculpture"
 featured: true
 order: 2

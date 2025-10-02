@@ -1,6 +1,6 @@
 ---
 title: "The Spectator - 'Beautiful and damned'"
-description: "Editorial illustration series exploring themes of beauty, decadence, and moral complexity."
+description: "Editorial map illustration for The Spectator World, Travel section, USA."
 category: "Editorial Illustration"
 order: 9
 featured: false

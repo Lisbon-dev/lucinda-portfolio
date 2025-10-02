@@ -1,6 +1,6 @@
 ---
 title: "W Hotel Paris"
-description: "Brand storytelling project for W Hotel Paris, creating compelling visual narratives that capture the essence of Parisian luxury hospitality"
+description: "Signature artwork for W Hotel Paris, Marriott, bringing the brand’s story to life in collaboration with Manuelle Gautrand Architecture and the wider design and interiors team."
 category: "Brand Storytelling"
 featured: true
 order: 1

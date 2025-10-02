@@ -1,6 +1,6 @@
 ---
 title: "'Place' Kings Road, London"
-description: "Contemporary art exhibition showcasing place-based narratives and cultural identity through visual storytelling and immersive installations"
+description: "One of a collection of paintings produced for a solo exhibiton ‘Place’, Kings Road, London. (Acrylic ink & paint on watercolour paper)"
 category: "Exhibition"
 featured: false
 order: 12

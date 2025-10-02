@@ -1,6 +1,6 @@
 ---
 title: "The Spectator - 'Shadow of a Doubt'"
-description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+description: "Editorial illustration for The Spectator, Books & Arts Section."
 category: "Editorial Illustration"
 order: 5
 featured: false

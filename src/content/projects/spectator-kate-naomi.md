@@ -1,6 +1,6 @@
 ---
 title: "The Spectator - 'Naomi & Kate'"
-description: "Fashion and culture editorial illustrations featuring iconic supermodel portraits and contemporary commentary."
+description: "Editorial fashion illustration for The Spectator World, US."
 category: "Editorial Illustration"
 order: 3
 featured: false

@@ -1,6 +1,6 @@
 ---
 title: "The Spectator - 'The thoroughly underrated Pessac-Léognan'"
-description: "Wine culture illustration series celebrating the sophisticated terroir and heritage of Pessac-Léognan wines."
+description: "Editorial illustration for The Spectator World, Food & Drink section, US."
 category: "Editorial Illustration"
 order: 15
 featured: false

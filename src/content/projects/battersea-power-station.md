@@ -1,6 +1,6 @@
 ---
 title: "Battersea Power Station"
-description: "Architectural illustration capturing the iconic industrial heritage of London's Battersea Power Station."
+description: "Commissioned painting of Battersea Power Station for a Private client, Abu Dhabi. (Acrylic ink on watercolour paper)"
 category: "Bespoke Commission"
 order: 6
 featured: false

@@ -1,6 +1,6 @@
 ---
 title: "The Spectator - 'Suffer little children'"
-description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+description: "Series of editorial carcicatures for The Spectator World, Books & Arts section, USA."
 category: "Editorial Illustration"
 order: 11
 featured: false

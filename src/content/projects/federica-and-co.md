@@ -1,6 +1,6 @@
 ---
 title: "Federica & Co."
-description: "Brand illustration and visual identity work for contemporary fashion and lifestyle brand."
+description: "Commisioned illustration for private client, Milan, Italy. (Black ink & alcohol-based marker)"
 category: "Bespoke Commission"
 order: 17
 featured: false
