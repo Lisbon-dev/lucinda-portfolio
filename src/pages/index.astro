@@ -196,13 +196,13 @@ const homeSEO = {
   .hero-header :global(.hero-title .animated-header) {
     font-family: "IVY PRESTO DISPLAY", serif;
     font-weight: 400; /* Regular */
-    font-size: 36px; /* Mobile first */
+    font-size: var(--text-hero-header);
   }
 
   .explanatory-text-links {
     font-family: "IVY PRESTO DISPLAY", serif;
     font-weight: 300; /* Light */
-    font-size: 14px;
+    font-size: var(--text-sub-header);
     letter-spacing: var(--tracking-wide);
     color: var(--color-text-primary);
     opacity: 0.8;
@@ -222,15 +222,6 @@ const homeSEO = {
   .separator {
     margin: 0 0.5em;
     user-select: none;
-  }
-
-  @media (min-width: 768px) {
-    .hero-header :global(.hero-title .animated-header) {
-      font-size: 60px;
-    }
-    .explanatory-text-links {
-      font-size: 16px;
-    }
   }
 
   @media (max-width: 480px) {

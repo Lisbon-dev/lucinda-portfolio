@@ -391,21 +391,12 @@ const activeDotIndex = currentIndex - dotsStartIndex;
   .project-hero :global(.typography[variant="header"]) {
     font-family: "IVY PRESTO DISPLAY", serif;
     font-weight: 400; /* Regular */
-    font-size: 36px; /* Mobile first */
+    font-size: var(--text-hero-header);
   }
   .project-hero :global(.typography[variant="explanatory"]) {
     font-family: "IVY PRESTO DISPLAY", serif;
     font-weight: 300; /* Light */
-    font-size: 14px; /* Mobile first */
-  }
-
-  @media (min-width: 768px) {
-    .project-hero :global(.typography[variant="header"]) {
-      font-size: 60px;
-    }
-    .project-hero :global(.typography[variant="explanatory"]) {
-      font-size: 16px;
-    }
+    font-size: var(--text-sub-header);
   }
 
   .project-page {
