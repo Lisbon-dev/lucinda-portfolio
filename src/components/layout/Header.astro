@@ -71,7 +71,7 @@ const headerClasses = [
     init() {
       if (!this.menuButton || !this.slideHeader) return;
 
-      const mediaQuery = window.matchMedia('(max-width: 768px)');
+      const mediaQuery = window.matchMedia('(max-width: 640px)');
       
       this.handleViewportChange(mediaQuery); // Initial check
       mediaQuery.addEventListener('change', (e) => this.handleViewportChange(e));
@@ -82,26 +82,46 @@ const headerClasses = [
           this.closeMenu();
         }
       });
+
+      // Add scroll listener for mobile menu
+      this.setupScrollListener();
     }
 
     handleViewportChange(e: MediaQueryList | MediaQueryListEvent) {
       if (e.matches) {
         // Mobile view: header is always visible
         if (this.slideHeader) {
-          this.slideHeader.setAttribute('aria-hidden', 'false');
           this.slideHeader.classList.remove('slide-header--open');
+          // Visibility is now controlled by scroll listener
+          if (window.scrollY === 0) {
+            this.slideHeader.setAttribute('aria-hidden', 'true');
+          } else {
+            this.slideHeader.setAttribute('aria-hidden', 'false');
+          }
         }
         if (this.menuButton) {
           this.menuButton.removeEventListener('click', this.boundToggleMenu);
         }
       } else {
         // Desktop view: header is toggleable
+        this.slideHeader?.classList.remove('slide-header--scrolled'); // Clean up mobile class
         if (this.menuButton) {
           this.menuButton.addEventListener('click', this.boundToggleMenu);
         }
         // When switching to desktop, ensure menu is closed initially
         this.closeMenu();
       }
+    }
+
+    setupScrollListener() {
+      let lastScrollY = window.scrollY;
+      
+      window.addEventListener('scroll', () => {
+        const isMobile = window.matchMedia('(max-width: 640px)').matches;
+        if (isMobile) {
+          this.slideHeader?.classList.toggle('slide-header--scrolled', window.scrollY > 50);
+        }
+      }, { passive: true });
     }
 
     toggleMenu() {
@@ -265,22 +285,27 @@ const headerClasses = [
   }
 
   /* Mobile responsive adjustments */
-  @media (max-width: 768px) {
+  @media (max-width: 640px) {
     .menu-button {
       display: none;
     }
 
     .slide-header {
-      transform: translateY(0);
+      transform: translateY(-100%);
       height: 65px;
-      background-color: var(--color-background);
+      background-color: transparent;
       backdrop-filter: none;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-      transition: none;
+      box-shadow: none;
+      transition: transform var(--transition-normal), background-color var(--transition-normal);
       justify-content: center;
       align-items: center;
       padding-top: 0;
       padding-right: 0;
+    }
+    .slide-header.slide-header--scrolled {
+      transform: translateY(0);
+      background-color: var(--color-background);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
     .slide-nav {
