@@ -2,7 +2,6 @@
 import Layout from "../layout/Layout.astro";
 import BaseSection from "../components/core/BaseSection.astro";
 import Container from "../components/core/Container.astro";
-import Typography from "../components/core/Typography.astro";
 import Header from "../components/layout/Header.astro";
 import SocialLinks from "../components/layout/SocialLinks.astro";
 import MasonryGrid from "../components/portfolio/MasonryGrid.astro";
@@ -77,7 +76,7 @@ const homeSEO = {
             animationDelay={300}
           />
           <Container size="narrow">
-            <div class="explanatory-text-links">
+            <div class="hero-categories">
               {categories.map((category, index) => (
                 <>
                   <a href={`#category-${category.name.toLowerCase().replace(/\s+/g, '-').replace(/&/g, 'and')}`} class="category-link">
@@ -192,15 +191,21 @@ const homeSEO = {
 </script>
 
 <style>
-  /* Client feedback: Typography adjustments */
+  /* Hero title styling */
   .hero-header :global(.hero-title .animated-header) {
-    font-weight: 100; /* Regular */
+    font-family: var(--font-heading);
     font-size: var(--text-hero-header);
+    font-weight: 100;
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-wider);
+    color: var(--color-text-primary);
   }
 
-  .explanatory-text-links {
-    font-weight: 100; /* Light */
+  .hero-categories {
+    font-family: var(--font-heading);
     font-size: var(--text-sub-header);
+    font-weight: 100;
+    line-height: var(--leading-normal);
     letter-spacing: var(--tracking-wide);
     color: var(--color-text-primary);
     opacity: 0.8;
@@ -223,7 +228,7 @@ const homeSEO = {
   }
 
   @media (max-width: 480px) {
-    .explanatory-text-links {
+    .hero-categories {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;

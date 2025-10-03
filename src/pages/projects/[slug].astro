@@ -2,7 +2,6 @@
 import Layout from "../../layout/Layout.astro";
 import BaseSection from "../../components/core/BaseSection.astro";
 import Container from "../../components/core/Container.astro";
-import Typography from "../../components/core/Typography.astro";
 import Header from "../../components/layout/Header.astro";
 import AboutDialog from "../../components/dialog/AboutDialog.astro";
 import ContactDialog from "../../components/dialog/ContactDialog.astro";
@@ -152,14 +151,9 @@ const activeDotIndex = currentIndex - dotsStartIndex;
       <Container>
         <header class="project-hero">
           <a href="/" class="home-link" aria-label="Go to homepage">
-            <Typography as="h1" variant="header" tracking="wider">
-              LUCINDA BURMAN
-            </Typography>
+            <h1 class="project-site-title">LUCINDA BURMAN</h1>
           </a>
-
-          <Typography as="h2" variant="h2" tracking="wide" size="var(--text-sub-header)">
-            {project.data.category}
-          </Typography>
+          <h2 class="project-category">{project.data.category}</h2>
         </header>
       </Container>
     </BaseSection>
@@ -170,12 +164,8 @@ const activeDotIndex = currentIndex - dotsStartIndex;
         <!-- Project Description with Navigation -->
         <div class="description-with-navigation">
           <div class="project-description">
-            <Typography as="h2" variant="h2" tracking="wider" size="var(--text-sub-header)">
-              {project.data.title}
-            </Typography>
-            <Typography as="p" variant="display" tracking="wider">
-              {project.data.description}
-            </Typography>
+            <h2 class="project-title">{project.data.title}</h2>
+            <p class="project-description-text">{project.data.description}</p>
           </div>
         </div>
 
@@ -387,16 +377,6 @@ const activeDotIndex = currentIndex - dotsStartIndex;
 </script>
 
 <style>
-  /* Client feedback: Typography adjustments to match homepage */
-  .project-hero :global(.typography[variant="header"]) {
-    font-weight: 100; /* Regular */
-    font-size: var(--text-hero-header);
-  }
-  .project-hero :global(.typography[variant="h2"]) {
-    font-weight: 100; /* Light */
-    font-size: var(--text-sub-header);
-  }
-
   .project-page {
     position: relative;
   }
@@ -421,13 +401,25 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     color: inherit;
   }
 
-  .project-hero > :global(.typography:first-child) {
-    margin-bottom: var(--spacing-sm);
+  .project-site-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-hero-header);
+    font-weight: 100;
     line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-wider);
+    color: var(--color-text-primary);
+    margin: 0 0 var(--spacing-sm) 0;
   }
 
-  .project-hero > :global(.typography:last-child) {
+  .project-category {
+    font-family: var(--font-heading);
+    font-size: var(--text-sub-header);
+    font-weight: 100;
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-wide);
+    color: var(--color-text-primary);
     opacity: 0.8;
+    margin: 0;
   }
 
   /* Project Content Section */
@@ -461,6 +453,26 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     gap: var(--spacing-sm);
     text-align: start;
     padding: 0 var(--spacing-xxs);
+  }
+
+  .project-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-sub-header);
+    font-weight: 100;
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-wider);
+    color: var(--color-text-primary);
+    margin: 0;
+  }
+
+  .project-description-text {
+    font-family: var(--font-heading);
+    font-size: var(--text-sm);
+    font-weight: 300;
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-wider);
+    color: var(--color-text-primary);
+    margin: 0;
   }
 
   /* Navigation positioned beside description */
