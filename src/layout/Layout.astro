@@ -7,7 +7,7 @@ export interface SEOProps {
   description?: string;
   image?: string;
   canonical?: string;
-  type?: 'website' | 'article';
+  type?: "website" | "article";
   noindex?: boolean;
   keywords?: string[];
 }
@@ -21,11 +21,23 @@ const { seo = {} } = Astro.props as Props;
 
 // Default SEO values
 const defaultSEO = {
-  title: "Lucinda Burman - Editorial Illustration | Branding & Interior Artwork | 2D & 3D | Bespoke Commissions | Weddings & Events",
-  description: "Professional editorial illustration, branding, and interior artwork by Lucinda Burman. Specializing in 2D & 3D design, bespoke commissions, weddings, and events. View portfolio of creative work.",
+  title:
+    "Lucinda Burman - Editorial Illustration | Branding & Interior Artwork | 2D & 3D | Bespoke Commissions | Weddings & Events",
+  description:
+    "Professional editorial illustration, branding, and interior artwork by Lucinda Burman. Specializing in 2D & 3D design, bespoke commissions, weddings, and events. View portfolio of creative work.",
   image: "/portfolio-og-image.jpg", // We'll create this
   type: "website" as const,
-  keywords: ["editorial illustration", "branding", "interior artwork", "2D design", "3D design", "bespoke commissions", "wedding illustration", "event design", "creative portfolio"]
+  keywords: [
+    "editorial illustration",
+    "branding",
+    "interior artwork",
+    "2D design",
+    "3D design",
+    "bespoke commissions",
+    "wedding illustration",
+    "event design",
+    "creative portfolio",
+  ],
 };
 
 // Merge props with defaults
@@ -36,29 +48,32 @@ const currentSEO = {
   canonical: seo.canonical || Astro.url.href,
   type: seo.type || defaultSEO.type,
   noindex: seo.noindex || false,
-  keywords: seo.keywords || defaultSEO.keywords
+  keywords: seo.keywords || defaultSEO.keywords,
 };
 
 // Ensure title is optimized for SEO (max 60 characters for optimal display)
-const optimizedTitle = currentSEO.title.length > 60 
-  ? currentSEO.title.substring(0, 57) + "..."
-  : currentSEO.title;
+const optimizedTitle =
+  currentSEO.title.length > 60
+    ? currentSEO.title.substring(0, 57) + "..."
+    : currentSEO.title;
 
 // Ensure description is optimized for SEO (max 155 characters)
-const optimizedDescription = currentSEO.description.length > 155
-  ? currentSEO.description.substring(0, 152) + "..."
-  : currentSEO.description;
+const optimizedDescription =
+  currentSEO.description.length > 155
+    ? currentSEO.description.substring(0, 152) + "..."
+    : currentSEO.description;
 
 // Create absolute URLs for social media - handle both string URLs and Astro image objects
-const imageUrl = typeof currentSEO.image === 'string' 
-  ? currentSEO.image 
-  : currentSEO.image?.src || defaultSEO.image;
+const imageUrl =
+  typeof currentSEO.image === "string"
+    ? currentSEO.image
+    : currentSEO.image?.src || defaultSEO.image;
 
-const absoluteImage = imageUrl.startsWith('http') 
-  ? imageUrl 
+const absoluteImage = imageUrl.startsWith("http")
+  ? imageUrl
   : new URL(imageUrl, Astro.site || Astro.url.origin).href;
 
-const absoluteCanonical = currentSEO.canonical.startsWith('http')
+const absoluteCanonical = currentSEO.canonical.startsWith("http")
   ? currentSEO.canonical
   : new URL(currentSEO.canonical, Astro.site || Astro.url.origin).href;
 
@@ -66,70 +81,71 @@ const absoluteCanonical = currentSEO.canonical.startsWith('http')
 const personSchema = {
   "@context": "https://schema.org",
   "@type": "Person",
-  "name": "Lucinda Burman",
-  "jobTitle": "Editorial Illustrator & Creative Designer",
-  "description": "Professional editorial illustrator specializing in branding, interior artwork, 2D & 3D design, bespoke commissions, weddings, and events.",
-  "url": Astro.site?.href || Astro.url.origin,
-  "image": absoluteImage,
-  "sameAs": [
+  name: "Lucinda Burman",
+  jobTitle: "Editorial Illustrator & Creative Designer",
+  description:
+    "Professional editorial illustrator specializing in branding, interior artwork, 2D & 3D design, bespoke commissions, weddings, and events.",
+  url: Astro.site?.href || Astro.url.origin,
+  image: absoluteImage,
+  sameAs: [
     // These will be updated with actual social media URLs
     "https://www.behance.net/lucindaburman",
-    "https://www.linkedin.com/in/lucindaburman"
+    "https://www.linkedin.com/in/lucindaburman",
   ],
-  "knowsAbout": [
+  knowsAbout: [
     "Editorial Illustration",
-    "Branding Design", 
+    "Branding Design",
     "Interior Artwork",
     "2D Design",
     "3D Design",
     "Wedding Illustration",
     "Event Design",
-    "Bespoke Commissions"
+    "Bespoke Commissions",
   ],
-  "hasOccupation": {
+  hasOccupation: {
     "@type": "Occupation",
-    "name": "Editorial Illustrator",
-    "occupationLocation": {
+    name: "Editorial Illustrator",
+    occupationLocation: {
       "@type": "Place",
-      "name": "United Kingdom"
-    }
-  }
+      name: "United Kingdom",
+    },
+  },
 };
 
 // Website Schema
 const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "name": "Lucinda Burman Portfolio",
-  "description": optimizedDescription,
-  "url": Astro.site?.href || Astro.url.origin,
-  "creator": {
+  name: "Lucinda Burman Portfolio",
+  description: optimizedDescription,
+  url: Astro.site?.href || Astro.url.origin,
+  creator: {
     "@type": "Person",
-    "name": "Lucinda Burman"
+    name: "Lucinda Burman",
   },
-  "inLanguage": "en-GB"
+  inLanguage: "en-GB",
 };
 
 // Organization Schema (for business inquiries)
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "Lucinda Burman Creative Services",
-  "description": "Professional creative services specializing in editorial illustration, branding, and bespoke design work.",
-  "url": Astro.site?.href || Astro.url.origin,
-  "founder": {
+  name: "Lucinda Burman Creative Services",
+  description:
+    "Professional creative services specializing in editorial illustration, branding, and bespoke design work.",
+  url: Astro.site?.href || Astro.url.origin,
+  founder: {
     "@type": "Person",
-    "name": "Lucinda Burman"
+    name: "Lucinda Burman",
   },
-  "serviceType": [
+  serviceType: [
     "Editorial Illustration",
     "Branding Design",
-    "Interior Artwork", 
+    "Interior Artwork",
     "Wedding Design",
-    "Event Illustration"
-  ]
+    "Event Illustration",
+  ],
 };
-
 ---
 
 <!doctype html>
@@ -139,63 +155,93 @@ const organizationSchema = {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
-    
+
     <!-- SEO Meta Tags -->
     <title>{optimizedTitle}</title>
     <meta name="description" content={optimizedDescription} />
     <meta name="keywords" content={currentSEO.keywords.join(", ")} />
     <link rel="canonical" href={absoluteCanonical} />
-    
+
     <!-- Robots Meta Tag -->
     {currentSEO.noindex && <meta name="robots" content="noindex, nofollow" />}
     {!currentSEO.noindex && <meta name="robots" content="index, follow" />}
-    
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content={currentSEO.type} />
     <meta property="og:url" content={absoluteCanonical} />
     <meta property="og:title" content={optimizedTitle} />
     <meta property="og:description" content={optimizedDescription} />
     <meta property="og:image" content={absoluteImage} />
-    <meta property="og:image:alt" content="Lucinda Burman Portfolio - Editorial Illustration and Creative Design" />
+    <meta
+      property="og:image:alt"
+      content="Lucinda Burman Portfolio - Editorial Illustration and Creative Design"
+    />
     <meta property="og:site_name" content="Lucinda Burman Portfolio" />
     <meta property="og:locale" content="en_GB" />
-    
+
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content={absoluteCanonical} />
     <meta property="twitter:title" content={optimizedTitle} />
     <meta property="twitter:description" content={optimizedDescription} />
     <meta property="twitter:image" content={absoluteImage} />
-    <meta property="twitter:image:alt" content="Lucinda Burman Portfolio - Editorial Illustration and Creative Design" />
-    
+    <meta
+      property="twitter:image:alt"
+      content="Lucinda Burman Portfolio - Editorial Illustration and Creative Design"
+    />
+
     <!-- Additional Meta Tags -->
     <meta name="author" content="Lucinda Burman" />
     <meta name="theme-color" content="#325C59" />
     <meta name="msapplication-TileColor" content="#325C59" />
-    
+
     <!-- Structured Data -->
-    <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
-    <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
-    <script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(personSchema)}
+    />
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(websiteSchema)}
+    />
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(organizationSchema)}
+    />
 
     <!-- Critical Font Preloading & Optimization -->
     <!-- High-priority preconnects -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://use.typekit.net" crossorigin />
-    
+
     <!-- Critical font preloading -->
-    <link 
-      rel="preload" 
-      href="https://use.typekit.net/roo1sig.css" 
-      as="style" 
+    <link
+      rel="preload"
+      href="https://use.typekit.net/roo1sig.css"
+      as="style"
       onload="this.onload=null;this.rel='stylesheet'"
     />
     <noscript>
       <link rel="stylesheet" href="https://use.typekit.net/roo1sig.css" />
     </noscript>
-    
+
     <!-- Google Fonts with optimized loading -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=optional"
+      rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
+
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Unbounded:wght@200..900&display=optional"
       rel="stylesheet"
@@ -337,8 +383,9 @@ const organizationSchema = {
     /* Typography with Performance Optimization */
     --font-body: "ibm-plex-sans", "Montserrat", "Inter", sans-serif; /* Clean sans for body text */
     --font-heading: "ivypresto-display", "Times New Roman", serif;
+    --font-sub-heading: "Lato", "Helvetica Neue", sans-serif;
     --font-lisbon-dev: "Unbounded", "Inter", sans-serif;
-    
+
     /* Font fallback metrics for CLS prevention */
     --font-fallback-size-adjust: 100%;
     --font-hero-min-height: 200px; /* Reserve space during font loading */
@@ -356,8 +403,16 @@ const organizationSchema = {
     --text-5xl: clamp(4rem, 1.636rem + 1.818vw, 9rem);
 
     /* Custom Typography for Client Feedback */
-    --text-hero-header: clamp(2.25rem, 1.5121rem + 2.3061vw, 5rem); /* Scales from 36px to 80px (~60pt) */
-    --text-sub-header: clamp(0.875rem, 0.752rem + 0.3845vw, 1.333rem); /* Scales from 14px to 21.3px (~16pt) */
+    --text-hero-header: clamp(
+      2.25rem,
+      1.5121rem + 2.3061vw,
+      5rem
+    ); /* Scales from 36px to 80px (~60pt) */
+    --text-sub-header: clamp(
+      0.875rem,
+      0.752rem + 0.3845vw,
+      1.333rem
+    ); /* Scales from 14px to 21.3px (~16pt) */
 
     /* Line Heights */
     --leading-tight: 1.2;
@@ -383,7 +438,7 @@ const organizationSchema = {
     --color-modal-bg: #f5f4f2;
     --color-overlay: rgba(0, 0, 0, 0.8);
 
-        /*
+    /*
      * Branding Accent 500 (Base)
      * HSL(17, 72%, 48%) / #B83E1A
      * Contrast vs. dark-bg: 3.4:1 (AA Large)
@@ -408,12 +463,12 @@ const organizationSchema = {
     --spacing-lg: 2.5rem;
     --spacing-xl: 3.75rem;
     --spacing-2xl: 5rem;
-    
+
     /* Wireframe-derived spacings as relative units */
     --spacing-grid-gap-mobile: 1.5rem;
     --spacing-grid-gap-tablet: 4.37%;
     --spacing-grid-gap-desktop: 66px;
-    
+
     --spacing-container-mobile: 5vw;
     --spacing-container-tablet: 6%;
     --spacing-container-desktop: 8%;
@@ -436,7 +491,7 @@ const organizationSchema = {
     padding: 0 var(--spacing-container-desktop);
   }
 
-/*   @media (max-width: 1200px) {
+  /*   @media (max-width: 1200px) {
     .container {
       padding: 0 var(--spacing-container-tablet);
     }
@@ -529,8 +584,8 @@ const organizationSchema = {
 
   /* Performance-Optimized Font Loading */
   @font-face {
-    font-family: 'ivypresto-display-optimized';
-    src: local('ivypresto-display'), local('Ivy Presto Display');
+    font-family: "ivypresto-display-optimized";
+    src: local("ivypresto-display"), local("Ivy Presto Display");
     font-display: optional; /* Prevents layout shifts for hero content */
     size-adjust: var(--font-fallback-size-adjust);
   }
@@ -540,10 +595,10 @@ const organizationSchema = {
     /* Hardware acceleration for animations */
     will-change: transform, opacity;
     transform: translateZ(0);
-    
+
     /* Reserve space during font loading to prevent CLS */
     min-height: var(--font-hero-min-height);
-    
+
     /* Optimize for LCP */
     contain: layout style;
   }

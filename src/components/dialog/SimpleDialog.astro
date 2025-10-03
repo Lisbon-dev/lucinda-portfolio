@@ -83,7 +83,7 @@ const { id, class: className } = Astro.props;
     background: none;
     border: none;
     color: var(--color-text-primary, #000000);
-    font-family: var(--font-alt-heading, serif);
+    font-family: var(--font-heading, serif);
     font-size: var(--text-base, 1rem);
     font-weight: 400;
     cursor: pointer;
@@ -155,7 +155,7 @@ const { id, class: className } = Astro.props;
 
   /* Typography styles for content */
   .content-area :global(h2) {
-    font-family: var(--font-alt-heading, serif);
+    font-family: var(--font-heading, serif);
     font-size: var(--text-2xl, 2rem);
     font-weight: 400;
     color: var(--color-text-primary, #000000);
@@ -163,7 +163,7 @@ const { id, class: className } = Astro.props;
   }
 
   .content-area :global(p) {
-    font-family: var(--font-alt-heading, serif);
+    font-family: var(--font-heading, serif);
     font-size: var(--text-base, 1rem);
     font-weight: 300;
     color: var(--color-text-primary, #000000);
