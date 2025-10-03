@@ -335,10 +335,8 @@ const organizationSchema = {
     --container-2xl: 70%;
 
     /* Typography with Performance Optimization */
-    --font-title: "Libre Baskerville", serif; /* Serif for titles */
     --font-body: "ibm-plex-sans", "Montserrat", "Inter", sans-serif; /* Clean sans for body text */
-    --font-heading: "Playfair Display", serif; /* Clean serif for body text */
-    --font-alt-heading: "ivypresto-display", "Times New Roman", serif;
+    --font-heading: "ivypresto-display", "Times New Roman", serif;
     --font-lisbon-dev: "Unbounded", "Inter", sans-serif;
     
     /* Font fallback metrics for CLS prevention */
@@ -518,22 +516,22 @@ const organizationSchema = {
 
   /* Typography Classes Using Design System */
   .header-text {
-    font-family: var(--font-alt-heading);
+    font-family: var(--font-heading);
     font-size: var(--text-4xl);
-    font-weight: 400;
+    font-weight: 100;
     line-height: var(--leading-tight);
     color: var(--color-text-primary);
   }
 
   .nav-text {
-    font-family: var(--font-alt-heading);
+    font-family: var(--font-heading);
     font-size: var(--text-base);
     font-weight: 400;
     color: var(--color-text-primary);
   }
 
   .explanatory-text {
-    font-family: var(--font-alt-heading);
+    font-family: var(--font-heading);
     font-size: var(--text-base);
     font-weight: 300;
     line-height: var(--leading-relaxed);
@@ -541,7 +539,7 @@ const organizationSchema = {
   }
 
   .small-text {
-    font-family: var(--font-alt-heading);
+    font-family: var(--font-heading);
     font-size: var(--text-sm);
     font-weight: 300;
     color: var(--color-text-primary);
@@ -558,8 +556,6 @@ const organizationSchema = {
 
   /* Focus Management */
   .focusable:focus {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
   }
 
   /* Performance-Optimized Font Loading */
@@ -595,7 +591,7 @@ const organizationSchema = {
 
   /* Base body styling */
   body {
-    font-family: var(--font-alt-heading);
+    font-family: var(--font-heading);
     background-color: var(--color-background);
     color: var(--color-text-primary);
   }

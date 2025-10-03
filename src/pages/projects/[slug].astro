@@ -157,7 +157,7 @@ const activeDotIndex = currentIndex - dotsStartIndex;
             </Typography>
           </a>
 
-          <Typography as="p" variant="explanatory" tracking="wide">
+          <Typography as="h2" variant="h2" tracking="wide" size="var(--text-sub-header)">
             {project.data.category}
           </Typography>
         </header>
@@ -170,10 +170,10 @@ const activeDotIndex = currentIndex - dotsStartIndex;
         <!-- Project Description with Navigation -->
         <div class="description-with-navigation">
           <div class="project-description">
-            <Typography as="h2" variant="explanatory" tracking="wider">
+            <Typography as="h2" variant="h2" tracking="wider" size="var(--text-sub-header)">
               {project.data.title}
             </Typography>
-            <Typography as="p" variant="small" tracking="wider">
+            <Typography as="p" variant="display" tracking="wider">
               {project.data.description}
             </Typography>
           </div>
@@ -389,13 +389,11 @@ const activeDotIndex = currentIndex - dotsStartIndex;
 <style>
   /* Client feedback: Typography adjustments to match homepage */
   .project-hero :global(.typography[variant="header"]) {
-    font-family: "IVY PRESTO DISPLAY", serif;
-    font-weight: 400; /* Regular */
+    font-weight: 100; /* Regular */
     font-size: var(--text-hero-header);
   }
-  .project-hero :global(.typography[variant="explanatory"]) {
-    font-family: "IVY PRESTO DISPLAY", serif;
-    font-weight: 300; /* Light */
+  .project-hero :global(.typography[variant="h2"]) {
+    font-weight: 100; /* Light */
     font-size: var(--text-sub-header);
   }
 
@@ -451,18 +449,18 @@ const activeDotIndex = currentIndex - dotsStartIndex;
   .description-with-navigation {
     position: relative;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: calc(66px / 982px * 100vh); /* 66px gap ratio */
+    justify-content: start;
+    align-items: start;
+    margin-bottom: calc(66px / 982px * 10vh); /* 66px gap ratio */
   }
 
   .project-description {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: var(--spacing-lg);
-    text-align: center;
-    padding: 0 var(--spacing-xs);
+    gap: var(--spacing-sm);
+    text-align: start;
+    padding: 0 var(--spacing-xxs);
   }
 
   /* Navigation positioned beside description */
