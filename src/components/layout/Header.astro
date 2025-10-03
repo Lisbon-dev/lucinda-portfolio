@@ -89,13 +89,16 @@ const headerClasses = [
 
     handleViewportChange(e: MediaQueryList | MediaQueryListEvent) {
       if (e.matches) {
-        // Mobile view: header is always visible
+        // Mobile view: header visibility controlled by scroll
         if (this.slideHeader) {
           this.slideHeader.classList.remove('slide-header--open');
-          // Visibility is now controlled by scroll listener
+          
+          // Ensure proper initial state based on scroll position
           if (window.scrollY === 0) {
+            this.slideHeader.classList.remove('slide-header--scrolled');
             this.slideHeader.setAttribute('aria-hidden', 'true');
           } else {
+            this.slideHeader.classList.add('slide-header--scrolled');
             this.slideHeader.setAttribute('aria-hidden', 'false');
           }
         }
@@ -118,8 +121,10 @@ const headerClasses = [
       
       window.addEventListener('scroll', () => {
         const isMobile = window.matchMedia('(max-width: 640px)').matches;
-        if (isMobile) {
-          this.slideHeader?.classList.toggle('slide-header--scrolled', window.scrollY > 50);
+        if (isMobile && this.slideHeader) {
+          const shouldShow = window.scrollY > 50;
+          this.slideHeader.classList.toggle('slide-header--scrolled', shouldShow);
+          this.slideHeader.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
         }
       }, { passive: true });
     }
@@ -291,7 +296,7 @@ const headerClasses = [
     }
 
     .slide-header {
-      transform: translateY(-100%);
+      transform: translateY(-110%);
       height: 65px;
       background-color: transparent;
       backdrop-filter: none;
