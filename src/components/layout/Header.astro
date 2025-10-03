@@ -146,13 +146,19 @@ const headerClasses = [
           const isCurrentlyVisible = this.slideHeader.classList.contains('slide-header--scrolled');
           if (shouldShow !== isCurrentlyVisible) {
             isTransitioning = true;
+            
+            // Force a reflow before adding the class for smoother animation
+            if (this.slideHeader) {
+              void this.slideHeader.offsetHeight;
+            }
+            
             this.slideHeader.classList.toggle('slide-header--scrolled', shouldShow);
             this.slideHeader.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
             
-            // Reset transition flag after animation completes
+            // Reset transition flag after animation completes (match 0.5s duration)
             setTimeout(() => {
               isTransitioning = false;
-            }, 300); // Match --transition-normal duration
+            }, 500);
           }
         }
         ticking = false;
@@ -269,7 +275,7 @@ const headerClasses = [
     background-color: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(10px);
     transform: translate3d(0, -100%, 0);
-    transition: transform var(--transition-slow) cubic-bezier(0.4, 0.0, 0.2, 1);
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     z-index: 1000;
     display: flex;
     align-items: flex-start;
@@ -279,7 +285,7 @@ const headerClasses = [
     box-sizing: border-box;
     /* Force hardware acceleration for smooth WebKit animations */
     -webkit-transform: translate3d(0, -100%, 0);
-    -webkit-transition: -webkit-transform var(--transition-slow) cubic-bezier(0.4, 0.0, 0.2, 1);
+    -webkit-transition: -webkit-transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     will-change: transform;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
@@ -350,22 +356,29 @@ const headerClasses = [
       background-color: transparent;
       backdrop-filter: none;
       box-shadow: none;
-      transition: transform var(--transition-normal) cubic-bezier(0.4, 0.0, 0.2, 1), 
-                  background-color var(--transition-normal) ease;
+      transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+                  background-color 0.5s ease,
+                  box-shadow 0.5s ease;
       justify-content: center;
       align-items: center;
       padding-top: 0;
       padding-right: 0;
       /* Force hardware acceleration for better iOS performance */
       -webkit-transform: translate3d(0, -110%, 0);
-      -webkit-transition: -webkit-transform var(--transition-normal) cubic-bezier(0.4, 0.0, 0.2, 1),
-                          background-color var(--transition-normal) ease;
+      -webkit-transition: -webkit-transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                          background-color 0.5s ease,
+                          box-shadow 0.5s ease;
       will-change: transform;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
       /* Prevent subpixel rendering issues */
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      /* Additional Safari optimizations */
+      perspective: 1000px;
+      -webkit-perspective: 1000px;
+      transform-style: preserve-3d;
+      -webkit-transform-style: preserve-3d;
     }
     .slide-header.slide-header--scrolled {
       transform: translate3d(0, 0, 0);
