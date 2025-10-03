@@ -15,6 +15,18 @@ export const GET: APIRoute = async ({ site }) => {
       lastmod: new Date().toISOString().split('T')[0],
       changefreq: 'weekly',
       priority: '1.0'
+    },
+    {
+      url: `${siteUrl}privacy-policy`,
+      lastmod: new Date().toISOString().split('T')[0],
+      changefreq: 'yearly',
+      priority: '0.3'
+    },
+    {
+      url: `${siteUrl}terms-and-conditions`,
+      lastmod: new Date().toISOString().split('T')[0],
+      changefreq: 'yearly',
+      priority: '0.3'
     }
   ];
   

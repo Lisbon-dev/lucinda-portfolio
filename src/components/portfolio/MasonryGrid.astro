@@ -29,19 +29,33 @@ const sortedProjects = projects.sort((a, b) => {
   return dateB.getTime() - dateA.getTime();
 });
 
+// To create anchor links for categories
+const processedCategories = new Set();
+
 ---
 
 <div class={`masonry-container ${className}`} id={uniqueId}>
   <Masonry 
     breakpointCols={{
       default: 3,
-      1600: 3,
-      900: 2,
-      550: 1
+      767: 2,
+      500: 1
     }}
   >
-    {sortedProjects.map((project, index) => 
-        <div class="masonry-item" data-project={project.slug} data-index={index} data-lazy={index >= 6 ? "true" : "false"}>
+    {sortedProjects.map((project, index) => {
+        const categorySlug = project.data.category.toLowerCase().replace(/\s+/g, '-').replace(/&/g, 'and');
+        const isFirstOfCategory = !processedCategories.has(categorySlug);
+        if (isFirstOfCategory) {
+          processedCategories.add(categorySlug);
+        }
+        return (
+        <div 
+          class="masonry-item" 
+          data-project={project.slug} 
+          data-index={index} 
+          data-lazy={index >= 6 ? "true" : "false"}
+          id={isFirstOfCategory ? `category-${categorySlug}` : undefined}
+         >
           <a href={`/projects/${project.slug}`} class="project-link" aria-label={`View ${project.data.title} project`}>
             <div class="image-container" data-loaded="false">
               <!-- Progressive loading placeholder -->
@@ -67,8 +81,8 @@ const sortedProjects = projects.sort((a, b) => {
             </div>
           </a>
         </div>
-      )
-    }
+      )}
+    )}
   </Masonry>
 </div>
 
@@ -80,35 +94,32 @@ const sortedProjects = projects.sort((a, b) => {
     padding: 0 var(--spacing-container-mobile);
   }
 
+  :global(.astro-masonry-grid) {
+    display: flex;
+    margin-left: calc(-1 * var(--spacing-grid-gap-mobile)); /* gutter size offset */
+    width: auto;
+  }
+
+  :global(.astro-masonry-grid_column) {
+    padding-left: var(--spacing-grid-gap-mobile); /* gutter size */
+    background-clip: padding-box;
+  }
+
   @media (min-width: 768px) {
     .masonry-container {
       padding: 0 var(--spacing-container-tablet);
     }
+    :global(.astro-masonry-grid) {
+      margin-left: -66px;
+    }
+    :global(.astro-masonry-grid_column) {
+      padding-left: 66px;
+    }
   }
 
-  @media (min-width: 1200px) {
+  @media (min-width: 1512px) { /* Target client's screen size for specific margin */
     .masonry-container {
-      padding: 0 var(--spacing-container-desktop);
-    }
-  }
-
-    :global(.astro-masonry-grid_column) {
-      padding-left: calc(var(--spacing-grid-gap-mobile));
-      padding-right: calc(var(--spacing-grid-gap-mobile));
-    }
-
-  /* Responsive gap adjustments */
-  @media (min-width: 768px) {
-    :global(.astro-masonry-grid_column) {
-      padding-left: calc(var(--spacing-grid-gap-tablet) / 2);
-      padding-right: calc(var(--spacing-grid-gap-tablet) / 2);
-    }
-  }
-
-  @media (min-width: 1200px) {
-    :global(.astro-masonry-grid_column) {
-      padding-left: calc(var(--spacing-grid-gap-desktop) / 3);
-      padding-right: calc(var(--spacing-grid-gap-desktop) / 3);
+      padding: 0 121px;
     }
   }
 
@@ -140,13 +151,7 @@ const sortedProjects = projects.sort((a, b) => {
   /* Responsive margin adjustments */
   @media (min-width: 768px) {
     :global(.masonry-item) {
-      margin-bottom: var(--spacing-grid-gap-tablet);
-    }
-  }
-
-  @media (min-width: 1200px) {
-    :global(.masonry-item) {
-      margin-bottom: var(--spacing-grid-gap-desktop);
+      margin-bottom: 66px;
     }
   }
 
@@ -219,9 +224,14 @@ const sortedProjects = projects.sort((a, b) => {
 
   /* Touch devices - show overlay on tap */
   @media (hover: none) and (pointer: coarse) {
-    :global(.masonry-item):active .overlay {
+    /* Handled by JS adding 'mobile-overlay-active' class */
+    :global(.masonry-item.mobile-overlay-active) .overlay {
       opacity: 1;
       visibility: visible;
+    }
+
+    :global(.masonry-item):active .overlay {
+      opacity: 0; /* Prevent flash on tap before JS logic runs */
     }
   }
 
@@ -249,7 +259,7 @@ const sortedProjects = projects.sort((a, b) => {
   }
 
   .project-title {
-    font-family: var(--font-alt-heading);
+    font-family: var(--font-heading);
     font-size: var(--text-lg);
     font-weight: 400;
     line-height: var(--leading-tight);
@@ -258,7 +268,7 @@ const sortedProjects = projects.sort((a, b) => {
   }
 
   .project-category {
-    font-family: var(--font-alt-heading);
+    font-family: var(--font-heading);
     font-size: var(--text-sm);
     font-weight: 300;
     letter-spacing: var(--tracking-wider);
@@ -275,13 +285,9 @@ const sortedProjects = projects.sort((a, b) => {
 
   /* Focus management for accessibility */
   :global(.masonry-item):focus-within {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 4px;
   }
 
   .project-link:focus {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 4px;
   }
 
   :global(.masonry-item) .project-link:focus .overlay {
@@ -399,6 +405,7 @@ const sortedProjects = projects.sort((a, b) => {
       if (eagerImagesLoaded >= totalEagerImages && !animationsReady) {
         console.log('🎬 All eager images loaded, preparing animations...');
         setTimeout(() => {
+          setupTouchInteractions();
           startAnimations();
         }, 200); // Small delay to ensure overlay completes first
       }
@@ -450,6 +457,7 @@ const sortedProjects = projects.sort((a, b) => {
         if (window.updateLoadingProgress) {
           window.updateLoadingProgress(100);
         }
+        setupTouchInteractions();
         startAnimations();
       }
     }, 3000);
@@ -457,6 +465,42 @@ const sortedProjects = projects.sort((a, b) => {
     // Initialize immediately if images are already cached
     if (eagerImagesLoaded >= totalEagerImages) {
       updateLoadingProgress();
+    }
+
+    function setupTouchInteractions() {
+      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      if (!isTouchDevice) return;
+
+      const masonryItems = document.querySelectorAll('.masonry-item');
+      let tappedItem = null;
+
+      masonryItems.forEach(item => {
+        const link = item.querySelector('.project-link');
+
+        link.addEventListener('click', (e) => {
+          if (item !== tappedItem) {
+            e.preventDefault();
+
+            // Remove active class from previously tapped item
+            if (tappedItem) {
+              tappedItem.classList.remove('mobile-overlay-active');
+            }
+            
+            // Add active class to current item and set it as tapped
+            item.classList.add('mobile-overlay-active');
+            tappedItem = item;
+          }
+          // If it's the second tap, the default link behavior will proceed
+        });
+      });
+
+      // Add a listener to the document to close the overlay if tapping outside
+      document.addEventListener('click', (e) => {
+        if (tappedItem && !tappedItem.contains(e.target)) {
+          tappedItem.classList.remove('mobile-overlay-active');
+          tappedItem = null;
+        }
+      });
     }
   }
   
@@ -516,6 +560,11 @@ const sortedProjects = projects.sort((a, b) => {
       
       // Listen for loading complete event from overlay
       document.addEventListener('loadingComplete', startItemAnimations);
+
+      // Also ensure touch interactions are set up after animations start
+      document.addEventListener('loadingComplete', () => {
+        setupTouchInteractions();
+      });
       
       // Fallback: start animations after a delay if event doesn't fire
       setTimeout(() => {

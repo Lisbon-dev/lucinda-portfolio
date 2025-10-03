@@ -2,7 +2,6 @@
 import Layout from "../layout/Layout.astro";
 import BaseSection from "../components/core/BaseSection.astro";
 import Container from "../components/core/Container.astro";
-import Typography from "../components/core/Typography.astro";
 import Header from "../components/layout/Header.astro";
 import SocialLinks from "../components/layout/SocialLinks.astro";
 import MasonryGrid from "../components/portfolio/MasonryGrid.astro";
@@ -26,6 +25,16 @@ const socialLinks = [
   { name: 'Instagram', href: '#', external: true },
   { name: 'Behance', href: '#', external: true },
   { name: 'LinkedIn', href: '#', external: true }
+];
+
+// Define categories for clickable sub-header
+const categories = [
+  { name: 'Illustration' },
+  { name: 'Editorial' },
+  { name: 'Brand Storytelling' },
+  { name: 'Installations' },
+  { name: 'Bespoke Commissions' },
+  { name: 'Events' }
 ];
 
 // Generate SEO data for homepage
@@ -67,10 +76,16 @@ const homeSEO = {
             animationDelay={300}
           />
           <Container size="narrow">
-            <Typography as="p" variant="explanatory" tracking="wide">
-              Editorial Illustration  |  Branding & Interior Artwork  |  2D & 3D  |  
-              Bespoke Commissions  |  Weddings & Events
-            </Typography>
+            <div class="hero-categories">
+              {categories.map((category, index) => (
+                <>
+                  <a href={`#category-${category.name.toLowerCase().replace(/\s+/g, '-').replace(/&/g, 'and')}`} class="category-link">
+                    {category.name}
+                  </a>
+                  {index < categories.length - 1 && <span class="separator">|</span>}
+                </>
+              ))}
+            </div>
           </Container>
         </header>
       </Container>
@@ -176,10 +191,60 @@ const homeSEO = {
 </script>
 
 <style>
+  /* Hero title styling */
+  .hero-header :global(.hero-title .animated-header) {
+    font-family: var(--font-heading);
+    font-size: var(--text-hero-header);
+    font-weight: 100;
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-wider);
+    color: var(--color-text-primary);
+  }
+
+  .hero-categories {
+    font-family: var(--font-heading);
+    font-size: var(--text-sub-header);
+    font-weight: 100;
+    line-height: var(--leading-normal);
+    letter-spacing: var(--tracking-wide);
+    color: var(--color-text-primary);
+    opacity: 0.8;
+  }
+  
+  .category-link {
+    text-decoration: none;
+    color: inherit;
+    transition: color var(--transition-normal);
+    padding: 0 0.25em;
+  }
+
+  .category-link:hover {
+    color: var(--color-primary);
+  }
+
+  .separator {
+    margin: 0 0.05em;
+    user-select: none;
+  }
+
+  @media (max-width: 480px) {
+    .hero-categories {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .separator {
+      display: none;
+    }
+    .category-link {
+      padding: 0.2em 0.5em;
+    }
+  }
+
   /* Performance-Optimized Hero Section */
   .hero-header {
     text-align: center;
-    padding-top: 11.2vh; /* Based on 110px / 982px wireframe ratio */
+    padding-top: max(11.2vh, 110px); /* Based on 110px / 982px wireframe ratio with minimum */
     display: flex;
     flex-direction: column;
     justify-content: flex-start;

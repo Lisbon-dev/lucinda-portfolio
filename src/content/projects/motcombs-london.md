@@ -1,6 +1,6 @@
 ---
 title: "Motcombs, London"
-description: "Brand storytelling project for Motcombs restaurant in London, developing sophisticated visual narratives that capture the essence of fine dining and British hospitality"
+description: "Commissioned artwork for Motcombs, Mayfair, London focusing on capturing the restaurant’s atmosphere and different characters within its clientele."
 category: "Brand Storytelling"
 featured: false
 order: 7
@@ -9,8 +9,6 @@ mainImage:
   src: "../../assets/portfolio/motcombs/Motcombs, Mayfair London 1.png"
   alt: "Motcombs London brand storytelling design"
 images:
-  - src: "../../assets/portfolio/motcombs/Motcombs, Mayfair London 1.png"
-    alt: "Motcombs London brand storytelling overview"
   - src: "../../assets/portfolio/motcombs/Motcombs, Mayfair London 2.png"
     alt: "Motcombs London narrative design elements"
   - src: "../../assets/portfolio/motcombs/Motcombs, Mayfair London 3.png"

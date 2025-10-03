@@ -1,6 +1,6 @@
 ---
 title: "The Spectator - 'Jazz genius cut short'"
-description: "Musical tribute illustration series celebrating jazz legends and their lasting cultural impact."
+description: "Editorial illustration for The Spectator, Books & Arts section. (charcoal)"
 category: "Editorial Illustration"
 order: 8
 featured: false

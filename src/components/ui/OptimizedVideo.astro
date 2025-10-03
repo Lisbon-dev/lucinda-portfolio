@@ -24,7 +24,6 @@ const formats = [
     width={width}
     height={height}
     poster={poster}
-    autoplay
     muted
     loop
     playsinline
@@ -52,6 +51,7 @@ const formats = [
       this.setupIntersectionObserver();
       this.setupNetworkAwareLoading();
       this.setupReducedMotionSupport();
+      this.setupClickToToggle();
     }
 
     setupIntersectionObserver() {
@@ -62,8 +62,9 @@ const formats = [
           const video = entry.target as HTMLVideoElement;
           
           if (entry.isIntersecting) {
-            this.loadVideo(video);
-            observer.unobserve(video);
+            this.playVideo(video);
+          } else {
+            video.pause();
           }
         });
       }, {
@@ -111,25 +112,43 @@ const formats = [
       handleMotionPreference(prefersReducedMotion);
     }
 
-    loadVideo(video: HTMLVideoElement) {
+    setupClickToToggle() {
+      document.querySelectorAll('.optimized-video').forEach(videoEl => {
+        videoEl.addEventListener('click', () => {
+          const video = videoEl as HTMLVideoElement;
+          if (video.paused) {
+            video.play().catch(e => console.warn("Play interrupted by user", e));
+          } else {
+            video.pause();
+          }
+        });
+      });
+    }
+
+    playVideo(video: HTMLVideoElement) {
       const src = video.dataset.videoSrc;
-      if (src && !video.src) {
-        // Load the video source
-        video.load();
+      // Check if source needs to be set (for lazy loading)
+      if (src && video.currentSrc === '') {
+        video.load(); // This will trigger loading sources
         
         // Handle loading states
         video.addEventListener('loadstart', () => {
           video.classList.add('loading');
         });
-        
-        video.addEventListener('canplay', () => {
-          video.classList.remove('loading');
-          video.classList.add('loaded');
-        });
 
         video.addEventListener('error', () => {
           video.classList.add('error');
           console.warn('Video failed to load:', src);
+        });
+      }
+      
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          video.classList.remove('loading');
+          video.classList.add('loaded');
+        }).catch(error => {
+          console.warn("Video autoplay was prevented:", error);
         });
       }
     }

@@ -1,6 +1,6 @@
 ---
 title: "Pascal Huser Design & Build"
-description: "Architectural and construction industry illustrations showcasing craftsmanship and design excellence."
+description: "Commissioned artwork to narrate Pascal Huser Design & Build’s journey, from its inception to an established London residential design firm."
 category: "Brand Storytelling"
 order: 14
 featured: false

@@ -1,6 +1,6 @@
 ---
 title: "The Spectator - 'The Born Exile'"
-description: "Literary illustration series exploring themes of displacement, identity, and belonging in contemporary society."
+description: "Editorial portrait for The Spectator, Books & Arts section."
 category: "Editorial Illustration"
 order: 10
 featured: false

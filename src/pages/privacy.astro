@@ -2,7 +2,6 @@
 import Layout from "../layout/Layout.astro";
 import BaseSection from "../components/core/BaseSection.astro";
 import Container from "../components/core/Container.astro";
-import Typography from "../components/core/Typography.astro";
 import Header from "../components/layout/Header.astro";
 import AboutDialog from "../components/dialog/AboutDialog.astro";
 import ContactDialog from "../components/dialog/ContactDialog.astro";
@@ -24,23 +23,23 @@ const seo = {
     <BaseSection class="privacy-policy">
       <Container size="narrow">
         <div class="legal-content">
-          <Typography variant="h1" class="legal-title">
+          <h1 class="legal-title">
             Privacy Policy
-          </Typography>
+          </h1>
           
           <div class="legal-meta">
             <p>Last updated: {new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
           </div>
 
           <div class="legal-body">
-            <Typography variant="h2">1. Introduction</Typography>
+            <h2>1. Introduction</h2>
             <p>
               Lucinda Burman ("we", "our", or "us") respects your privacy and is committed to protecting your personal data. 
               This privacy policy explains how we collect, use, and safeguard your information when you visit our portfolio 
               website or contact us through our forms.
             </p>
 
-            <Typography variant="h2">2. Data Controller</Typography>
+            <h2>2. Data Controller</h2>
             <p>
               Lucinda Burman is the data controller responsible for your personal data. You can contact us at:
             </p>
@@ -49,8 +48,8 @@ const seo = {
               <li>Website: lucindaburman.com</li>
             </ul>
 
-            <Typography variant="h2">3. Information We Collect</Typography>
-            <Typography variant="h3">3.1 Information You Provide</Typography>
+            <h2>3. Information We Collect</h2>
+            <h3>3.1 Information You Provide</h3>
             <p>When you contact us through our website, we may collect:</p>
             <ul>
               <li>Your name</li>
@@ -60,7 +59,7 @@ const seo = {
               <li>Any additional information you choose to provide</li>
             </ul>
 
-            <Typography variant="h3">3.2 Automatically Collected Information</Typography>
+            <h3>3.2 Automatically Collected Information</h3>
             <p>We may automatically collect certain technical information, including:</p>
             <ul>
               <li>IP address (for rate limiting and security purposes)</li>
@@ -70,7 +69,7 @@ const seo = {
               <li>Referring website</li>
             </ul>
 
-            <Typography variant="h2">4. How We Use Your Information</Typography>
+            <h2>4. How We Use Your Information</h2>
             <p>We use your personal data for the following purposes:</p>
             <ul>
               <li>To respond to your inquiries and communications</li>
@@ -81,7 +80,7 @@ const seo = {
               <li>To protect against fraud and ensure website security</li>
             </ul>
 
-            <Typography variant="h2">5. Legal Basis for Processing</Typography>
+            <h2>5. Legal Basis for Processing</h2>
             <p>Under GDPR, we process your personal data based on:</p>
             <ul>
               <li><strong>Consent:</strong> When you voluntarily submit information through our contact form</li>
@@ -89,7 +88,7 @@ const seo = {
               <li><strong>Legal obligation:</strong> When required to comply with applicable laws</li>
             </ul>
 
-            <Typography variant="h2">6. Data Sharing and Disclosure</Typography>
+            <h2>6. Data Sharing and Disclosure</h2>
             <p>
               We do not sell, trade, or rent your personal information to third parties. We may share your data only in 
               the following circumstances:
@@ -101,7 +100,7 @@ const seo = {
               <li>With trusted service providers who assist in website operations (under strict confidentiality agreements)</li>
             </ul>
 
-            <Typography variant="h2">7. Data Retention</Typography>
+            <h2>7. Data Retention</h2>
             <p>
               We retain your personal data only for as long as necessary to fulfill the purposes outlined in this policy:
             </p>
@@ -111,7 +110,7 @@ const seo = {
               <li>Email communications: Until you request deletion or withdraw consent</li>
             </ul>
 
-            <Typography variant="h2">8. Your Rights Under GDPR</Typography>
+            <h2>8. Your Rights Under GDPR</h2>
             <p>You have the following rights regarding your personal data:</p>
             <ul>
               <li><strong>Right of access:</strong> Request copies of your personal data</li>
@@ -124,38 +123,38 @@ const seo = {
             </ul>
             <p>To exercise these rights, contact us at hello@lucindaburman.com.</p>
 
-            <Typography variant="h2">9. Cookies and Tracking</Typography>
+            <h2>9. Cookies and Tracking</h2>
             <p>
               Our website uses minimal tracking technologies. We do not use advertising cookies or third-party tracking. 
               Any technical cookies used are essential for website functionality and security.
             </p>
 
-            <Typography variant="h2">10. Data Security</Typography>
+            <h2>10. Data Security</h2>
             <p>
               We implement appropriate technical and organizational measures to protect your personal data against 
               unauthorized access, alteration, disclosure, or destruction. However, no internet transmission is 
               completely secure, and we cannot guarantee absolute security.
             </p>
 
-            <Typography variant="h2">11. International Data Transfers</Typography>
+            <h2>11. International Data Transfers</h2>
             <p>
               Your data may be processed in countries outside the European Economic Area. When this occurs, we ensure 
               adequate protection through appropriate safeguards such as standard contractual clauses or adequacy decisions.
             </p>
 
-            <Typography variant="h2">12. Children's Privacy</Typography>
+            <h2>12. Children's Privacy</h2>
             <p>
               Our website is not intended for children under 16 years of age. We do not knowingly collect personal 
               information from children under 16.
             </p>
 
-            <Typography variant="h2">13. Changes to This Policy</Typography>
+            <h2>13. Changes to This Policy</h2>
             <p>
               We may update this privacy policy from time to time. We will notify you of any material changes by 
               posting the new policy on this page with an updated "Last updated" date.
             </p>
 
-            <Typography variant="h2">14. Contact Information</Typography>
+            <h2>14. Contact Information</h2>
             <p>
               If you have questions about this privacy policy or wish to exercise your rights, please contact us at:
             </p>
@@ -164,7 +163,7 @@ const seo = {
               <li>Subject line: "Privacy Policy Inquiry"</li>
             </ul>
 
-            <Typography variant="h2">15. Supervisory Authority</Typography>
+            <h2>15. Supervisory Authority</h2>
             <p>
               You have the right to lodge a complaint with a supervisory authority if you believe your data protection 
               rights have been violated. You can contact your local data protection authority or the Information 
@@ -179,7 +178,7 @@ const seo = {
 
 <style>
   .privacy-policy {
-    padding-top: var(--spacing-xl);
+    padding-top: calc(max(8.66vh, 85px) + var(--spacing-xl));
     padding-bottom: var(--spacing-xl);
   }
 
@@ -191,6 +190,11 @@ const seo = {
   .legal-title {
     margin-bottom: var(--spacing-lg);
     text-align: center;
+    font-family: var(--font-heading);
+    font-size: var(--text-3xl);
+    font-weight: 400;
+    color: var(--color-text-primary);
+    line-height: var(--leading-tight);
   }
 
   .legal-meta {
@@ -235,9 +239,9 @@ const seo = {
     color: var(--color-text-primary);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 640px) {
     .privacy-policy {
-      padding-top: var(--spacing-lg);
+      padding-top: calc(65px + var(--spacing-lg));
       padding-bottom: var(--spacing-lg);
     }
 

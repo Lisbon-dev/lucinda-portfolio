@@ -1,6 +1,6 @@
 ---
 title: "'Place' Kings Road, London"
-description: "Contemporary art exhibition showcasing place-based narratives and cultural identity through visual storytelling and immersive installations"
+description: "One of a collection of paintings produced for a solo exhibiton ‘Place’, Kings Road, London. (Acrylic ink & paint on watercolour paper)"
 category: "Exhibition"
 featured: false
 order: 12
@@ -8,9 +8,7 @@ publishedDate: 2023-05-20
 mainImage:
   src: "../../assets/portfolio/paris/Paris Renato.png"
   alt: "Place Kings Road London exhibition artwork"
-images:
-  - src: "../../assets/portfolio/paris/Paris Renato.png"
-    alt: "Place Kings Road exhibition featured artwork"
+images: []
 tags: ["exhibition", "contemporary-art", "place-based-art", "london", "kings-road", "cultural-identity"]
 client: "Kings Road Gallery"
 year: 2023

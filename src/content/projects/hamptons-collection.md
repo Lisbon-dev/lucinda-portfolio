@@ -1,6 +1,6 @@
 ---
 title: "The Hamptons Collection, NYC"
-description: "Luxury lifestyle illustrations capturing the refined elegance of Hamptons culture and aesthetic."
+description: "‘The Highline, NYC’ and ‘Notting Hill, London’ produced for the collaborative exhibition ‘Emerging Collectors’ in The Hamptons, NYC, July 4th. (Acrylic ink & paint on watercolour paper)"
 category: "Exhibition"
 order: 13
 featured: false

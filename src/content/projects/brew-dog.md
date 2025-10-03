@@ -1,6 +1,6 @@
 ---
 title: "Brew Dog"
-description: "Dynamic brand illustrations for Brew Dog, capturing the craft beer brand's rebellious spirit and bold flavors."
+description: "Concept illustration for BrewDog’s core beers, featured in their São Paulo Bar, Brazil."
 category: "Brand Storytelling"
 order: 18
 featured: false

@@ -1,6 +1,6 @@
 ---
 title: "Carlowrie Group, Edinburgh"
-description: "Elegant illustrations for Carlowrie Castle, showcasing the historic venue's romantic architecture and picturesque grounds."
+description: "Commissioned painting of Carlowrie Castle, capturing the elegance of the luxury venue for the Carlowrie Group, Scotland. (Acrylic ink on watercolour paper)"
 category: "Wedding & Events"
 order: 4
 featured: false

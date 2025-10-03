@@ -266,9 +266,6 @@ const Tag = tag;
   }
 
   .animated-header {
-    font-family: var(--font-heading, 'Playfair Display', serif);
-    font-size: var(--text-4xl, clamp(3rem, 8vw, 6rem));
-    font-weight: 400;
     color: var(--color-text-primary, #000000);
     letter-spacing: var(--tracking-wide, 0.025em);
     margin: 0;
@@ -285,7 +282,6 @@ const Tag = tag;
   /* Responsive adjustments */
   @media (max-width: 768px) {
     .animated-header {
-      font-size: var(--text-3xl, clamp(2rem, 10vw, 3rem));
       letter-spacing: var(--tracking-normal, 0);
     }
     
@@ -297,7 +293,6 @@ const Tag = tag;
 
   @media (max-width: 480px) {
     .animated-header {
-      font-size: var(--text-2xl, clamp(1.5rem, 12vw, 2rem));
     }
   }
 

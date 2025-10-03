@@ -1,6 +1,6 @@
 ---
 title: "W Hotel Paris"
-description: "Brand storytelling project for W Hotel Paris, creating compelling visual narratives that capture the essence of Parisian luxury hospitality"
+description: "Signature artwork for W Hotel Paris, Marriott, bringing the brand’s story to life in collaboration with Manuelle Gautrand Architecture and the wider design and interiors team."
 category: "Brand Storytelling"
 featured: true
 order: 1
@@ -22,9 +22,9 @@ images:
   - src: "../../assets/portfolio/whotel/Whotel 8.png"
     alt: "W Hotel Paris brand implementation"
 videos:
-  - src: "/src/assets/portfolio/whotel/FINAL SCULPTURE VIDEO-optimized"
-    poster: "../../assets/portfolio/whotel/FINAL SCULPTURE VIDEO-poster.png"
-    alt: "W Hotel Paris sculpture installation video showcasing the dynamic 3D art piece in motion"
+  - src: "/src/assets/portfolio/whotel/W HOTEL PRESENTATION_optimized"
+    poster: "../../assets/portfolio/whotel/W HOTEL PRESENTATION-poster.png"
+    alt: "W Hotel Paris project board video showcasing the illustration narrative"
     width: 695
     height: 391
     position: 0
