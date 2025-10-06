@@ -25,8 +25,8 @@ const headerClasses = [
     MENU
   </button>
 
-  <!-- Slide-down header -->
-  <header class="slide-header" id="slide-header" aria-hidden="true">
+  <!-- Slide-down header with initial hidden state -->
+  <header class="slide-header slide-header--initial-hidden" id="slide-header" aria-hidden="true">
     <nav class="slide-nav" role="navigation" aria-label="Main navigation">
       <button 
         class="nav-button about-button"
@@ -70,6 +70,9 @@ const headerClasses = [
 
     init() {
       if (!this.menuButton || !this.slideHeader) return;
+
+      // Remove initial hidden class immediately to enable transitions
+      this.slideHeader.classList.remove('slide-header--initial-hidden');
 
       const mediaQuery = window.matchMedia('(max-width: 640px)');
       
@@ -147,18 +150,23 @@ const headerClasses = [
           if (shouldShow !== isCurrentlyVisible) {
             isTransitioning = true;
             
-            // Force a reflow before adding the class for smoother animation
+            // iOS Safari specific: Force style recalculation
             if (this.slideHeader) {
+              // Read computed style to force style calculation
+              window.getComputedStyle(this.slideHeader).transform;
+              
+              // Toggle class
+              this.slideHeader.classList.toggle('slide-header--scrolled', shouldShow);
+              this.slideHeader.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
+              
+              // Force another reflow after class change for iOS
               void this.slideHeader.offsetHeight;
             }
             
-            this.slideHeader.classList.toggle('slide-header--scrolled', shouldShow);
-            this.slideHeader.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
-            
-            // Reset transition flag after animation completes (match 0.5s duration)
+            // Reset transition flag after animation completes (match 0.6s duration)
             setTimeout(() => {
               isTransitioning = false;
-            }, 500);
+            }, 600);
           }
         }
         ticking = false;
@@ -241,6 +249,9 @@ const headerClasses = [
   .header-container {
     position: relative;
     z-index: 1000;
+    /* Move perspective to parent for proper 3D rendering on mobile */
+    perspective: 1000px;
+    -webkit-perspective: 1000px;
   }
 
   /* Minimalist MENU button - positioned top-right */
@@ -351,40 +362,54 @@ const headerClasses = [
     }
 
     .slide-header {
+      /* Use only -webkit prefixed properties for iOS consistency */
+      -webkit-transform: translate3d(0, -110%, 0);
       transform: translate3d(0, -110%, 0);
       height: 65px;
       background-color: transparent;
       backdrop-filter: none;
       box-shadow: none;
-      transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
-                  background-color 0.5s ease,
-                  box-shadow 0.5s ease;
+      /* Simplify to single transform transition for iOS */
+      -webkit-transition: -webkit-transform 0.6s cubic-bezier(0.4, 0.0, 0.6, 1);
+      transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.6, 1);
       justify-content: center;
       align-items: center;
       padding-top: 0;
       padding-right: 0;
-      /* Force hardware acceleration for better iOS performance */
-      -webkit-transform: translate3d(0, -110%, 0);
-      -webkit-transition: -webkit-transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-                          background-color 0.5s ease,
-                          box-shadow 0.5s ease;
+      /* Force hardware acceleration */
+      -webkit-will-change: transform;
       will-change: transform;
-      backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
       /* Prevent subpixel rendering issues */
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      /* Additional Safari optimizations */
-      perspective: 1000px;
-      -webkit-perspective: 1000px;
-      transform-style: preserve-3d;
+      /* Enable 3D rendering context */
       -webkit-transform-style: preserve-3d;
+      transform-style: preserve-3d;
+      /* Force layer creation */
+      -webkit-transform-origin: center top;
+      transform-origin: center top;
     }
+    
+    /* Initial hidden state - no transition on page load */
+    .slide-header.slide-header--initial-hidden {
+      -webkit-transition: none;
+      transition: none;
+    }
+    
     .slide-header.slide-header--scrolled {
-      transform: translate3d(0, 0, 0);
       -webkit-transform: translate3d(0, 0, 0);
+      transform: translate3d(0, 0, 0);
+      /* Animate background separately to avoid iOS jank */
       background-color: var(--color-background);
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      -webkit-transition: -webkit-transform 0.6s cubic-bezier(0.4, 0.0, 0.6, 1),
+                          background-color 0.3s ease 0.2s,
+                          box-shadow 0.3s ease 0.2s;
+      transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.6, 1),
+                  background-color 0.3s ease 0.2s,
+                  box-shadow 0.3s ease 0.2s;
     }
 
     .slide-nav {
