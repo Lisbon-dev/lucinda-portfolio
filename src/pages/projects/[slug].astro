@@ -437,7 +437,9 @@ const activeDotIndex = currentIndex - dotsStartIndex;
   .project-content-container {
     max-width: none;
     margin: 0 auto;
-    padding: 0 var(--spacing-container-desktop);
+    /* Responsive margins based on client's 410px measurement at 1512px viewport */
+    /* 410px / 1512px = 27.12% */
+    padding: 0 27.12%;
     position: relative;
   }
 
@@ -604,8 +606,10 @@ const activeDotIndex = currentIndex - dotsStartIndex;
   }
 
   /* Responsive adjustments */
-  @media (max-width: 1512px) {
-    .hero-container,
+  @media (max-width: 1024px) {
+    .hero-container {
+      padding: 0 var(--spacing-container-tablet);
+    }
     .project-content-container {
       padding: 0 var(--spacing-container-tablet);
     }
@@ -618,7 +622,7 @@ const activeDotIndex = currentIndex - dotsStartIndex;
   }
 
   @media (min-width: 1512px) {
-    /* Target client's screen size for 410px horizontal margins */
+    /* Exact client measurement: 410px margins at 1512px viewport */
     .project-content-container {
       padding: 0 410px;
     }
@@ -627,10 +631,20 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     }
     /* Position arrows inside the 410px margin area */
     .nav-arrow--prev {
-      left: 430px; /* 410px margin + 20px spacing */
+      left: calc(27.12% + 20px); /* Responsive margin + 20px spacing */
     }
     .nav-arrow--next {
-      right: 430px; /* 410px margin + 20px spacing */
+      right: calc(27.12% + 20px); /* Responsive margin + 20px spacing */
+    }
+  }
+
+  /* Exact match for client's 1512px viewport */
+  @media (min-width: 1512px) and (max-width: 1512px) {
+    .nav-arrow--prev {
+      left: 430px; /* Exact: 410px margin + 20px spacing */
+    }
+    .nav-arrow--next {
+      right: 430px; /* Exact: 410px margin + 20px spacing */
     }
   }
 
@@ -652,8 +666,12 @@ const activeDotIndex = currentIndex - dotsStartIndex;
       padding-top: calc(79px * 0.8); /* Adjusted mobile spacing */
     }
 
-    .hero-container,
+    .hero-container {
+      padding: 0 var(--spacing-container-mobile);
+    }
+
     .project-content-container {
+      /* Maintain proportional margins on mobile: 27.12% scales down naturally */
       padding: 0 var(--spacing-container-mobile);
     }
 
