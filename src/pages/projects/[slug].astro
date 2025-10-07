@@ -1,7 +1,6 @@
 ---
 import Layout from "../../layout/Layout.astro";
 import BaseSection from "../../components/core/BaseSection.astro";
-import Container from "../../components/core/Container.astro";
 import Header from "../../components/layout/Header.astro";
 import AboutDialog from "../../components/dialog/AboutDialog.astro";
 import ContactDialog from "../../components/dialog/ContactDialog.astro";
@@ -147,19 +146,19 @@ const activeDotIndex = currentIndex - dotsStartIndex;
       fullHeight={false}
       backgroundColor="background"
     >
-      <Container>
+      <div class="hero-container">
         <header class="project-hero">
           <a href="/" class="home-link" aria-label="Go to homepage">
             <h1 class="project-site-title">LUCINDA BURMAN</h1>
           </a>
           <h2 class="project-category">{project.data.category}</h2>
         </header>
-      </Container>
+      </div>
     </BaseSection>
 
     <!-- Project Content Section -->
     <div class="project-content-section">
-      <div class="container">
+      <div class="project-content-container">
         <!-- Project Description with Navigation -->
         <div class="description-with-navigation">
           <div class="project-description">
@@ -428,8 +427,15 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     background-color: var(--color-background);
   }
 
-  .project-content-container {
+  /* Hero container for consistent spacing */
+  .hero-container {
     max-width: 1512px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-container-desktop);
+  }
+
+  .project-content-container {
+    max-width: none;
     margin: 0 auto;
     padding: 0 var(--spacing-container-desktop);
     position: relative;
@@ -599,6 +605,7 @@ const activeDotIndex = currentIndex - dotsStartIndex;
 
   /* Responsive adjustments */
   @media (max-width: 1512px) {
+    .hero-container,
     .project-content-container {
       padding: 0 var(--spacing-container-tablet);
     }
@@ -610,15 +617,20 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     }
   }
 
-  @media (min-width: 1512px) { /* Target client's screen size for specific margin */
+  @media (min-width: 1512px) {
+    /* Target client's screen size for 410px horizontal margins */
     .project-content-container {
       padding: 0 410px;
     }
+    .hero-container {
+      padding: 0 var(--spacing-container-desktop);
+    }
+    /* Position arrows inside the 410px margin area */
     .nav-arrow--prev {
-      left: calc(410px - 50px);
+      left: 430px; /* 410px margin + 20px spacing */
     }
     .nav-arrow--next {
-      right: calc(410px - 50px);
+      right: 430px; /* 410px margin + 20px spacing */
     }
   }
 
@@ -640,6 +652,7 @@ const activeDotIndex = currentIndex - dotsStartIndex;
       padding-top: calc(79px * 0.8); /* Adjusted mobile spacing */
     }
 
+    .hero-container,
     .project-content-container {
       padding: 0 var(--spacing-container-mobile);
     }
@@ -660,6 +673,11 @@ const activeDotIndex = currentIndex - dotsStartIndex;
 
     .project-content-section {
       padding-top: calc(79px * 0.7);
+    }
+
+    .hero-container,
+    .project-content-container {
+      padding: 0 5vw;
     }
 
     .image-wrapper:not(:last-child) {
