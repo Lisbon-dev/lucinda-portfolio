@@ -1,7 +1,6 @@
 ---
 import Layout from "../../layout/Layout.astro";
 import BaseSection from "../../components/core/BaseSection.astro";
-import Container from "../../components/core/Container.astro";
 import Header from "../../components/layout/Header.astro";
 import AboutDialog from "../../components/dialog/AboutDialog.astro";
 import ContactDialog from "../../components/dialog/ContactDialog.astro";
@@ -146,21 +145,20 @@ const activeDotIndex = currentIndex - dotsStartIndex;
       variant="hero"
       fullHeight={false}
       backgroundColor="background"
-      padding="none"
     >
-      <Container>
+      <div class="hero-container">
         <header class="project-hero">
           <a href="/" class="home-link" aria-label="Go to homepage">
             <h1 class="project-site-title">LUCINDA BURMAN</h1>
           </a>
           <h2 class="project-category">{project.data.category}</h2>
         </header>
-      </Container>
+      </div>
     </BaseSection>
 
     <!-- Project Content Section -->
     <div class="project-content-section">
-      <div class="container">
+      <div class="project-content-container">
         <!-- Project Description with Navigation -->
         <div class="description-with-navigation">
           <div class="project-description">
@@ -377,28 +375,68 @@ const activeDotIndex = currentIndex - dotsStartIndex;
 </script>
 
 <style>
+  /* ============================================
+     CLIENT DESIGN SPECIFICATIONS
+     Base viewport: 1512px × 982px (MacBook)
+     All measurements derived from wireframe
+     
+     Breakpoint Strategy:
+     - Mobile: max-width 480px → 70% scale, 5vw padding
+     - Tablet Portrait: 481px - 768px → 80% scale, mobile padding
+     - Desktop: 769px - 1511px → 100% scale, 27.12% padding (design system)
+     - Client Viewport: 1512px+ → 100% scale, 410px fixed padding
+     ============================================ */
+  :root {
+    /* Container System - Based on 410px margins at 1512px */
+    --project-container-margin-ratio: 27.12%; /* 410px / 1512px - maintains proportion */
+    --project-container-margin-fixed: 410px; /* Locks at 1512px+ */
+    --project-container-max-width: 1512px;
+    
+    /* Content Spacing - Wireframe measurements */
+    --project-content-gap: 66px; /* Image spacing from wireframe */
+    --project-hero-to-content: 79px; /* 397px total - 318px hero */
+    --project-hero-padding-top: max(11.2vh, 110px); /* 110px / 982px */
+    
+    /* Navigation Arrow Positioning */
+    --nav-arrow-inset-base: 20px; /* Distance from container edge */
+    --nav-arrow-size: 32px;
+    --nav-arrow-size-mobile: 24px;
+    
+    /* Responsive Scale Factors */
+    --scale-tablet: 0.8; /* 481px - 768px */
+    --scale-mobile: 0.7; /* max-width 480px */
+  }
+
+  /* ============================================
+     BASE LAYOUT
+     ============================================ */
   .project-page {
     position: relative;
   }
 
-  /* Hero Section - Match landing page exactly */
+  /* ============================================
+     HERO SECTION
+     Measurements from client wireframe
+     ============================================ */
   .project-hero {
     text-align: center;
-    /* Fixed height approach - 318px baseline with responsive scaling */
-    /*     height: 318px;
-    max-height: 318px; */
-    padding-top: 11.2vh;
+    padding-block-start: var(--project-hero-padding-top);
+    
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    box-sizing: border-box;
-    overflow: hidden; /* Prevent content overflow */
+    gap: var(--spacing-md);
   }
 
   .home-link {
     text-decoration: none;
     color: inherit;
+    transition: opacity var(--transition-normal);
+  }
+
+  .home-link:hover {
+    opacity: 0.8;
   }
 
   .project-site-title {
@@ -408,7 +446,7 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     line-height: var(--leading-tight);
     letter-spacing: var(--tracking-wider);
     color: var(--color-text-primary);
-    margin: 0 0 var(--spacing-sm) 0;
+    margin: 0;
   }
 
   .project-category {
@@ -422,28 +460,41 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     margin: 0;
   }
 
-  /* Project Content Section */
+  /* ============================================
+     CONTENT SECTION
+     79px spacing from wireframe (397px - 318px)
+     ============================================ */
   .project-content-section {
-    /* Ensure 397px total from body top to first image */
-    /* 397px - 318px (hero) = 79px remaining */
-    padding-top: 79px;
+    padding-block-start: var(--project-hero-to-content);
     background-color: var(--color-background);
   }
 
-  .project-content-container {
-    max-width: 1512px;
+  .hero-container {
+    max-width: var(--project-container-max-width);
     margin: 0 auto;
     padding: 0 var(--spacing-container-desktop);
+  }
+
+  .project-content-container {
+    max-width: var(--project-container-max-width);
+    margin-inline: auto;
+    /* Use 27.12% until 1512px, then lock to 410px */
+    padding-inline: min(
+      var(--project-container-margin-ratio),
+      var(--project-container-margin-fixed)
+    );
     position: relative;
   }
 
-  /* Description with Navigation */
+  /* ============================================
+     PROJECT DESCRIPTION
+     ============================================ */
   .description-with-navigation {
     position: relative;
     display: flex;
-    justify-content: start;
-    align-items: start;
-    margin-bottom: calc(66px / 982px * 10vh); /* 66px gap ratio */
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-block-end: var(--project-content-gap);
   }
 
   .project-description {
@@ -475,26 +526,31 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     margin: 0;
   }
 
-  /* Navigation positioned beside description */
+  /* ============================================
+     NAVIGATION ARROWS
+     Positioned within margin area (27.12% or 410px)
+     ============================================ */
   .project-navigation {
-    /* This container is now just a semantic wrapper for the arrows,
-       which handle their own fixed positioning. */
+    /* Semantic wrapper only */
   }
-
+  
   .nav-arrow {
     position: fixed;
     top: 50%;
     transform: translateY(-50%);
     z-index: 10;
-
-    pointer-events: auto;
+    
     display: flex;
     align-items: center;
     justify-content: center;
+    
+    inline-size: var(--nav-arrow-size);
+    block-size: var(--nav-arrow-size);
+    
     color: var(--color-text-secondary);
     text-decoration: none;
-    transition: all var(--transition-normal);
     opacity: 0.7;
+    transition: opacity var(--transition-normal), color var(--transition-normal);
   }
 
   .nav-arrow:hover {
@@ -502,19 +558,42 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     color: var(--color-text-primary);
   }
 
-  .nav-arrow--prev {
-    left: var(--spacing-container-desktop);
-  }
-
-  .nav-arrow--next {
-    right: var(--spacing-container-desktop);
-  }
-
   .nav-arrow svg {
-    width: 32px;
-    height: 32px;
+    width: var(--nav-arrow-size);
+    height: var(--nav-arrow-size);
   }
 
+  /* ============================================
+     MEDIA GRID
+     66px gaps from wireframe
+     ============================================ */
+  .project-images {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .image-wrapper,
+  .video-wrapper {
+    width: 100%;
+  }
+
+  .image-wrapper:not(:last-child),
+  .video-wrapper:not(:last-child) {
+    margin-block-end: var(--project-content-gap);
+  }
+
+  .project-image,
+  .project-video {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 0;
+  }
+
+  /* ============================================
+     MOBILE SWIPE UI
+     ============================================ */
   .mobile-swipe-hint {
     display: flex;
     justify-content: center;
@@ -549,11 +628,13 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     transform: scale(1.1);
   }
 
-  /* Back to Top Link */
+  /* ============================================
+     BACK TO TOP
+     ============================================ */
   .back-to-top {
     text-align: center;
-    margin-top: 66px;
-    padding-bottom: var(--spacing-xl);
+    margin-block-start: var(--project-content-gap);
+    padding-block-end: var(--spacing-xl);
   }
 
   .back-to-top-link {
@@ -577,163 +658,144 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     border-radius: var(--rounded-sm);
   }
 
-  /* Single Column Images with proper gaps */
-  .project-images {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .image-wrapper {
-    width: 100%;
-  }
-
-  .image-wrapper:not(:last-child) {
-    margin-bottom: 66px; /* Fixed 66px gap between images as per wireframe */
-  }
-
-  .project-image {
-    width: 100%;
-    height: auto;
-    display: block;
-    border-radius: 0; /* Clean, minimal aesthetic */
-  }
-
-  /* Responsive adjustments */
-  @media (max-width: 1512px) {
-    .project-content-container {
-      padding: 0 var(--spacing-container-tablet);
+  /* ============================================
+     RESPONSIVE: DESKTOP (769px - 1511px)
+     Maintains 27.12% padding per design system
+     ============================================ */
+  @media (min-width: 769px) and (max-width: 1511px) {
+    .hero-container {
+      padding: 0 var(--spacing-container-desktop);
     }
+    
+    /* project-content-container inherits base 27.12% padding */
+    /* No override needed - respects design system */
+    
+    /* Position arrows within the 27.12% margin area */
     .nav-arrow--prev {
-      left: var(--spacing-container-tablet);
+      inset-inline-start: calc(var(--project-container-margin-ratio) + var(--nav-arrow-inset-base));
     }
+    
     .nav-arrow--next {
-      right: var(--spacing-container-tablet);
+      inset-inline-end: calc(var(--project-container-margin-ratio) + var(--nav-arrow-inset-base));
     }
-  }
-
-  @media (min-width: 1512px) { /* Target client's screen size for specific margin */
-    .project-content-container {
-      padding: 0 410px;
-    }
-    .nav-arrow--prev {
-      left: calc(410px - 50px);
-    }
-    .nav-arrow--next {
-      right: calc(410px - 50px);
-    }
-  }
-
-  @media (max-width: 768px) {
-    .nav-arrow--prev {
-      left: var(--spacing-container-mobile);
-    }
-
-    .nav-arrow--next {
-      right: var(--spacing-container-mobile);
-    }
-
-    .nav-arrow svg {
-      width: 24px;
-      height: 24px;
-    }
-
-    .project-content-section {
-      padding-top: calc(79px * 0.8); /* Adjusted mobile spacing */
-    }
-
-    .project-content-container {
-      padding: 0 var(--spacing-container-mobile);
-    }
-
-    .image-wrapper:not(:last-child) {
-      margin-bottom: calc(66px * 0.8); /* Proportional gaps for mobile */
-    }
-
-    .description-with-navigation {
-      margin-bottom: calc(66px * 0.8);
-    }
-  }
-
-  @media (max-width: 480px) {
-    .project-description {
-      padding: 0 var(--spacing-sm);
-    }
-
-    .project-content-section {
-      padding-top: calc(79px * 0.7);
-    }
-
-    .image-wrapper:not(:last-child) {
-      margin-bottom: calc(66px * 0.7); /* Consistent proportional gaps */
-    }
-
-    .description-with-navigation {
-      margin-bottom: calc(66px * 0.7);
-    }
-  }
-
-  /* Hide swipe hint on larger screens where arrows are present */
-  @media (min-width: 1024px) {
+    
     .mobile-swipe-hint {
       display: none;
     }
   }
 
-  /* Hide arrows on smaller screens where swipe is intended */
+  /* ============================================
+     RESPONSIVE: CLIENT VIEWPORT (1512px)
+     Exact design specifications
+     ============================================ */
+  @media (min-width: 1512px) {
+    .project-content-container {
+      padding-inline: var(--project-container-margin-fixed);
+    }
+    
+    .hero-container {
+      padding: 0 var(--spacing-container-desktop);
+    }
+    
+    .nav-arrow--prev {
+      /* 410px margin + 20px inset */
+      inset-inline-start: calc(var(--project-container-margin-fixed) + var(--nav-arrow-inset-base));
+    }
+    
+    .nav-arrow--next {
+      inset-inline-end: calc(var(--project-container-margin-fixed) + var(--nav-arrow-inset-base));
+    }
+  }
+
+  /* ============================================
+     RESPONSIVE: TABLET PORTRAIT (481px - 768px)
+     80% scale factor
+     ============================================ */
+  @media (min-width: 481px) and (max-width: 768px) {
+    .project-content-section {
+      padding-block-start: calc(var(--project-hero-to-content) * var(--scale-tablet));
+    }
+    
+    .hero-container,
+    .project-content-container {
+      padding-inline: var(--spacing-container-mobile);
+    }
+    
+    .image-wrapper:not(:last-child),
+    .video-wrapper:not(:last-child),
+    .description-with-navigation {
+      margin-block-end: calc(var(--project-content-gap) * var(--scale-tablet));
+    }
+    
+    .back-to-top {
+      margin-block-start: calc(var(--project-content-gap) * var(--scale-tablet));
+    }
+    
+    .nav-arrow svg {
+      width: var(--nav-arrow-size-mobile);
+      height: var(--nav-arrow-size-mobile);
+    }
+  }
+
+  /* ============================================
+     RESPONSIVE: MOBILE (max-width: 480px)
+     70% scale factor
+     ============================================ */
+  @media (max-width: 480px) {
+    .project-content-section {
+      padding-block-start: calc(var(--project-hero-to-content) * var(--scale-mobile));
+    }
+    
+    .hero-container,
+    .project-content-container {
+      padding-inline: 5vw;
+    }
+    
+    .image-wrapper:not(:last-child),
+    .video-wrapper:not(:last-child),
+    .description-with-navigation {
+      margin-block-end: calc(var(--project-content-gap) * var(--scale-mobile));
+    }
+    
+    .back-to-top {
+      margin-block-start: calc(var(--project-content-gap) * var(--scale-mobile));
+    }
+    
+    .project-description {
+      padding: 0 var(--spacing-sm);
+    }
+  }
+
+  /* ============================================
+     RESPONSIVE: HIDE/SHOW NAVIGATION
+     ============================================ */
   @media (max-width: 1023px) {
     .nav-arrow {
       display: none;
     }
   }
 
-  /* Desktop measurements are now the default above */
-
-  /* Accessibility: Respect reduced motion preferences */
+  /* ============================================
+     ACCESSIBILITY
+     ============================================ */
   @media (prefers-reduced-motion: reduce) {
-    .nav-arrow {
+    .nav-arrow,
+    .nav-arrow:hover,
+    .swipe-dot,
+    .home-link {
       transition: none;
     }
-
+    
     .nav-arrow:hover {
-      transform: none;
+      transform: translateY(-50%);
     }
   }
 
-  /* Video wrapper styling to match image wrappers */
-  .video-wrapper {
-    width: 100%;
-  }
-
-  .video-wrapper:not(:last-child) {
-    margin-bottom: 66px;
-  }
-
-  .project-video {
-    width: 100%;
-    height: auto;
-    display: block;
-    border-radius: 0;
-  }
-
-  /* High contrast mode support */
   @media (prefers-contrast: high) {
     .nav-arrow {
       border: 2px solid ButtonText;
       background: ButtonFace;
       color: ButtonText;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .video-wrapper:not(:last-child) {
-      margin-bottom: calc(66px * 0.8);
-    }
-  }
-
-  @media (max-width: 480px) {
-    .video-wrapper:not(:last-child) {
-      margin-bottom: calc(66px * 0.7);
     }
   }
 </style>
