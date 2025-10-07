@@ -139,11 +139,11 @@ const headerClasses = [
       let isTransitioning = false;
       
       const updateHeaderVisibility = () => {
-        const isMobile = window.matchMedia('(max-width: 640px)').matches;
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
         if (isMobile && this.slideHeader && !isTransitioning) {
           // Use Math.max to handle iOS elastic scrolling (negative values)
           const scrollY = Math.max(0, window.scrollY);
-          const shouldShow = scrollY > 50;
+          const shouldShow = scrollY > 20;
           
           // Only update if state actually changes
           const isCurrentlyVisible = this.slideHeader.classList.contains('slide-header--scrolled');
@@ -180,7 +180,7 @@ const headerClasses = [
       }, { passive: true });
       
       // Initial check on page load for mobile
-      if (window.matchMedia('(max-width: 640px)').matches) {
+      if (window.matchMedia('(max-width: 768px)').matches) {
         updateHeaderVisibility();
       }
     }
@@ -356,7 +356,7 @@ const headerClasses = [
   }
 
   /* Mobile responsive adjustments */
-  @media (max-width: 640px) {
+  @media (max-width: 768px) {
     .menu-button {
       display: none;
     }
