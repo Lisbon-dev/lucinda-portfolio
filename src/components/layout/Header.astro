@@ -14,20 +14,20 @@ const headerClasses = [
 ---
 
 <div class={headerClasses}>
-  <!-- Minimalist MENU button (top-right fixed) -->
+  <!-- Desktop MENU button (top-right fixed) -->
   <button 
     class="menu-button interactive-element" 
     type="button"
     aria-label="Toggle navigation menu"
     aria-expanded="false"
-    aria-controls="slide-header"
+    aria-controls="main-header"
   >
     MENU
   </button>
 
-  <!-- Slide-down header with initial hidden state -->
-  <header class="slide-header slide-header--initial-hidden" id="slide-header" aria-hidden="true">
-    <nav class="slide-nav" role="navigation" aria-label="Main navigation">
+  <!-- Main header - starts hidden on mobile, toggleable on desktop -->
+  <header class="main-header" id="main-header" aria-hidden="true">
+    <nav class="header-nav" role="navigation" aria-label="Main navigation">
       <button 
         class="nav-button about-button"
         onclick="document.getElementById('about-dialog').showModal()"
@@ -51,141 +51,149 @@ const headerClasses = [
   </header>
 </div>
 
-<!-- Header functionality script -->
 <script>
-  class MinimalistHeader {
-    menuButton: HTMLElement | null;
-    slideHeader: HTMLElement | null;
-    isMenuOpen: boolean;
-    boundToggleMenu: () => void;
+  class HeaderController {
+    private menuButton: HTMLButtonElement | null;
+    private header: HTMLElement | null;
+    private isDesktop: boolean = false;
+    private isMenuOpen: boolean = false;
+    private scrollThreshold: number = 20;
+    private rafId: number | null = null;
+    private isTransitioning: boolean = false;
 
     constructor() {
       this.menuButton = document.querySelector('.menu-button');
-      this.slideHeader = document.querySelector('.slide-header');
-      this.isMenuOpen = false;
-      this.boundToggleMenu = this.toggleMenu.bind(this);
+      this.header = document.querySelector('.main-header');
       
+      if (!this.menuButton || !this.header) {
+        console.warn('HeaderController: Required elements not found');
+        return;
+      }
+
       this.init();
     }
 
-    init() {
-      if (!this.menuButton || !this.slideHeader) return;
-
-      // Remove initial hidden class immediately to enable transitions
-      this.slideHeader.classList.remove('slide-header--initial-hidden');
-
-      const mediaQuery = window.matchMedia('(max-width: 640px)');
+    private init(): void {
+      // Determine initial viewport
+      this.isDesktop = window.matchMedia('(min-width: 769px)').matches;
       
-      this.handleViewportChange(mediaQuery); // Initial check
-      mediaQuery.addEventListener('change', (e) => this.handleViewportChange(e));
-
-      // Close menu on escape key
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && this.isMenuOpen) {
-          this.closeMenu();
-        }
-      });
-
-      // Add scroll listener for mobile menu
-      this.setupScrollListener();
+      // Set initial state based on viewport
+      this.setInitialState();
       
-      // Force initial state on mobile after a short delay to handle iOS rendering
-      if (mediaQuery.matches) {
-        setTimeout(() => {
-          const scrollY = Math.max(0, window.scrollY);
-          if (scrollY === 0 && this.slideHeader) {
-            this.slideHeader.classList.remove('slide-header--scrolled');
-            this.slideHeader.setAttribute('aria-hidden', 'true');
-          }
-        }, 100);
+      // Setup event listeners
+      this.setupEventListeners();
+      
+      // Initialize scroll behavior for mobile
+      if (!this.isDesktop) {
+        this.updateMobileHeaderVisibility();
       }
     }
 
-    handleViewportChange(e: MediaQueryList | MediaQueryListEvent) {
-      if (e.matches) {
-        // Mobile view: header visibility controlled by scroll
-        if (this.slideHeader) {
-          this.slideHeader.classList.remove('slide-header--open');
-          
-          // Use Math.max to handle iOS elastic scrolling
-          const scrollY = Math.max(0, window.scrollY);
-          
-          // Ensure proper initial state based on scroll position
-          if (scrollY <= 10) { // Small threshold for iOS bounce
-            this.slideHeader.classList.remove('slide-header--scrolled');
-            this.slideHeader.setAttribute('aria-hidden', 'true');
-          } else {
-            this.slideHeader.classList.add('slide-header--scrolled');
-            this.slideHeader.setAttribute('aria-hidden', 'false');
-          }
-        }
-        if (this.menuButton) {
-          this.menuButton.removeEventListener('click', this.boundToggleMenu);
-        }
+    private setInitialState(): void {
+      if (!this.header) return;
+
+      if (this.isDesktop) {
+        // Desktop: header hidden, controlled by menu button
+        this.header.classList.remove('header--visible');
+        this.header.setAttribute('aria-hidden', 'true');
       } else {
-        // Desktop view: header is toggleable
-        this.slideHeader?.classList.remove('slide-header--scrolled'); // Clean up mobile class
-        if (this.menuButton) {
-          this.menuButton.addEventListener('click', this.boundToggleMenu);
+        // Mobile: header visibility based on scroll position
+        const scrollY = Math.max(0, window.scrollY);
+        if (scrollY > this.scrollThreshold) {
+          this.showHeader();
+        } else {
+          this.hideHeader();
         }
-        // When switching to desktop, ensure menu is closed initially
-        this.closeMenu();
       }
     }
 
-    setupScrollListener() {
-      let lastScrollY = window.scrollY;
-      let ticking = false;
-      let isTransitioning = false;
-      
-      const updateHeaderVisibility = () => {
-        const isMobile = window.matchMedia('(max-width: 768px)').matches;
-        if (isMobile && this.slideHeader && !isTransitioning) {
-          // Use Math.max to handle iOS elastic scrolling (negative values)
-          const scrollY = Math.max(0, window.scrollY);
-          const shouldShow = scrollY > 20;
-          
-          // Only update if state actually changes
-          const isCurrentlyVisible = this.slideHeader.classList.contains('slide-header--scrolled');
-          if (shouldShow !== isCurrentlyVisible) {
-            isTransitioning = true;
-            
-            // iOS Safari specific: Force style recalculation
-            if (this.slideHeader) {
-              // Read computed style to force style calculation
-              window.getComputedStyle(this.slideHeader).transform;
-              
-              // Toggle class
-              this.slideHeader.classList.toggle('slide-header--scrolled', shouldShow);
-              this.slideHeader.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
-              
-              // Force another reflow after class change for iOS
-              void this.slideHeader.offsetHeight;
-            }
-            
-            // Reset transition flag after animation completes (match 0.6s duration)
-            setTimeout(() => {
-              isTransitioning = false;
-            }, 600);
+    private setupEventListeners(): void {
+      // Viewport change detection
+      const mediaQuery = window.matchMedia('(min-width: 769px)');
+      mediaQuery.addEventListener('change', (e) => this.handleViewportChange(e.matches));
+
+      // Desktop menu toggle
+      if (this.isDesktop) {
+        this.menuButton?.addEventListener('click', () => this.toggleMenu());
+      }
+
+      // Mobile scroll behavior
+      if (!this.isDesktop) {
+        window.addEventListener('scroll', () => this.handleScroll(), { passive: true });
+      }
+
+      // Keyboard navigation
+      document.addEventListener('keydown', (e) => this.handleKeyboard(e));
+
+      // Close menu when clicking nav items
+      this.header?.querySelectorAll('.nav-button').forEach(button => {
+        button.addEventListener('click', () => {
+          if (this.isDesktop && this.isMenuOpen) {
+            this.closeMenu();
           }
-        }
-        ticking = false;
-      };
-      
-      window.addEventListener('scroll', () => {
-        if (!ticking) {
-          window.requestAnimationFrame(updateHeaderVisibility);
-          ticking = true;
-        }
-      }, { passive: true });
-      
-      // Initial check on page load for mobile
-      if (window.matchMedia('(max-width: 768px)').matches) {
-        updateHeaderVisibility();
+        });
+      });
+    }
+
+    private handleViewportChange(isDesktop: boolean): void {
+      this.isDesktop = isDesktop;
+
+      // Cancel any pending RAF
+      if (this.rafId !== null) {
+        cancelAnimationFrame(this.rafId);
+        this.rafId = null;
+      }
+
+      if (isDesktop) {
+        // Switched to desktop
+        this.header?.classList.remove('header--visible');
+        this.closeMenu();
+        window.removeEventListener('scroll', () => this.handleScroll());
+        this.menuButton?.addEventListener('click', () => this.toggleMenu());
+      } else {
+        // Switched to mobile
+        this.closeMenu();
+        this.menuButton?.removeEventListener('click', () => this.toggleMenu());
+        window.addEventListener('scroll', () => this.handleScroll(), { passive: true });
+        this.updateMobileHeaderVisibility();
       }
     }
 
-    toggleMenu() {
+    private handleScroll(): void {
+      if (this.isDesktop || this.rafId !== null) return;
+
+      this.rafId = requestAnimationFrame(() => {
+        this.updateMobileHeaderVisibility();
+        this.rafId = null;
+      });
+    }
+
+    private updateMobileHeaderVisibility(): void {
+      if (this.isDesktop || !this.header || this.isTransitioning) return;
+
+      const scrollY = Math.max(0, window.scrollY);
+      const shouldShow = scrollY > this.scrollThreshold;
+      const isCurrentlyVisible = this.header.classList.contains('header--visible');
+
+      if (shouldShow !== isCurrentlyVisible) {
+        this.isTransitioning = true;
+
+        if (shouldShow) {
+          this.showHeader();
+        } else {
+          this.hideHeader();
+        }
+
+        // Reset transition flag after animation completes
+        setTimeout(() => {
+          this.isTransitioning = false;
+        }, 600); // Match CSS transition duration
+      }
+    }
+
+    private toggleMenu(): void {
+      if (!this.isDesktop) return;
+
       if (this.isMenuOpen) {
         this.closeMenu();
       } else {
@@ -193,121 +201,155 @@ const headerClasses = [
       }
     }
 
-    openMenu() {
-      this.slideHeader.classList.add('slide-header--open');
+    private openMenu(): void {
+      if (!this.header || !this.menuButton) return;
+
+      this.header.classList.add('header--visible');
+      this.header.setAttribute('aria-hidden', 'false');
       this.menuButton.setAttribute('aria-expanded', 'true');
-      this.slideHeader.setAttribute('aria-hidden', 'false');
       this.isMenuOpen = true;
-      
-      // Announce to screen readers
+
       this.announceToScreenReader('Navigation menu opened');
     }
 
-    closeMenu() {
-      this.slideHeader.classList.remove('slide-header--open');
+    private closeMenu(): void {
+      if (!this.header || !this.menuButton) return;
+
+      this.header.classList.remove('header--visible');
+      this.header.setAttribute('aria-hidden', 'true');
       this.menuButton.setAttribute('aria-expanded', 'false');
-      this.slideHeader.setAttribute('aria-hidden', 'true');
       this.isMenuOpen = false;
-      
-      // Announce to screen readers
+
       this.announceToScreenReader('Navigation menu closed');
     }
 
-    announceToScreenReader(message: string) {
-      // Create or find existing live region for header announcements
+    private showHeader(): void {
+      if (!this.header) return;
+      this.header.classList.add('header--visible');
+      this.header.setAttribute('aria-hidden', 'false');
+    }
+
+    private hideHeader(): void {
+      if (!this.header) return;
+      this.header.classList.remove('header--visible');
+      this.header.setAttribute('aria-hidden', 'true');
+    }
+
+    private handleKeyboard(e: KeyboardEvent): void {
+      if (e.key === 'Escape' && this.isMenuOpen) {
+        this.closeMenu();
+      }
+    }
+
+    private announceToScreenReader(message: string): void {
       let liveRegion = document.getElementById('header-live-region');
+      
       if (!liveRegion) {
         liveRegion = document.createElement('div');
         liveRegion.id = 'header-live-region';
         liveRegion.setAttribute('aria-live', 'polite');
         liveRegion.setAttribute('aria-atomic', 'true');
-        liveRegion.style.position = 'absolute';
-        liveRegion.style.left = '-10000px';
-        liveRegion.style.width = '1px';
-        liveRegion.style.height = '1px';
-        liveRegion.style.overflow = 'hidden';
+        liveRegion.className = 'sr-only';
         document.body.appendChild(liveRegion);
       }
 
-      // Clear and set message
       liveRegion.textContent = '';
       setTimeout(() => {
-        liveRegion.textContent = message;
+        if (liveRegion) liveRegion.textContent = message;
       }, 100);
     }
   }
 
-  // Initialize header when DOM is ready
+  // Initialize when DOM is ready
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => new MinimalistHeader());
+    document.addEventListener('DOMContentLoaded', () => new HeaderController());
   } else {
-    new MinimalistHeader();
+    new HeaderController();
   }
 </script>
 
 <style>
+  /* ============================================
+     HEADER CONTAINER
+     ============================================ */
   .header-container {
     position: relative;
     z-index: 1000;
-    /* Move perspective to parent for proper 3D rendering on mobile */
-    perspective: 1000px;
-    -webkit-perspective: 1000px;
   }
 
-  /* Minimalist MENU button - positioned top-right */
+  /* ============================================
+     MENU BUTTON (Desktop only)
+     ============================================ */
   .menu-button {
     position: fixed;
     top: var(--spacing-md);
     right: var(--spacing-lg);
     z-index: 1001;
+    
     background: none;
     border: none;
     cursor: pointer;
     padding: var(--spacing-sm);
+    
     font-family: var(--font-heading);
     font-size: var(--text-base);
     font-weight: 400;
     color: var(--color-text-primary);
     letter-spacing: var(--tracking-wider);
-    transition: all var(--transition-normal);
+    
+    transition: color var(--transition-normal);
   }
 
   .menu-button:hover {
     color: var(--color-primary);
   }
 
-  /* Slide-down header - Based on wireframe: 85px for 982px viewport = 8.66vh */
-  .slide-header {
+  .menu-button:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 4px;
+    border-radius: 2px;
+  }
+
+  /* ============================================
+     MAIN HEADER
+     ============================================ */
+  .main-header {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
+    z-index: 1000;
+    
+    /* Height based on wireframe: 85px for 982px viewport = 8.66vh */
     height: max(8.66vh, 85px);
+    
     background-color: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(10px);
-    transform: translate3d(0, -100%, 0);
-    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
-    padding-top: var(--spacing-md);
-    padding-right: var(--spacing-lg);
-    box-sizing: border-box;
-    /* Force hardware acceleration for smooth WebKit animations */
-    -webkit-transform: translate3d(0, -100%, 0);
-    -webkit-transition: -webkit-transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    padding: var(--spacing-md) var(--spacing-lg);
+    
+    /* Hidden by default - slides down from top */
+    transform: translateY(-100%);
+    transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+    
+    /* Performance optimizations */
     will-change: transform;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
+    contain: layout style paint;
   }
 
-  .slide-header--open {
-    transform: translate3d(0, 0, 0);
-    -webkit-transform: translate3d(0, 0, 0);
+  /* Visible state - slides into view */
+  .main-header.header--visible {
+    transform: translateY(0);
   }
 
-  .slide-nav {
+  /* ============================================
+     NAVIGATION
+     ============================================ */
+  .header-nav {
     display: flex;
     gap: var(--spacing-2xl);
     align-items: center;
@@ -320,14 +362,17 @@ const headerClasses = [
     letter-spacing: var(--tracking-wider);
     color: var(--color-text-primary);
     text-decoration: none;
+    
     background: none;
     border: none;
     cursor: pointer;
     padding: var(--spacing-sm) var(--spacing-md);
-    transition: all var(--transition-normal);
+    
     position: relative;
+    transition: color var(--transition-normal);
   }
 
+  /* Underline effect */
   .nav-button::after {
     content: '';
     position: absolute;
@@ -336,8 +381,7 @@ const headerClasses = [
     width: 0;
     height: 1px;
     background-color: var(--color-primary);
-    transition: all var(--transition-normal);
-    transform: translateX(-50%);
+    transition: width var(--transition-normal), left var(--transition-normal);
   }
 
   .nav-button:hover {
@@ -346,101 +390,103 @@ const headerClasses = [
 
   .nav-button:hover::after {
     width: 100%;
+    left: 0;
   }
 
-  /* Button styling for nav context */
-  button.nav-button {
-    background: none;
-    border: none;
-    cursor: pointer;
+  .nav-button:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 4px;
+    border-radius: 2px;
   }
 
-  /* Mobile responsive adjustments */
+  /* ============================================
+     MOBILE RESPONSIVE (max-width: 768px)
+     ============================================ */
   @media (max-width: 768px) {
+    /* Hide desktop menu button */
     .menu-button {
       display: none;
     }
 
-    .slide-header {
-      /* Use only -webkit prefixed properties for iOS consistency */
-      -webkit-transform: translate3d(0, -110%, 0);
-      transform: translate3d(0, -110%, 0);
+    /* Adjust header for mobile */
+    .main-header {
       height: 65px;
       background-color: transparent;
       backdrop-filter: none;
       box-shadow: none;
-      /* Simplify to single transform transition for iOS */
-      -webkit-transition: -webkit-transform 0.6s cubic-bezier(0.4, 0.0, 0.6, 1);
-      transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.6, 1);
-      justify-content: center;
-      align-items: center;
-      padding-top: 0;
-      padding-right: 0;
-      /* Force hardware acceleration */
-      -webkit-will-change: transform;
-      will-change: transform;
-      -webkit-backface-visibility: hidden;
-      backface-visibility: hidden;
-      /* Prevent subpixel rendering issues */
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      /* Enable 3D rendering context */
-      -webkit-transform-style: preserve-3d;
-      transform-style: preserve-3d;
-      /* Force layer creation */
-      -webkit-transform-origin: center top;
-      transform-origin: center top;
+      padding: 0;
     }
-    
-    /* Initial hidden state - no transition on page load */
-    .slide-header.slide-header--initial-hidden {
-      -webkit-transition: none;
-      transition: none;
-    }
-    
-    .slide-header.slide-header--scrolled {
-      -webkit-transform: translate3d(0, 0, 0);
-      transform: translate3d(0, 0, 0);
-      /* Animate background separately to avoid iOS jank */
+
+    /* Add background when visible on mobile */
+    .main-header.header--visible {
       background-color: var(--color-background);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-      -webkit-transition: -webkit-transform 0.6s cubic-bezier(0.4, 0.0, 0.6, 1),
-                          background-color 0.3s ease 0.2s,
-                          box-shadow 0.3s ease 0.2s;
-      transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.6, 1),
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1),
                   background-color 0.3s ease 0.2s,
                   box-shadow 0.3s ease 0.2s;
     }
 
-    .slide-nav {
+    /* Tighter navigation spacing */
+    .header-nav {
       gap: var(--spacing-lg);
     }
 
     .nav-button {
-      font-size: var(--text-base);
-      padding: var(--spacing-sm);
-    }
-
-    button.nav-button {
-      font-size: var(--text-base);
-      padding: var(--spacing-sm);
+      font-size: var(--text-sm);
+      padding: var(--spacing-xs) var(--spacing-sm);
     }
   }
 
-  /* High contrast mode support */
-  @media (prefers-contrast: high) {
-    .slide-header {
-      background-color: white;
-      border-bottom-color: black;
-    }
+  /* ============================================
+     ACCESSIBILITY
+     ============================================ */
+  
+  /* Screen reader only class */
+  :global(.sr-only) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
   }
 
   /* Reduced motion support */
   @media (prefers-reduced-motion: reduce) {
-    .slide-header,
+    .main-header,
     .nav-button,
-    .nav-button::after {
+    .nav-button::after,
+    .menu-button {
       transition: none;
+    }
+  }
+
+  /* High contrast mode */
+  @media (prefers-contrast: high) {
+    .main-header {
+      background-color: white;
+      border-bottom: 2px solid black;
+    }
+
+    .menu-button,
+    .nav-button {
+      border: 1px solid currentColor;
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    .menu-button {
+      display: none;
+    }
+
+    .main-header {
+      position: static;
+      transform: none;
+      box-shadow: none;
     }
   }
 </style>

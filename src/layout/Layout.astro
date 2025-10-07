@@ -257,20 +257,6 @@ const organizationSchema = {
   </head>
 
   <body>
-    <!-- Inline script to prevent header flash on page load -->
-    <script is:inline>
-      // Run before any other scripts to prevent FOUC
-      (function() {
-        const header = document.getElementById('slide-header');
-        if (header && window.matchMedia('(max-width: 640px)').matches) {
-          // Ensure header starts hidden on mobile
-          if (window.scrollY <= 10) {
-            header.classList.remove('slide-header--scrolled');
-            header.setAttribute('aria-hidden', 'true');
-          }
-        }
-      })();
-    </script>
     <slot />
   </body>
   <Footer />
