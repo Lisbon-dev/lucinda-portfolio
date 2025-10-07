@@ -375,28 +375,62 @@ const activeDotIndex = currentIndex - dotsStartIndex;
 </script>
 
 <style>
+  /* ============================================
+     CLIENT DESIGN SPECIFICATIONS
+     Base viewport: 1512px × 982px (MacBook)
+     All measurements derived from wireframe
+     ============================================ */
+  :root {
+    /* Container System - Based on 410px margins at 1512px */
+    --project-container-margin-ratio: 27.12%; /* 410px / 1512px */
+    --project-container-margin-fixed: 410px;
+    --project-container-max-width: 1512px;
+    
+    /* Content Spacing - Wireframe measurements */
+    --project-content-gap: 66px; /* Image spacing from wireframe */
+    --project-hero-to-content: 79px; /* 397px total - 318px hero */
+    --project-hero-padding-top: max(11.2vh, 110px); /* 110px / 982px */
+    
+    /* Navigation Arrow Positioning */
+    --nav-arrow-inset-base: 20px; /* Distance from container edge */
+    --nav-arrow-size: 32px;
+    --nav-arrow-size-mobile: 24px;
+    
+    /* Responsive Scale Factors */
+    --scale-tablet: 0.8;
+    --scale-mobile: 0.7;
+  }
+
+  /* ============================================
+     BASE LAYOUT
+     ============================================ */
   .project-page {
     position: relative;
   }
 
-  /* Hero Section - Match landing page exactly */
+  /* ============================================
+     HERO SECTION
+     Measurements from client wireframe
+     ============================================ */
   .project-hero {
     text-align: center;
-    /* Fixed height approach - 318px baseline with responsive scaling */
-    /*     height: 318px;
-    max-height: 318px; */
-    padding-top: max(11.2vh, 110px);
+    padding-block-start: var(--project-hero-padding-top);
+    
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    box-sizing: border-box;
-    overflow: hidden; /* Prevent content overflow */
+    gap: var(--spacing-md);
   }
 
   .home-link {
     text-decoration: none;
     color: inherit;
+    transition: opacity var(--transition-normal);
+  }
+
+  .home-link:hover {
+    opacity: 0.8;
   }
 
   .project-site-title {
@@ -406,6 +440,7 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     line-height: var(--leading-tight);
     letter-spacing: var(--tracking-wider);
     color: var(--color-text-primary);
+    margin: 0;
   }
 
   .project-category {
@@ -419,37 +454,40 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     margin: 0;
   }
 
-  /* Project Content Section */
+  /* ============================================
+     CONTENT SECTION
+     79px spacing from wireframe (397px - 318px)
+     ============================================ */
   .project-content-section {
-    /* Ensure 397px total from body top to first image */
-    /* 397px - 318px (hero) = 79px remaining */
-    padding-top: 79px;
+    padding-block-start: var(--project-hero-to-content);
     background-color: var(--color-background);
   }
 
-  /* Hero container for consistent spacing */
   .hero-container {
-    max-width: 1512px;
+    max-width: var(--project-container-max-width);
     margin: 0 auto;
     padding: 0 var(--spacing-container-desktop);
   }
 
   .project-content-container {
-    max-width: none;
-    margin: 0 auto;
-    /* Responsive margins based on client's 410px measurement at 1512px viewport */
-    /* 410px / 1512px = 27.12% */
-    padding: 0 27.12%;
+    max-width: var(--project-container-max-width);
+    margin-inline: auto;
+    padding-inline: min(
+      var(--project-container-margin-ratio),
+      var(--project-container-margin-fixed)
+    );
     position: relative;
   }
 
-  /* Description with Navigation */
+  /* ============================================
+     PROJECT DESCRIPTION
+     ============================================ */
   .description-with-navigation {
     position: relative;
     display: flex;
-    justify-content: start;
-    align-items: start;
-    margin-bottom: calc(66px / 982px * 10vh); /* 66px gap ratio */
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-block-end: var(--project-content-gap);
   }
 
   .project-description {
@@ -481,26 +519,31 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     margin: 0;
   }
 
-  /* Navigation positioned beside description */
+  /* ============================================
+     NAVIGATION ARROWS
+     Positioned within 410px margin area
+     ============================================ */
   .project-navigation {
-    /* This container is now just a semantic wrapper for the arrows,
-       which handle their own fixed positioning. */
+    /* Semantic wrapper only */
   }
-
+  
   .nav-arrow {
     position: fixed;
     top: 50%;
     transform: translateY(-50%);
     z-index: 10;
-
-    pointer-events: auto;
+    
     display: flex;
     align-items: center;
     justify-content: center;
+    
+    inline-size: var(--nav-arrow-size);
+    block-size: var(--nav-arrow-size);
+    
     color: var(--color-text-secondary);
     text-decoration: none;
-    transition: all var(--transition-normal);
     opacity: 0.7;
+    transition: opacity var(--transition-normal), color var(--transition-normal);
   }
 
   .nav-arrow:hover {
@@ -508,19 +551,42 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     color: var(--color-text-primary);
   }
 
-  .nav-arrow--prev {
-    left: var(--spacing-container-desktop);
-  }
-
-  .nav-arrow--next {
-    right: var(--spacing-container-desktop);
-  }
-
   .nav-arrow svg {
-    width: 32px;
-    height: 32px;
+    width: var(--nav-arrow-size);
+    height: var(--nav-arrow-size);
   }
 
+  /* ============================================
+     MEDIA GRID
+     66px gaps from wireframe
+     ============================================ */
+  .project-images {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .image-wrapper,
+  .video-wrapper {
+    width: 100%;
+  }
+
+  .image-wrapper:not(:last-child),
+  .video-wrapper:not(:last-child) {
+    margin-block-end: var(--project-content-gap);
+  }
+
+  .project-image,
+  .project-video {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 0;
+  }
+
+  /* ============================================
+     MOBILE SWIPE UI
+     ============================================ */
   .mobile-swipe-hint {
     display: flex;
     justify-content: center;
@@ -555,11 +621,13 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     transform: scale(1.1);
   }
 
-  /* Back to Top Link */
+  /* ============================================
+     BACK TO TOP
+     ============================================ */
   .back-to-top {
     text-align: center;
-    margin-top: 66px;
-    padding-bottom: var(--spacing-xl);
+    margin-block-start: var(--project-content-gap);
+    padding-block-end: var(--spacing-xl);
   }
 
   .back-to-top-link {
@@ -583,191 +651,143 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     border-radius: var(--rounded-sm);
   }
 
-  /* Single Column Images with proper gaps */
-  .project-images {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .image-wrapper {
-    width: 100%;
-  }
-
-  .image-wrapper:not(:last-child) {
-    margin-bottom: 66px; /* Fixed 66px gap between images as per wireframe */
-  }
-
-  .project-image {
-    width: 100%;
-    height: auto;
-    display: block;
-    border-radius: 0; /* Clean, minimal aesthetic */
-  }
-
-  /* Responsive adjustments */
-  @media (max-width: 1024px) {
-    .hero-container {
-      padding: 0 var(--spacing-container-tablet);
-    }
-    .project-content-container {
-      padding: 0 var(--spacing-container-tablet);
-    }
-    .nav-arrow--prev {
-      left: var(--spacing-container-tablet);
-    }
-    .nav-arrow--next {
-      right: var(--spacing-container-tablet);
-    }
-  }
-
-  @media (min-width: 1512px) {
-    /* Exact client measurement: 410px margins at 1512px viewport */
-    .project-content-container {
-      padding: 0 410px;
-    }
+  /* ============================================
+     RESPONSIVE: DESKTOP (1024px+)
+     ============================================ */
+  @media (min-width: 1024px) {
     .hero-container {
       padding: 0 var(--spacing-container-desktop);
     }
-    /* Position arrows inside the 410px margin area */
-    .nav-arrow--prev {
-      left: calc(27.12% + 20px); /* Responsive margin + 20px spacing */
-    }
-    .nav-arrow--next {
-      right: calc(27.12% + 20px); /* Responsive margin + 20px spacing */
-    }
-  }
-
-  /* Exact match for client's 1512px viewport */
-  @media (min-width: 1512px) and (max-width: 1512px) {
-    .nav-arrow--prev {
-      left: 430px; /* Exact: 410px margin + 20px spacing */
-    }
-    .nav-arrow--next {
-      right: 430px; /* Exact: 410px margin + 20px spacing */
-    }
-  }
-
-  @media (max-width: 768px) {
-    .nav-arrow--prev {
-      left: var(--spacing-container-mobile);
-    }
-
-    .nav-arrow--next {
-      right: var(--spacing-container-mobile);
-    }
-
-    .nav-arrow svg {
-      width: 24px;
-      height: 24px;
-    }
-
-    .project-content-section {
-      padding-top: calc(79px * 0.8); /* Adjusted mobile spacing */
-    }
-
-    .hero-container {
-      padding: 0 var(--spacing-container-mobile);
-    }
-
+    
     .project-content-container {
-      /* Maintain proportional margins on mobile: 27.12% scales down naturally */
-      padding: 0 var(--spacing-container-mobile);
+      padding-inline: var(--spacing-container-tablet);
     }
-
-    .image-wrapper:not(:last-child) {
-      margin-bottom: calc(66px * 0.8); /* Proportional gaps for mobile */
+    
+    .nav-arrow--prev {
+      inset-inline-start: calc(var(--spacing-container-desktop) + var(--nav-arrow-inset-base));
     }
-
-    .description-with-navigation {
-      margin-bottom: calc(66px * 0.8);
+    
+    .nav-arrow--next {
+      inset-inline-end: calc(var(--spacing-container-desktop) + var(--nav-arrow-inset-base));
     }
-  }
-
-  @media (max-width: 480px) {
-    .project-description {
-      padding: 0 var(--spacing-sm);
-    }
-
-    .project-content-section {
-      padding-top: calc(79px * 0.7);
-    }
-
-    .hero-container,
-    .project-content-container {
-      padding: 0 5vw;
-    }
-
-    .image-wrapper:not(:last-child) {
-      margin-bottom: calc(66px * 0.7); /* Consistent proportional gaps */
-    }
-
-    .description-with-navigation {
-      margin-bottom: calc(66px * 0.7);
-    }
-  }
-
-  /* Hide swipe hint on larger screens where arrows are present */
-  @media (min-width: 1024px) {
+    
     .mobile-swipe-hint {
       display: none;
     }
   }
 
-  /* Hide arrows on smaller screens where swipe is intended */
+  /* ============================================
+     RESPONSIVE: CLIENT VIEWPORT (1512px)
+     Exact design specifications
+     ============================================ */
+  @media (min-width: 1512px) {
+    .project-content-container {
+      padding-inline: var(--project-container-margin-fixed);
+    }
+    
+    .hero-container {
+      padding: 0 var(--spacing-container-desktop);
+    }
+    
+    .nav-arrow--prev {
+      /* 410px margin + 20px inset */
+      inset-inline-start: calc(var(--project-container-margin-fixed) + var(--nav-arrow-inset-base));
+    }
+    
+    .nav-arrow--next {
+      inset-inline-end: calc(var(--project-container-margin-fixed) + var(--nav-arrow-inset-base));
+    }
+  }
+
+  /* ============================================
+     RESPONSIVE: TABLET (max-width: 768px)
+     80% scale factor
+     ============================================ */
+  @media (max-width: 768px) {
+    .project-content-section {
+      padding-block-start: calc(var(--project-hero-to-content) * var(--scale-tablet));
+    }
+    
+    .hero-container,
+    .project-content-container {
+      padding-inline: var(--spacing-container-mobile);
+    }
+    
+    .image-wrapper:not(:last-child),
+    .video-wrapper:not(:last-child),
+    .description-with-navigation {
+      margin-block-end: calc(var(--project-content-gap) * var(--scale-tablet));
+    }
+    
+    .back-to-top {
+      margin-block-start: calc(var(--project-content-gap) * var(--scale-tablet));
+    }
+    
+    .nav-arrow svg {
+      width: var(--nav-arrow-size-mobile);
+      height: var(--nav-arrow-size-mobile);
+    }
+  }
+
+  /* ============================================
+     RESPONSIVE: MOBILE (max-width: 480px)
+     70% scale factor
+     ============================================ */
+  @media (max-width: 480px) {
+    .project-content-section {
+      padding-block-start: calc(var(--project-hero-to-content) * var(--scale-mobile));
+    }
+    
+    .hero-container,
+    .project-content-container {
+      padding-inline: 5vw;
+    }
+    
+    .image-wrapper:not(:last-child),
+    .video-wrapper:not(:last-child),
+    .description-with-navigation {
+      margin-block-end: calc(var(--project-content-gap) * var(--scale-mobile));
+    }
+    
+    .back-to-top {
+      margin-block-start: calc(var(--project-content-gap) * var(--scale-mobile));
+    }
+    
+    .project-description {
+      padding: 0 var(--spacing-sm);
+    }
+  }
+
+  /* ============================================
+     RESPONSIVE: HIDE/SHOW NAVIGATION
+     ============================================ */
   @media (max-width: 1023px) {
     .nav-arrow {
       display: none;
     }
   }
 
-  /* Desktop measurements are now the default above */
-
-  /* Accessibility: Respect reduced motion preferences */
+  /* ============================================
+     ACCESSIBILITY
+     ============================================ */
   @media (prefers-reduced-motion: reduce) {
-    .nav-arrow {
+    .nav-arrow,
+    .nav-arrow:hover,
+    .swipe-dot,
+    .home-link {
       transition: none;
     }
-
+    
     .nav-arrow:hover {
-      transform: none;
+      transform: translateY(-50%);
     }
   }
 
-  /* Video wrapper styling to match image wrappers */
-  .video-wrapper {
-    width: 100%;
-  }
-
-  .video-wrapper:not(:last-child) {
-    margin-bottom: 66px;
-  }
-
-  .project-video {
-    width: 100%;
-    height: auto;
-    display: block;
-    border-radius: 0;
-  }
-
-  /* High contrast mode support */
   @media (prefers-contrast: high) {
     .nav-arrow {
       border: 2px solid ButtonText;
       background: ButtonFace;
       color: ButtonText;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .video-wrapper:not(:last-child) {
-      margin-bottom: calc(66px * 0.8);
-    }
-  }
-
-  @media (max-width: 480px) {
-    .video-wrapper:not(:last-child) {
-      margin-bottom: calc(66px * 0.7);
     }
   }
 </style>
