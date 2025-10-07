@@ -146,7 +146,6 @@ const activeDotIndex = currentIndex - dotsStartIndex;
       variant="hero"
       fullHeight={false}
       backgroundColor="background"
-      padding="none"
     >
       <Container>
         <header class="project-hero">
@@ -387,7 +386,7 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     /* Fixed height approach - 318px baseline with responsive scaling */
     /*     height: 318px;
     max-height: 318px; */
-    padding-top: 11.2vh;
+    padding-top: max(11.2vh, 110px);
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -408,7 +407,6 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     line-height: var(--leading-tight);
     letter-spacing: var(--tracking-wider);
     color: var(--color-text-primary);
-    margin: 0 0 var(--spacing-sm) 0;
   }
 
   .project-category {
