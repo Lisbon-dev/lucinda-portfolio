@@ -383,14 +383,13 @@ const activeDotIndex = currentIndex - dotsStartIndex;
      Breakpoint Strategy:
      - Mobile: max-width 480px → 70% scale, 5vw padding
      - Tablet Portrait: 481px - 768px → 80% scale, mobile padding
-     - Tablet Landscape: 769px - 1023px → 85% scale, 6% padding
-     - Desktop: 1024px - 1511px → 100% scale, 8% padding
+     - Desktop: 769px - 1511px → 100% scale, 27.12% padding (design system)
      - Client Viewport: 1512px+ → 100% scale, 410px fixed padding
      ============================================ */
   :root {
     /* Container System - Based on 410px margins at 1512px */
-    --project-container-margin-ratio: 27.12%; /* 410px / 1512px */
-    --project-container-margin-fixed: 410px;
+    --project-container-margin-ratio: 27.12%; /* 410px / 1512px - maintains proportion */
+    --project-container-margin-fixed: 410px; /* Locks at 1512px+ */
     --project-container-max-width: 1512px;
     
     /* Content Spacing - Wireframe measurements */
@@ -404,9 +403,8 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     --nav-arrow-size-mobile: 24px;
     
     /* Responsive Scale Factors */
-    --scale-tablet-landscape: 0.85;
-    --scale-tablet: 0.8;
-    --scale-mobile: 0.7;
+    --scale-tablet: 0.8; /* 481px - 768px */
+    --scale-mobile: 0.7; /* max-width 480px */
   }
 
   /* ============================================
@@ -480,6 +478,7 @@ const activeDotIndex = currentIndex - dotsStartIndex;
   .project-content-container {
     max-width: var(--project-container-max-width);
     margin-inline: auto;
+    /* Use 27.12% until 1512px, then lock to 410px */
     padding-inline: min(
       var(--project-container-margin-ratio),
       var(--project-container-margin-fixed)
@@ -529,7 +528,7 @@ const activeDotIndex = currentIndex - dotsStartIndex;
 
   /* ============================================
      NAVIGATION ARROWS
-     Positioned within 410px margin area
+     Positioned within margin area (27.12% or 410px)
      ============================================ */
   .project-navigation {
     /* Semantic wrapper only */
@@ -660,70 +659,24 @@ const activeDotIndex = currentIndex - dotsStartIndex;
   }
 
   /* ============================================
-     RESPONSIVE: TABLET LANDSCAPE (769px - 1023px)
-     Intermediate scale factor: 85%
+     RESPONSIVE: DESKTOP (769px - 1511px)
+     Maintains 27.12% padding per design system
      ============================================ */
-  @media (min-width: 769px) and (max-width: 1023px) {
-    :root {
-      --scale-tablet-landscape: 0.85;
-    }
-    
-    .project-content-section {
-      padding-block-start: calc(var(--project-hero-to-content) * var(--scale-tablet-landscape));
-    }
-    
-    .hero-container,
-    .project-content-container {
-      padding-inline: var(--spacing-container-tablet);
-    }
-    
-    .image-wrapper:not(:last-child),
-    .video-wrapper:not(:last-child),
-    .description-with-navigation {
-      margin-block-end: calc(var(--project-content-gap) * var(--scale-tablet-landscape));
-    }
-    
-    .back-to-top {
-      margin-block-start: calc(var(--project-content-gap) * var(--scale-tablet-landscape));
-    }
-    
-    /* Position arrows appropriately for this viewport range */
-    .nav-arrow--prev {
-      inset-inline-start: calc(var(--spacing-container-tablet) + var(--nav-arrow-inset-base));
-    }
-    
-    .nav-arrow--next {
-      inset-inline-end: calc(var(--spacing-container-tablet) + var(--nav-arrow-inset-base));
-    }
-    
-    .nav-arrow svg {
-      width: 28px;
-      height: 28px;
-    }
-    
-    .mobile-swipe-hint {
-      display: none;
-    }
-  }
-
-  /* ============================================
-     RESPONSIVE: DESKTOP (1024px+)
-     ============================================ */
-  @media (min-width: 1024px) {
+  @media (min-width: 769px) and (max-width: 1511px) {
     .hero-container {
       padding: 0 var(--spacing-container-desktop);
     }
     
-    .project-content-container {
-      padding-inline: var(--spacing-container-desktop);
-    }
+    /* project-content-container inherits base 27.12% padding */
+    /* No override needed - respects design system */
     
+    /* Position arrows within the 27.12% margin area */
     .nav-arrow--prev {
-      inset-inline-start: calc(var(--spacing-container-desktop) + var(--nav-arrow-inset-base));
+      inset-inline-start: calc(var(--project-container-margin-ratio) + var(--nav-arrow-inset-base));
     }
     
     .nav-arrow--next {
-      inset-inline-end: calc(var(--spacing-container-desktop) + var(--nav-arrow-inset-base));
+      inset-inline-end: calc(var(--project-container-margin-ratio) + var(--nav-arrow-inset-base));
     }
     
     .mobile-swipe-hint {
