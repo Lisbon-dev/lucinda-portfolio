@@ -379,6 +379,13 @@ const activeDotIndex = currentIndex - dotsStartIndex;
      CLIENT DESIGN SPECIFICATIONS
      Base viewport: 1512px × 982px (MacBook)
      All measurements derived from wireframe
+     
+     Breakpoint Strategy:
+     - Mobile: max-width 480px → 70% scale, 5vw padding
+     - Tablet Portrait: 481px - 768px → 80% scale, mobile padding
+     - Tablet Landscape: 769px - 1023px → 85% scale, 6% padding
+     - Desktop: 1024px - 1511px → 100% scale, 8% padding
+     - Client Viewport: 1512px+ → 100% scale, 410px fixed padding
      ============================================ */
   :root {
     /* Container System - Based on 410px margins at 1512px */
@@ -397,6 +404,7 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     --nav-arrow-size-mobile: 24px;
     
     /* Responsive Scale Factors */
+    --scale-tablet-landscape: 0.85;
     --scale-tablet: 0.8;
     --scale-mobile: 0.7;
   }
@@ -652,6 +660,53 @@ const activeDotIndex = currentIndex - dotsStartIndex;
   }
 
   /* ============================================
+     RESPONSIVE: TABLET LANDSCAPE (769px - 1023px)
+     Intermediate scale factor: 85%
+     ============================================ */
+  @media (min-width: 769px) and (max-width: 1023px) {
+    :root {
+      --scale-tablet-landscape: 0.85;
+    }
+    
+    .project-content-section {
+      padding-block-start: calc(var(--project-hero-to-content) * var(--scale-tablet-landscape));
+    }
+    
+    .hero-container,
+    .project-content-container {
+      padding-inline: var(--spacing-container-tablet);
+    }
+    
+    .image-wrapper:not(:last-child),
+    .video-wrapper:not(:last-child),
+    .description-with-navigation {
+      margin-block-end: calc(var(--project-content-gap) * var(--scale-tablet-landscape));
+    }
+    
+    .back-to-top {
+      margin-block-start: calc(var(--project-content-gap) * var(--scale-tablet-landscape));
+    }
+    
+    /* Position arrows appropriately for this viewport range */
+    .nav-arrow--prev {
+      inset-inline-start: calc(var(--spacing-container-tablet) + var(--nav-arrow-inset-base));
+    }
+    
+    .nav-arrow--next {
+      inset-inline-end: calc(var(--spacing-container-tablet) + var(--nav-arrow-inset-base));
+    }
+    
+    .nav-arrow svg {
+      width: 28px;
+      height: 28px;
+    }
+    
+    .mobile-swipe-hint {
+      display: none;
+    }
+  }
+
+  /* ============================================
      RESPONSIVE: DESKTOP (1024px+)
      ============================================ */
   @media (min-width: 1024px) {
@@ -660,7 +715,7 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     }
     
     .project-content-container {
-      padding-inline: var(--spacing-container-tablet);
+      padding-inline: var(--spacing-container-desktop);
     }
     
     .nav-arrow--prev {
@@ -700,10 +755,10 @@ const activeDotIndex = currentIndex - dotsStartIndex;
   }
 
   /* ============================================
-     RESPONSIVE: TABLET (max-width: 768px)
+     RESPONSIVE: TABLET PORTRAIT (481px - 768px)
      80% scale factor
      ============================================ */
-  @media (max-width: 768px) {
+  @media (min-width: 481px) and (max-width: 768px) {
     .project-content-section {
       padding-block-start: calc(var(--project-hero-to-content) * var(--scale-tablet));
     }
