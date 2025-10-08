@@ -9,6 +9,14 @@ import { getCollection } from "astro:content";
 import { Image } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
 
+// Import all video files to make them available in the build
+const allVideos = await import.meta.glob('/src/assets/portfolio/**/*.{mp4,webm}');
+const videoPathMap = new Map<string, string>();
+for (const path in allVideos) {
+  const videoModule = await allVideos[path]();
+  videoPathMap.set(path, videoModule.default);
+}
+
 export async function getStaticPaths() {
   const projects = await getCollection("projects");
   // Sort projects to ensure previous/next navigation is in the correct order
@@ -219,10 +227,27 @@ const activeDotIndex = currentIndex - dotsStartIndex;
               // Render sorted media items
               return mediaItems.map((item, index) => {
                 if (item.type === 'video') {
+                  // Resolve video paths from the frontmatter string
+                  const rawMp4Path = item.data.src;
+                  const rawWebmPath = rawMp4Path.replace(/\.mp4$/, '.webm');
+                  
+                  const finalMp4Path = videoPathMap.get(rawMp4Path);
+                  const finalWebmPath = videoPathMap.get(rawWebmPath);
+
+                  if (!finalMp4Path) {
+                    console.warn(`Video not found in build assets: ${rawMp4Path}`);
+                    return null;
+                  }
+
+                  const videoSources = {
+                    mp4: finalMp4Path,
+                    webm: finalWebmPath,
+                  };
+
                   return (
                     <div class="video-wrapper">
                       <OptimizedVideo
-                        src={item.data.src}
+                        sources={videoSources}
                         poster={item.data.poster?.src}
                         alt={item.data.alt}
                         width={item.data.width || 695}
