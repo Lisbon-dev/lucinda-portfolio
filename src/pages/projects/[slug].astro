@@ -310,52 +310,146 @@ const activeDotIndex = currentIndex - dotsStartIndex;
 
     if (!prevUrl || !nextUrl) return;
 
+    // Enhanced swipe detection with zoom protection
     let touchStartX = 0;
     let touchEndX = 0;
     let touchStartY = 0;
     let touchEndY = 0;
-    const swipeThreshold = 50; // Minimum distance for a swipe
+    let touchStartTime = 0;
+    let initialTouchCount = 0;
+    let maxTouchCount = 0;
+    let isPinching = false;
+    let lastPinchTime = 0;
+    
+    // Configuration
+    const config = {
+      swipeThreshold: 40,           // Minimum distance (px)
+      velocityThreshold: 0.3,       // Minimum speed (px/ms)
+      maxVerticalRatio: 0.5,        // Max vertical/horizontal movement ratio
+      maxDuration: 750,             // Maximum swipe duration (ms)
+      pinchCooldown: 300,           // Time after pinch before allowing swipe (ms)
+    };
 
-    projectPage.addEventListener(
-      "touchstart",
-      (event) => {
-        // Ignore if it's not a single touch
-        if (event.touches.length !== 1) {
-          touchStartX = 0;
-          touchStartY = 0;
-          return;
-        }
-        touchStartX = event.changedTouches[0].screenX;
-        touchStartY = event.changedTouches[0].screenY;
-      },
-      { passive: true }
-    );
+    projectPage.addEventListener("touchstart", (event) => {
+      const touchCount = event.touches.length;
+      initialTouchCount = touchCount;
+      maxTouchCount = touchCount;
+      
+      // Check if touch started on media element (allow zoom on media)
+      const target = event.target;
+      const isMediaElement = 
+        target instanceof HTMLImageElement ||
+        target instanceof HTMLVideoElement ||
+        target.closest('.image-wrapper') !== null ||
+        target.closest('.video-wrapper') !== null;
+      
+      if (isMediaElement) {
+        touchStartX = 0;
+        return;
+      }
+      
+      // Reset pinch flag on new single-touch gesture
+      if (touchCount === 1) {
+        isPinching = false;
+        touchStartX = event.touches[0].clientX;
+        touchStartY = event.touches[0].clientY;
+        touchStartTime = Date.now();
+      } else {
+        // Multi-touch detected - this is a pinch/zoom gesture
+        isPinching = true;
+        lastPinchTime = Date.now();
+        touchStartX = 0;
+        touchStartY = 0;
+      }
+    }, { passive: true });
 
-    projectPage.addEventListener(
-      "touchend",
-      (event) => {
-        // Ignore if there are still touches on screen (e.g., pinch-to-zoom)
-        if (event.touches.length > 0) {
-          return;
-        }
-        if (touchStartX !== 0) {
-          touchEndX = event.changedTouches[0].screenX;
-          touchEndY = event.changedTouches[0].screenY;
-          handleSwipe();
-        }
-      },
-      { passive: true }
-    );
+    projectPage.addEventListener("touchmove", (event) => {
+      const touchCount = event.touches.length;
+      
+      // Track maximum touch count during gesture
+      if (touchCount > maxTouchCount) {
+        maxTouchCount = touchCount;
+      }
+      
+      // If we ever had multiple touches, mark as pinch
+      if (touchCount > 1 || maxTouchCount > 1) {
+        isPinching = true;
+        lastPinchTime = Date.now();
+      }
+    }, { passive: true });
+
+    projectPage.addEventListener("touchend", (event) => {
+      // Ignore if there are still touches on screen
+      if (event.touches.length > 0) {
+        return;
+      }
+      
+      const timeSincePinch = Date.now() - lastPinchTime;
+      
+      // Reject swipe if:
+      // - We detected a pinch during this gesture
+      // - We're in cooldown period after a pinch
+      // - Initial touch wasn't single-finger
+      // - We ever had multiple touches
+      // - Touch start wasn't recorded
+      if (
+        isPinching ||
+        timeSincePinch < config.pinchCooldown ||
+        initialTouchCount !== 1 ||
+        maxTouchCount > 1 ||
+        touchStartX === 0
+      ) {
+        // Reset state
+        touchStartX = 0;
+        touchStartY = 0;
+        initialTouchCount = 0;
+        maxTouchCount = 0;
+        return;
+      }
+
+      touchEndX = event.changedTouches[0].clientX;
+      touchEndY = event.changedTouches[0].clientY;
+      
+      handleSwipe();
+      
+      // Reset state
+      touchStartX = 0;
+      touchStartY = 0;
+      initialTouchCount = 0;
+      maxTouchCount = 0;
+    }, { passive: true });
 
     function handleSwipe() {
       const deltaX = touchEndX - touchStartX;
       const deltaY = touchEndY - touchStartY;
+      const deltaTime = Date.now() - touchStartTime;
       
-      // Ensure it's a horizontal swipe and not a vertical scroll or too small
-      if (Math.abs(deltaX) < swipeThreshold || Math.abs(deltaX) < Math.abs(deltaY)) {
-        return; // Not a valid swipe
+      const absX = Math.abs(deltaX);
+      const absY = Math.abs(deltaY);
+      
+      // Calculate velocity (px/ms)
+      const velocity = absX / deltaTime;
+      
+      // Validation checks
+      const isHorizontal = absX > absY;
+      const meetsDistanceThreshold = absX >= config.swipeThreshold;
+      const meetsVelocityThreshold = velocity >= config.velocityThreshold;
+      const verticalRatio = absY / (absX || 1);
+      const isNotTooVertical = verticalRatio <= config.maxVerticalRatio;
+      const isNotTooSlow = deltaTime <= config.maxDuration;
+      
+      // All conditions must be met
+      if (
+        !isHorizontal ||
+        !meetsDistanceThreshold ||
+        !meetsVelocityThreshold ||
+        !isNotTooVertical ||
+        !isNotTooSlow
+      ) {
+        return;
       }
-
+      
+      // Navigate
       if (deltaX < 0) {
         // Swiped left -> Next project
         window.location.href = nextUrl;

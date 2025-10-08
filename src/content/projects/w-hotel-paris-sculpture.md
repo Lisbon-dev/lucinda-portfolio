@@ -22,7 +22,7 @@ images:
   - src: "../../assets/portfolio/wsculpture/7 - W Hotel Sculpture 5.png"
     alt: "W Hotel Paris final installation view"
 videos:
-  - src: "/src/assets/portfolio/wsculpture/FINAL SCULPTURE VIDEO-optimized"
+  - src: "/videos/wsculpture/FINAL-SCULPTURE-VIDEO"
     poster: "../../assets/portfolio/wsculpture/FINAL SCULPTURE VIDEO-poster.png"
     alt: "W Hotel Paris sculpture installation video showcasing the dynamic 3D art piece in motion"
     width: 695

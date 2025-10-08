@@ -22,7 +22,7 @@ images:
   - src: "../../assets/portfolio/whotel/Whotel 8.png"
     alt: "W Hotel Paris brand implementation"
 videos:
-  - src: "/src/assets/portfolio/whotel/W HOTEL PRESENTATION_optimized"
+  - src: "/videos/whotel/W-HOTEL-PRESENTATION"
     poster: "../../assets/portfolio/whotel/W HOTEL PRESENTATION-poster.png"
     alt: "W Hotel Paris project board video showcasing the illustration narrative"
     width: 695
