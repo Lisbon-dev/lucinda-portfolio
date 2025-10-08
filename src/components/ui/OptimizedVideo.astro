@@ -1,11 +1,6 @@
 ---
-export interface VideoSources {
-  mp4: string;
-  webm?: string;
-}
-
 interface Props {
-  sources: VideoSources;
+  src: string;
   poster?: string;
   alt: string;
   width?: number;
@@ -13,7 +8,14 @@ interface Props {
   class?: string;
 }
 
-const { sources, poster, alt, width, height, class: className } = Astro.props;
+const { src, poster, alt, width, height, class: className } = Astro.props;
+
+// Generate different video formats for the same source
+const videoBase = src.replace(/\.[^/.]+$/, ""); // Remove extension
+const formats = [
+  { src: `${videoBase}.webm`, type: 'video/webm' },
+  { src: `${videoBase}.mp4`, type: 'video/mp4' }
+];
 ---
 
 <div class={`video-container ${className || ''}`}>
@@ -28,14 +30,15 @@ const { sources, poster, alt, width, height, class: className } = Astro.props;
     playsinline
     preload="metadata"
     aria-label={alt}
-    data-video-src={sources.mp4}
+    data-video-src={src}
   >
-    {sources.webm && <source src={sources.webm} type="video/webm" />}
-    <source src={sources.mp4} type="video/mp4" />
+    {formats.map(format => (
+      <source src={format.src} type={format.type} />
+    ))}
     <!-- Fallback for browsers that don't support video -->
     <p class="video-fallback">
       Your browser doesn't support video playback. 
-      <a href={sources.mp4} download>Download the video</a> to view it.
+      <a href={src} download>Download the video</a> to view it.
     </p>
   </video>
   
