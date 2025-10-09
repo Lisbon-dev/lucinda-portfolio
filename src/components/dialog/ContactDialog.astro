@@ -47,3 +47,17 @@ import ContactForm from '../forms/ContactForm.astro';
     }
   }
 </style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const dialog = document.getElementById('contact-dialog');
+    if (!dialog) return;
+
+    const observer = new MutationObserver(() => {
+      const isOpen = dialog.hasAttribute('open');
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+    });
+
+    observer.observe(dialog, { attributes: true, attributeFilter: ['open'] });
+  });
+</script>
