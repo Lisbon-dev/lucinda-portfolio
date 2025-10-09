@@ -17,76 +17,92 @@ const subjectOptions = [
   novalidate
   aria-label="Contact form"
 >
-  <div class="contact-form__fields">
-    <FormField
-      type="text"
-      name="name"
-      label="Full Name"
-      placeholder="Your full name"
-      required
-      validation="minLength:2,maxLength:50"
-    />
+  <div class="contact-form__progress">
+    <div class="contact-form__progress-bar" data-progress-bar></div>
+  </div>
 
-    <FormField
-      type="email"
-      name="email"
-      label="Email Address"
-      placeholder="your@email.com"
-      required
-      validation="email,maxLength:100"
-    />
+  <div class="contact-form__steps" data-form-steps>
+    <!-- Step 1: Name and Email -->
+    <div class="contact-form__step active" data-step="1">
+      <h3 class="contact-form__step-title">About You</h3>
+      <FormField
+        type="text"
+        name="name"
+        label="Full Name"
+        placeholder="Your full name"
+        required
+        validation="minLength:2,maxLength:50"
+      />
+      <FormField
+        type="email"
+        name="email"
+        label="Email Address"
+        placeholder="your@email.com"
+        required
+        validation="email,maxLength:100"
+      />
+    </div>
 
-    <FormField
-      type="select"
-      name="subject"
-      label="Subject"
-      required
-      options={subjectOptions}
-      validation="required"
-    />
+    <!-- Step 2: Subject and Message -->
+    <div class="contact-form__step" data-step="2">
+      <h3 class="contact-form__step-title">The Details</h3>
+      <FormField
+        type="select"
+        name="subject"
+        label="Subject"
+        required
+        options={subjectOptions}
+        validation="required"
+      />
+      <FormField
+        type="textarea"
+        name="message"
+        label="Message"
+        placeholder="Tell me about your project or inquiry..."
+        required
+        rows={6}
+        validation="minLength:10,maxLength:1000"
+      >
+        <div slot="help">
+          Share details about your project, timeline, and any specific requirements.
+        </div>
+      </FormField>
+    </div>
 
-    <FormField
-      type="textarea"
-      name="message"
-      label="Message"
-      placeholder="Tell me about your project or inquiry..."
-      required
-      rows={6}
-      validation="minLength:10,maxLength:1000"
-    >
-      <div slot="help">
-        Share details about your project, timeline, and any specific requirements.
-      </div>
-    </FormField>
-
-    <!-- Privacy consent checkbox -->
-    <div class="privacy-consent">
-      <label class="privacy-consent__label">
-        <input 
-          type="checkbox" 
-          name="privacy_consent" 
-          class="privacy-consent__checkbox"
-          required
-        />
-        <span class="privacy-consent__checkmark" aria-hidden="true"></span>
-        <span class="privacy-consent__text">
-          I agree to the <a href="/privacy" target="_blank" rel="noopener" class="privacy-link">Privacy Policy</a> 
-          and <a href="/terms" target="_blank" rel="noopener" class="privacy-link">Terms & Conditions</a>
-        </span>
-      </label>
-      <div class="privacy-consent__error" role="alert" aria-live="polite">
-        <div class="privacy-consent__error-content">
-          You must agree to the Privacy Policy and Terms & Conditions to continue.
+    <!-- Step 3: Privacy and Submit -->
+    <div class="contact-form__step" data-step="3">
+      <h3 class="contact-form__step-title">Legal</h3>
+      <div class="privacy-consent">
+        <label class="privacy-consent__label">
+          <input 
+            type="checkbox" 
+            name="privacy_consent" 
+            class="privacy-consent__checkbox"
+            required
+          />
+          <span class="privacy-consent__checkmark" aria-hidden="true"></span>
+          <span class="privacy-consent__text">
+            I agree to the <a href="/privacy" target="_blank" rel="noopener" class="privacy-link">Privacy Policy</a> 
+            and <a href="/terms" target="_blank" rel="noopener" class="privacy-link">Terms & Conditions</a>
+          </span>
+        </label>
+        <div class="privacy-consent__error" role="alert" aria-live="polite">
+          <div class="privacy-consent__error-content">
+            You must agree to the Privacy Policy and Terms & Conditions to continue.
+          </div>
         </div>
       </div>
     </div>
   </div>
 
   <div class="contact-form__actions">
+    <button type="button" class="contact-form__nav-button contact-form__nav-button--prev focusable" data-prev-button style="display: none;">Previous</button>
+    <button type="button" class="contact-form__nav-button contact-form__nav-button--next focusable" data-next-button>Next</button>
     <button 
       type="submit" 
       class="contact-form__submit focusable"
       data-submit-button
+      style="display: none;"
     >
       <span class="contact-form__submit-text">Send Message</span>
       <span class="contact-form__submit-loading" aria-hidden="true">
@@ -116,22 +132,76 @@ const subjectOptions = [
     width: 100%;
     max-width: 600px;
     height: 100vh;
-  }
-
-  .contact-form__fields {
-    margin-bottom: var(--spacing-lg);
     display: flex;
     flex-direction: column;
+  }
+
+  .contact-form__progress {
+    width: 100%;
+    height: 4px;
+    background-color: #f0f0f0;
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .contact-form__progress-bar {
+    width: 0%;
+    height: 100%;
+    background-color: var(--color-primary);
+    transition: width 0.3s ease;
+  }
+
+  .contact-form__steps {
+    position: relative;
+    flex-grow: 1;
+  }
+
+  .contact-form__step {
+    display: none;
+    flex-direction: column;
     gap: var(--spacing-lg);
+    animation: fade-in 0.5s ease;
+  }
+
+  .contact-form__step.active {
+    display: flex;
+  }
+
+  .contact-form__step-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-sm);
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   .contact-form__actions {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     gap: var(--spacing-md);
-    margin-bottom: var(--spacing-md);
+    margin-top: auto;
+    padding-top: var(--spacing-lg);
   }
 
+  .contact-form__nav-button {
+    background: transparent;
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: 2px;
+    font-family: var(--font-heading);
+    font-size: var(--text-base);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .contact-form__nav-button:hover {
+    background: var(--color-primary);
+    color: white;
+  }
   .contact-form__submit {
     background: var(--color-primary);
     color: white;
@@ -441,25 +511,41 @@ const subjectOptions = [
     private isSubmitting = false;
     private fields: Map<string, HTMLElement> = new Map();
     private submitButton: HTMLButtonElement;
+    private nextButton: HTMLButtonElement;
+    private prevButton: HTMLButtonElement;
     private messagesContainer: HTMLElement;
     private privacyConsent: HTMLInputElement;
+    private progressBar: HTMLElement;
+    private steps: HTMLElement[];
+    private currentStep = 1;
+    private totalSteps: number;
+
+    private formSteps: Record<number, string[]> = {
+      1: ['name', 'email'],
+      2: ['subject', 'message'],
+      3: ['privacy_consent'],
+    };
 
     constructor(formElement: HTMLFormElement) {
       this.form = formElement;
       this.validator = new FormValidator();
       this.submitButton = this.form.querySelector('[data-submit-button]') as HTMLButtonElement;
+      this.nextButton = this.form.querySelector('[data-next-button]') as HTMLButtonElement;
+      this.prevButton = this.form.querySelector('[data-prev-button]') as HTMLButtonElement;
       this.messagesContainer = this.form.querySelector('[data-form-messages]') as HTMLElement;
       this.privacyConsent = this.form.querySelector('input[name="privacy_consent"]') as HTMLInputElement;
+      this.progressBar = this.form.querySelector('[data-progress-bar]') as HTMLElement;
+      this.steps = Array.from(this.form.querySelectorAll('[data-step]'));
+      this.totalSteps = this.steps.length;
       
       this.setupFields();
       this.attachEventListeners();
+      this.updateFormUI();
     }
 
     private setupFields(): void {
       contactFormConfig.forEach(config => {
-        const fieldContainer = this.form.querySelector(`[data-field-name="${config.name}"]`) as HTMLElement;
-        const fieldElement = fieldContainer?.querySelector('input, textarea, select') as HTMLElement;
-        
+        const fieldElement = this.form.querySelector(`[name="${config.name}"]`) as HTMLElement;
         if (fieldElement) {
           this.fields.set(config.name, fieldElement);
         }
@@ -467,16 +553,15 @@ const subjectOptions = [
     }
 
     private attachEventListeners(): void {
-      // Form submission
       this.form.addEventListener('submit', this.handleSubmit.bind(this));
+      this.nextButton.addEventListener('click', this.nextStep.bind(this));
+      this.prevButton.addEventListener('click', this.prevStep.bind(this));
 
-      // Real-time validation on blur and input
       this.fields.forEach((field, name) => {
-        field.addEventListener('blur', () => this.validateField(name));
+        field.addEventListener('blur', () => this.validateField(name, true));
         field.addEventListener('input', () => this.clearFieldError(name));
       });
 
-      // Privacy consent validation - only clear error on change, don't validate
       if (this.privacyConsent) {
         this.privacyConsent.addEventListener('change', () => {
           const consentContainer = this.form.querySelector('.privacy-consent') as HTMLElement;
@@ -487,78 +572,122 @@ const subjectOptions = [
       }
     }
 
+    private nextStep(): void {
+      if (this.validateCurrentStep()) {
+        if (this.currentStep < this.totalSteps) {
+          this.currentStep++;
+          this.updateFormUI();
+        }
+      }
+    }
+
+    private prevStep(): void {
+      if (this.currentStep > 1) {
+        this.currentStep--;
+        this.updateFormUI();
+      }
+    }
+
+    private updateFormUI(): void {
+      // Update progress bar
+      this.progressBar.style.width = `${((this.currentStep - 1) / (this.totalSteps - 1)) * 100}%`;
+
+      // Show/hide steps
+      this.steps.forEach(step => {
+        step.classList.toggle('active', parseInt(step.dataset.step!) === this.currentStep);
+      });
+
+      // Update button visibility
+      this.prevButton.style.display = this.currentStep > 1 ? 'inline-flex' : 'none';
+      this.nextButton.style.display = this.currentStep < this.totalSteps ? 'inline-flex' : 'none';
+      this.submitButton.style.display = this.currentStep === this.totalSteps ? 'inline-flex' : 'none';
+    }
+
+    private validateCurrentStep(): boolean {
+      const fieldsToValidate = this.formSteps[this.currentStep];
+      let isStepValid = true;
+
+      fieldsToValidate.forEach(fieldName => {
+        if (fieldName === 'privacy_consent') {
+          if (!this.validatePrivacyConsent()) {
+            isStepValid = false;
+          }
+        } else {
+          const fieldConfig = contactFormConfig.find(c => c.name === fieldName);
+          const fieldElement = this.fields.get(fieldName) as HTMLInputElement;
+          if (fieldConfig && fieldElement) {
+            const error = this.validator.validateField(fieldElement.value, fieldConfig.rules);
+            if (error) {
+              this.showFieldError(fieldName, error);
+              isStepValid = false;
+            }
+          }
+        }
+      });
+
+      if (!isStepValid) {
+        this.focusFirstError();
+      }
+
+      return isStepValid;
+    }
+
     private async handleSubmit(event: SubmitEvent): Promise<void> {
       event.preventDefault();
-      
       if (this.isSubmitting) return;
 
-      // Validate privacy consent first
-      if (!this.validatePrivacyConsent()) {
+      if (!this.validateCurrentStep()) {
         return;
       }
 
-      // Client-side validation
       const formData = new FormData(this.form);
       const validation = this.validator.validateForm(formData, contactFormConfig);
       
       if (!validation.isValid) {
         this.displayErrors(validation.errors);
         this.focusFirstError();
+        // Find which step has the error and go to it
+        const firstErrorField = Object.keys(validation.errors)[0];
+        const stepWithError = Object.keys(this.formSteps).find(step => this.formSteps[parseInt(step)].includes(firstErrorField));
+        if (stepWithError) {
+          this.currentStep = parseInt(stepWithError);
+          this.updateFormUI();
+        }
         return;
       }
 
-      // Clear any previous errors
       this.clearAllErrors();
-
-      // Submit to API
       await this.submitToAPI(formData);
     }
 
     private validatePrivacyConsent(): boolean {
       const consentContainer = this.form.querySelector('.privacy-consent') as HTMLElement;
-      
       if (!this.privacyConsent?.checked) {
         consentContainer?.classList.add('privacy-consent--error');
         this.privacyConsent?.focus();
-        
-        // Auto-hide error after 4 seconds
-        setTimeout(() => {
-          consentContainer?.classList.remove('privacy-consent--error');
-        }, 4000);
-        
+        setTimeout(() => consentContainer?.classList.remove('privacy-consent--error'), 4000);
         return false;
-      } else {
-        consentContainer?.classList.remove('privacy-consent--error');
-        return true;
       }
+      consentContainer?.classList.remove('privacy-consent--error');
+      return true;
     }
 
     private async submitToAPI(formData: FormData): Promise<void> {
       this.setSubmittingState(true);
-
       try {
         const contactData = createSafeContactFormData(Object.fromEntries(formData));
-        
         const response = await fetch('/api/contact', {
           method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
           body: JSON.stringify(contactData)
         });
-
         const result = await response.json();
-
         if (response.ok && result.success) {
           this.showSuccessMessage(result.message || 'Message sent successfully!');
           this.resetForm();
           this.form.classList.add('contact-form--success');
-          
-          // Announce success to screen readers
           this.announceToScreenReader('Message sent successfully');
         } else {
-          // Handle API validation errors
           if (result.errors) {
             this.displayErrors(result.errors);
           } else {
@@ -566,7 +695,6 @@ const subjectOptions = [
           }
           this.form.classList.add('contact-form--error');
         }
-        
       } catch (error) {
         console.error('Contact form submission error:', error);
         this.showErrorMessage('Network error. Please check your connection and try again.');
@@ -576,24 +704,24 @@ const subjectOptions = [
       }
     }
 
-    private validateField(fieldName: string): void {
+    private validateField(fieldName: string, showEagerError: boolean = false): void {
       const fieldConfig = contactFormConfig.find(config => config.name === fieldName);
       const fieldElement = this.fields.get(fieldName) as HTMLInputElement;
-      
       if (!fieldConfig || !fieldElement) return;
 
       const value = fieldElement.value;
       const error = this.validator.validateField(value, fieldConfig.rules);
 
-      if (error) {
+      if (error && showEagerError) {
         this.showFieldError(fieldName, error);
-      } else {
+      } else if (!error) {
         this.clearFieldError(fieldName);
       }
     }
 
     private showFieldError(fieldName: string, errorMessage: string): void {
-      const fieldContainer = this.form.querySelector(`[data-field-name="${fieldName}"]`) as HTMLElement;
+      const fieldElement = this.fields.get(fieldName);
+      const fieldContainer = fieldElement?.closest('[data-field-name]') as HTMLElement;
       const errorElement = fieldContainer?.querySelector('.form-field__error') as HTMLElement;
       const errorContent = fieldContainer?.querySelector('.form-field__error-content') as HTMLElement;
       
@@ -601,22 +729,18 @@ const subjectOptions = [
         fieldContainer.classList.add('form-field--error');
         errorContent.textContent = errorMessage;
         
-        // Auto-hide error after 4 seconds
-        setTimeout(() => {
-          fieldContainer.classList.remove('form-field--error');
-        }, 4000);
+        setTimeout(() => fieldContainer.classList.remove('form-field--error'), 4000);
       }
     }
 
     private clearFieldError(fieldName: string): void {
-      const fieldContainer = this.form.querySelector(`[data-field-name="${fieldName}"]`) as HTMLElement;
+      const fieldElement = this.fields.get(fieldName);
+      const fieldContainer = fieldElement?.closest('[data-field-name]') as HTMLElement;
       
       if (fieldContainer) {
         fieldContainer.classList.remove('form-field--error', 'form-field--valid');
-        
-        // Add valid state if field has content
-        const fieldElement = this.fields.get(fieldName) as HTMLInputElement;
-        if (fieldElement?.value.trim()) {
+        const inputElement = this.fields.get(fieldName) as HTMLInputElement;
+        if (inputElement?.value.trim()) {
           fieldContainer.classList.add('form-field--valid');
         }
       }
@@ -634,8 +758,6 @@ const subjectOptions = [
       });
       this.messagesContainer.innerHTML = '';
       this.form.classList.remove('contact-form--error', 'contact-form--success');
-      
-      // Clear privacy consent error
       const consentContainer = this.form.querySelector('.privacy-consent') as HTMLElement;
       consentContainer?.classList.remove('privacy-consent--error');
     }
@@ -682,7 +804,6 @@ const subjectOptions = [
     private setSubmittingState(isSubmitting: boolean): void {
       this.isSubmitting = isSubmitting;
       this.submitButton.disabled = isSubmitting;
-      
       if (isSubmitting) {
         this.form.classList.add('contact-form--submitting');
       } else {
@@ -693,10 +814,11 @@ const subjectOptions = [
     private resetForm(): void {
       this.form.reset();
       this.clearAllErrors();
+      this.currentStep = 1;
+      this.updateFormUI();
     }
 
     private announceToScreenReader(message: string): void {
-      // Create or find existing live region
       let liveRegion = document.getElementById('form-live-region');
       if (!liveRegion) {
         liveRegion = document.createElement('div');
@@ -710,8 +832,6 @@ const subjectOptions = [
         liveRegion.style.overflow = 'hidden';
         document.body.appendChild(liveRegion);
       }
-
-      // Clear and set message
       liveRegion.textContent = '';
       setTimeout(() => {
         liveRegion.textContent = message;
