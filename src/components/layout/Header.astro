@@ -261,11 +261,18 @@ const headerClasses = [
   }
 
   // Initialize when DOM is ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => new HeaderController());
-  } else {
+  function initializeHeader() {
     new HeaderController();
   }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeHeader);
+  } else {
+    initializeHeader();
+  }
+
+  // Reinitialize after view transitions
+  document.addEventListener('astro:after-swap', initializeHeader);
 </script>
 
 <style>

@@ -198,6 +198,17 @@ const organizationSchema = {
 
     <!-- View Transitions -->
     <ViewTransitions />
+    
+    <!-- Close modals on navigation -->
+    <script>
+      document.addEventListener('astro:before-preparation', () => {
+        // Close any open modals before navigation
+        const openDialogs = document.querySelectorAll('dialog[open]');
+        openDialogs.forEach(dialog => {
+          dialog.close();
+        });
+      });
+    </script>
 
     <!-- Structured Data -->
     <script

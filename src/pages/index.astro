@@ -65,7 +65,7 @@ const homeSEO = {
   <Header />
 
   <!-- Hero Section - Clean Landing Page -->
-  <main>
+  <main class="fade-transition">
     <BaseSection variant="hero" fullHeight={false} backgroundColor="background">
       <Container>
         <header class="hero-header">
@@ -109,8 +109,16 @@ const homeSEO = {
 <script>
   import Lenis from 'lenis';
 
-  // Initialize Lenis with optimized settings for masonry grid
-  const lenis = new Lenis({
+  let lenis;
+
+  function initializeLenis() {
+    // Clean up existing instance
+    if (lenis) {
+      lenis.destroy();
+    }
+
+    // Initialize Lenis with optimized settings for masonry grid
+    lenis = new Lenis({
     lerp: 0.08, // Smooth interpolation
     duration: 1.2, // Natural timing
     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Custom easing curve
@@ -129,16 +137,26 @@ const homeSEO = {
   }
   requestAnimationFrame(raf);
 
-  // Make lenis available globally for masonry grid integration
-  window.lenis = lenis;
+    // Make lenis available globally for masonry grid integration
+    window.lenis = lenis;
 
-  // Coordinate with loading overlay for smooth transition
-  document.addEventListener('loadingComplete', () => {
-    // Ensure Lenis is ready and smooth scrolling is active
-    setTimeout(() => {
-      lenis.start(); // Ensure Lenis is running
-      console.log('Lenis smooth scrolling activated after loading complete');
-    }, 100);
+    // Coordinate with loading overlay for smooth transition
+    document.addEventListener('loadingComplete', () => {
+      // Ensure Lenis is ready and smooth scrolling is active
+      setTimeout(() => {
+        lenis.start(); // Ensure Lenis is running
+        console.log('Lenis smooth scrolling activated after loading complete');
+      }, 100);
+    });
+  }
+
+  // Initialize on page load
+  initializeLenis();
+
+  // Reinitialize after view transitions
+  document.addEventListener('astro:after-swap', () => {
+    console.log('Reinitializing Lenis after view transition');
+    initializeLenis();
   });
 
   // Core Web Vitals Monitoring for Task-009 optimization
