@@ -9,8 +9,6 @@ mainImage:
   src: "../../assets/portfolio/wsculpture/1 - W Hotel Sculpture 1.png"
   alt: "W Hotel Paris 3D illustrative installation"
 images:
-  - src: "../../assets/portfolio/wsculpture/1 - W Hotel Sculpture 1.png"
-    alt: "W Hotel Paris installation main view"
   - src: "../../assets/portfolio/wsculpture/3 - W Hotel Sculpture.png"
     alt: "W Hotel Paris installation detail view"
   - src: "../../assets/portfolio/wsculpture/4 - W Hotel Sculpture 2 with W.png"
