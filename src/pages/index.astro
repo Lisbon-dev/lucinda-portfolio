@@ -79,9 +79,9 @@ const homeSEO = {
             <div class="hero-categories">
               {categories.map((category, index) => (
                 <>
-                  <a href={`#category-${category.name.toLowerCase().replace(/\s+/g, '-').replace(/&/g, 'and')}`} class="category-link">
+                  <span class="category-text">
                     {category.name}
-                  </a>
+                  </span>
                   {index < categories.length - 1 && <span class="separator">|</span>}
                 </>
               ))}
@@ -211,16 +211,10 @@ const homeSEO = {
     opacity: 0.8;
   }
   
-  .category-link {
-    text-decoration: none;
+  .category-text {
     color: inherit;
-    transition: color var(--transition-normal);
     padding: 0 0.25em;
     white-space: nowrap; /* Prevent category names from breaking across lines */
-  }
-
-  .category-link:hover {
-    color: var(--color-primary);
   }
 
   .separator {
@@ -237,7 +231,7 @@ const homeSEO = {
     .separator {
       display: none;
     }
-    .category-link {
+    .category-text {
       padding: 0.2em 0.5em;
     }
   }
