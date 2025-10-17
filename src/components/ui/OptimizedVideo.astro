@@ -31,6 +31,7 @@ const formats = [
     preload="metadata"
     aria-label={alt}
     data-video-src={src}
+    data-click-to-pause="true"
   >
     {formats.map(format => (
       <source src={format.src} type={format.type} />
@@ -101,15 +102,21 @@ const formats = [
 
       // iOS-specific: Handle unexpected pauses
       video.addEventListener('pause', () => {
-        if (video.dataset.shouldPlay === 'true') {
+        if (video.dataset.shouldPlay === 'true' && !video.dataset.userPaused) {
           this.setupPlayRetry(video);
         }
       });
 
       video.addEventListener('play', () => {
         video.dataset.shouldPlay = 'true';
+        video.dataset.userPaused = 'false';
         this.playAttempts.delete(video);
       });
+
+      // Set up click/touch to pause functionality
+      if (video.dataset.clickToPause === 'true') {
+        this.setupClickToPause(video);
+      }
     }
 
     setupPlayRetry(video: HTMLVideoElement) {
@@ -171,6 +178,58 @@ const formats = [
           });
         }
       }
+    }
+
+    setupClickToPause(video: HTMLVideoElement) {
+      const container = video.closest('.video-container') as HTMLElement;
+      if (!container) return;
+
+      // Add visual indicator that video is clickable
+      container.style.cursor = 'pointer';
+      container.setAttribute('title', 'Click to pause/play video');
+
+      // Handle click events
+      const handleClick = (e: Event) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (video.paused) {
+          video.dataset.userPaused = 'false';
+          this.playVideo(video);
+        } else {
+          video.dataset.userPaused = 'true';
+          video.pause();
+        }
+      };
+
+      // Handle touch events for mobile
+      const handleTouch = (e: TouchEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (video.paused) {
+          video.dataset.userPaused = 'false';
+          this.playVideo(video);
+        } else {
+          video.dataset.userPaused = 'true';
+          video.pause();
+        }
+      };
+
+      container.addEventListener('click', handleClick);
+      container.addEventListener('touchend', handleTouch, { passive: false });
+
+      // Keyboard accessibility
+      container.setAttribute('tabindex', '0');
+      container.setAttribute('role', 'button');
+      container.setAttribute('aria-label', 'Play/pause video');
+
+      container.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleClick(e);
+        }
+      });
     }
 
     setupReducedMotionSupport() {
@@ -261,6 +320,19 @@ const formats = [
     position: relative;
     width: 100%;
     overflow: hidden;
+  }
+
+  .video-container[style*="cursor: pointer"] {
+    transition: opacity var(--transition-normal, 0.3s ease);
+  }
+
+  .video-container[style*="cursor: pointer"]:hover {
+    opacity: 0.9;
+  }
+
+  .video-container[style*="cursor: pointer"]:focus {
+    outline: 2px solid var(--color-primary, #007acc);
+    outline-offset: 2px;
   }
 
   .optimized-video {

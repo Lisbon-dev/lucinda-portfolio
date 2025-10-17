@@ -1,4 +1,5 @@
 ---
+import { ViewTransitions } from 'astro:transitions';
 import Footer from "../components/layout/Footer.astro";
 
 // SEO Props Interface
@@ -194,6 +195,20 @@ const organizationSchema = {
     <meta name="author" content="Lucinda Burman" />
     <meta name="theme-color" content="#325C59" />
     <meta name="msapplication-TileColor" content="#325C59" />
+
+    <!-- View Transitions -->
+    <ViewTransitions />
+    
+    <!-- Close modals on navigation -->
+    <script>
+      document.addEventListener('astro:before-preparation', () => {
+        // Close any open modals before navigation
+        const openDialogs = document.querySelectorAll('dialog[open]');
+        openDialogs.forEach(dialog => {
+          dialog.close();
+        });
+      });
+    </script>
 
     <!-- Structured Data -->
     <script
@@ -405,9 +420,9 @@ const organizationSchema = {
     /* Custom Typography for Client Feedback */
     --text-hero-header: clamp(
       2.25rem,
-      1.5121rem + 2.3061vw,
-      5rem
-    ); /* Scales from 36px to 80px (~60pt) */
+      1.5121rem + 1.5374vw,
+      3.333rem
+    ); /* Scales from 36px to 53.33px (40pt) */
     --text-sub-header: clamp(
       0.875rem,
       0.752rem + 0.3845vw,
@@ -618,5 +633,87 @@ const organizationSchema = {
     font-family: var(--font-heading);
     background-color: var(--color-background);
     color: var(--color-text-primary);
+  }
+
+  /* View Transitions Styles */
+  @view-transition {
+    navigation: auto;
+  }
+
+  /* Instant transitions after initial load */
+  ::view-transition-group(root) {
+    animation-duration: 0.2s;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.2s;
+  }
+
+  /* Fade transition for project navigation */
+  .fade-transition {
+    view-transition-name: fade;
+  }
+
+  ::view-transition-group(fade) {
+    animation-duration: 0.3s;
+  }
+
+  ::view-transition-old(fade) {
+    animation: fade-out 0.3s ease-out forwards;
+  }
+
+  ::view-transition-new(fade) {
+    animation: fade-in 0.3s ease-in forwards;
+  }
+
+  @keyframes fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* Portfolio grid item transitions */
+  .portfolio-item {
+    view-transition-name: var(--portfolio-item-id, none);
+  }
+
+  /* Shared element transition for portfolio items */
+  ::view-transition-group(portfolio-item) {
+    animation-duration: 0.4s;
+  }
+
+  /* Modal close behavior during transitions */
+  [data-dialog] {
+    view-transition-name: none;
+  }
+
+  /* Ensure modals close during navigation */
+  @media (prefers-reduced-motion: no-preference) {
+    [data-dialog][open] {
+      animation: modal-close 0.2s ease-out forwards;
+    }
+  }
+
+  @keyframes modal-close {
+    from { 
+      opacity: 1; 
+      transform: scale(1);
+    }
+    to { 
+      opacity: 0; 
+      transform: scale(0.95);
+    }
+  }
+
+  /* Fallback for browsers without view transitions */
+  @supports not (view-transition-name: none) {
+    .portfolio-item {
+      transition: transform var(--transition-normal);
+    }
   }
 </style>

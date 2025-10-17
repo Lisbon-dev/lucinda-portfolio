@@ -492,7 +492,7 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     --project-hero-padding-top: max(11.2vh, 110px); /* 110px / 982px */
     
     /* Navigation Arrow Positioning */
-    --nav-arrow-inset-base: 20px; /* Distance from container edge */
+    --nav-arrow-inset-base: -15vw; /* Distance from container edge */
     --nav-arrow-size: 32px;
     --nav-arrow-size-mobile: 24px;
     
@@ -536,7 +536,7 @@ const activeDotIndex = currentIndex - dotsStartIndex;
   .project-site-title {
     font-family: var(--font-heading);
     font-size: var(--text-hero-header);
-    font-weight: 100;
+    font-weight: 400;
     line-height: var(--leading-tight);
     letter-spacing: var(--tracking-wider);
     color: var(--color-text-primary);
@@ -764,13 +764,13 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     /* project-content-container inherits base 27.12% padding */
     /* No override needed - respects design system */
     
-    /* Position arrows within the 27.12% margin area */
+    /* Position arrows within the 27.12% margin area with additional spacing */
     .nav-arrow--prev {
-      inset-inline-start: calc(var(--project-container-margin-ratio) + var(--nav-arrow-inset-base));
+      inset-inline-start: calc(var(--project-container-margin-ratio) + var(--nav-arrow-inset-base) + 20px);
     }
     
     .nav-arrow--next {
-      inset-inline-end: calc(var(--project-container-margin-ratio) + var(--nav-arrow-inset-base));
+      inset-inline-end: calc(var(--project-container-margin-ratio) + var(--nav-arrow-inset-base) + 20px);
     }
     
     .mobile-swipe-hint {
@@ -792,12 +792,12 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     }
     
     .nav-arrow--prev {
-      /* 410px margin + 20px inset */
-      inset-inline-start: calc(var(--project-container-margin-fixed) + var(--nav-arrow-inset-base));
+      /* 410px margin + 20px inset + 20px additional spacing */
+      inset-inline-start: calc(var(--project-container-margin-fixed) + var(--nav-arrow-inset-base) + 20px);
     }
     
     .nav-arrow--next {
-      inset-inline-end: calc(var(--project-container-margin-fixed) + var(--nav-arrow-inset-base));
+      inset-inline-end: calc(var(--project-container-margin-fixed) + var(--nav-arrow-inset-base) + 20px);
     }
   }
 

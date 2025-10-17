@@ -22,7 +22,7 @@ const { className = '' } = Astro.props;
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  function initializeLoadingOverlay() {
     const overlay = document.getElementById('loading-overlay');
     const percentageElement = document.getElementById('loading-percentage');
     
@@ -98,7 +98,17 @@ const { className = '' } = Astro.props;
     
     // Don't auto-complete for fully loaded pages - wait for image loading coordination
     // The MasonryGrid script will drive the progress updates based on actual image loading
-  });
+  }
+
+  // Initialize on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeLoadingOverlay);
+  } else {
+    initializeLoadingOverlay();
+  }
+
+  // Reinitialize after view transitions
+  document.addEventListener('astro:after-swap', initializeLoadingOverlay);
 </script>
 
 <style>
