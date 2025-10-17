@@ -14,6 +14,7 @@ export class MasonryAnimations {
     this.revealCleanups = [];
     this.animationsInitialized = false;
     this.eagerImagesLoaded = 0;
+    this.eventListenersSetup = false;
     
     this.init();
   }
@@ -215,14 +216,25 @@ export class MasonryAnimations {
   }
 
   setupEventListeners() {
+    // Prevent duplicate event listeners
+    if (this.eventListenersSetup) return;
+    this.eventListenersSetup = true;
+    
     // Listen for loading complete event from overlay
-    document.addEventListener('loadingComplete', () => {
+    const handleLoadingComplete = () => {
       console.log('MasonryAnimations: Loading complete event received');
       
       // Ensure content is visible and animations can start
       if (!this.animationsInitialized) {
         this.initializeFallbackAnimations();
       }
+    };
+    
+    document.addEventListener('loadingComplete', handleLoadingComplete);
+    
+    // Store cleanup function
+    this.revealCleanups.push(() => {
+      document.removeEventListener('loadingComplete', handleLoadingComplete);
     });
 
     // Handle reduced motion preferences
@@ -303,6 +315,7 @@ export class MasonryAnimations {
       // Reset state for new page
       this.animationsInitialized = false;
       this.eagerImagesLoaded = 0;
+      this.eventListenersSetup = false;
       this.revealCleanups.length = 0;
       
       // Find new container after transition
@@ -310,11 +323,35 @@ export class MasonryAnimations {
       if (this.containerElement) {
         this.masonryContainer = this.containerElement.querySelector('.masonry-grid');
         if (this.masonryContainer) {
+          // Reset loading overlay state
+          if (window.updateLoadingProgress) {
+            console.log('MasonryAnimations: Resetting loading progress to 0%');
+            window.updateLoadingProgress(0);
+          }
+          
+          // Reset all image loaded states
+          const images = this.masonryContainer.querySelectorAll('.masonry-image');
+          images.forEach(img => {
+            const container = img.closest('.image-container');
+            if (container) {
+              container.removeAttribute('data-loaded');
+            }
+          });
+          
+          // Reset all masonry items to initial state
+          const items = this.masonryContainer.querySelectorAll('.masonry-item');
+          items.forEach(item => {
+            item.style.opacity = '0';
+            item.style.transform = 'translate3d(0, 40px, 0) scale(0.95)';
+            item.removeAttribute('data-motion-revealed');
+          });
+          
           // Reinitialize animations for new page content
           setTimeout(() => {
             this.setupImageLoading();
             this.setupScrollReveals();
-          }, 50);
+            this.setupEventListeners();
+          }, 100);
         }
       }
     });
@@ -322,6 +359,16 @@ export class MasonryAnimations {
     // Handle page preparation (before transition starts)
     document.addEventListener('astro:before-preparation', () => {
       console.log('MasonryAnimations: Preparing for view transition');
+      
+      // Clean up current page animations
+      this.revealCleanups.forEach(cleanup => {
+        try {
+          if (typeof cleanup === 'function') cleanup();
+        } catch (error) {
+          console.warn('MasonryAnimations: Error during cleanup:', error);
+        }
+      });
+      this.revealCleanups.length = 0;
       
       // Ensure all items are visible before transition to prevent flash
       if (this.masonryContainer) {
