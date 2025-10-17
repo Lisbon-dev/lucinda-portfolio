@@ -55,6 +55,7 @@ const processedCategories = new Set();
           data-index={index} 
           data-lazy={index >= 6 ? "true" : "false"}
           id={isFirstOfCategory ? `category-${categorySlug}` : undefined}
+          style={`--portfolio-item-id: portfolio-${project.slug}`}
          >
           <a href={`/projects/${project.slug}`} class="project-link" aria-label={`View ${project.data.title} project`}>
             <div class="image-container" data-loaded="false">
@@ -339,13 +340,39 @@ const processedCategories = new Set();
   let eagerImagesLoaded = 0;
   let totalEagerImages = 0;
   let animationsReady = false;
+  let isInitialized = false;
+  
+  function initializeMasonryGrid() {
+    // Prevent duplicate initialization
+    if (isInitialized) {
+      console.log('🔄 MasonryGrid already initialized, skipping...');
+      return;
+    }
+    
+    console.log('🎯 Initializing MasonryGrid...');
+    isInitialized = true;
+    
+    // Reset state for fresh initialization
+    eagerImagesLoaded = 0;
+    totalEagerImages = 0;
+    animationsReady = false;
+    
+    initializeLoadingCoordination();
+  }
   
   // Wait for DOM to be ready
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeLoadingCoordination);
+    document.addEventListener('DOMContentLoaded', initializeMasonryGrid);
   } else {
-    initializeLoadingCoordination();
+    initializeMasonryGrid();
   }
+  
+  // Reinitialize after view transitions
+  document.addEventListener('astro:after-swap', () => {
+    console.log('🔄 MasonryGrid: Reinitializing after view transition');
+    isInitialized = false;
+    setTimeout(initializeMasonryGrid, 50);
+  });
   
   function initializeLoadingCoordination() {
     console.log('🎯 Initializing loading coordination...');

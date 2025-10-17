@@ -15,6 +15,7 @@ export class MasonryAnimations {
     this.animationsInitialized = false;
     this.eagerImagesLoaded = 0;
     this.eventListenersSetup = false;
+    this.viewTransitionsSetup = false;
     
     this.init();
   }
@@ -308,8 +309,12 @@ export class MasonryAnimations {
   }
 
   setupViewTransitionsCompatibility() {
+    // Prevent duplicate event listeners
+    if (this.viewTransitionsSetup) return;
+    this.viewTransitionsSetup = true;
+
     // Handle Astro view transitions
-    document.addEventListener('astro:after-swap', () => {
+    const handleAfterSwap = () => {
       console.log('MasonryAnimations: View transition completed, reinitializing animations');
       
       // Reset state for new page
@@ -354,10 +359,10 @@ export class MasonryAnimations {
           }, 100);
         }
       }
-    });
+    };
 
     // Handle page preparation (before transition starts)
-    document.addEventListener('astro:before-preparation', () => {
+    const handleBeforePreparation = () => {
       console.log('MasonryAnimations: Preparing for view transition');
       
       // Clean up current page animations
@@ -378,6 +383,15 @@ export class MasonryAnimations {
           item.style.transform = 'translate3d(0, 0, 0) scale(1)';
         });
       }
+    };
+
+    document.addEventListener('astro:after-swap', handleAfterSwap);
+    document.addEventListener('astro:before-preparation', handleBeforePreparation);
+
+    // Store cleanup functions
+    this.revealCleanups.push(() => {
+      document.removeEventListener('astro:after-swap', handleAfterSwap);
+      document.removeEventListener('astro:before-preparation', handleBeforePreparation);
     });
   }
 }
