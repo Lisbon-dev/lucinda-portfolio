@@ -367,11 +367,50 @@ const processedCategories = new Set();
     initializeMasonryGrid();
   }
   
-  // Reinitialize after view transitions
+  // Handle view transitions more intelligently
   document.addEventListener('astro:after-swap', () => {
-    console.log('🔄 MasonryGrid: Reinitializing after view transition');
-    isInitialized = false;
-    setTimeout(initializeMasonryGrid, 50);
+    console.log('🔄 MasonryGrid: Handling view transition');
+    
+    // Check if we're navigating to a page with masonry grid
+    const container = document.querySelector('.masonry-container');
+    if (!container) {
+      console.log('🔄 MasonryGrid: No masonry container found, skipping initialization');
+      return;
+    }
+
+    // Check if images are already cached/loaded
+    const images = container.querySelectorAll('img');
+    const cachedImages = Array.from(images).filter(img => img.complete && img.naturalWidth > 0);
+    const cacheRatio = images.length > 0 ? cachedImages.length / images.length : 0;
+    
+    console.log(`🔄 MasonryGrid: ${cachedImages.length}/${images.length} images cached (${Math.round(cacheRatio * 100)}%)`);
+    
+    // If most images are cached, skip loading overlay and initialize immediately
+    if (cacheRatio > 0.7) {
+      console.log('🔄 MasonryGrid: Most images cached, initializing immediately');
+      isInitialized = false;
+      
+      // Mark images as loaded
+      cachedImages.forEach(img => {
+        const container = img.closest('.image-container');
+        if (container) {
+          container.setAttribute('data-loaded', 'true');
+        }
+      });
+      
+      // Initialize without loading overlay
+      setTimeout(() => {
+        initializeMasonryGrid();
+        // Dispatch loading complete immediately for cached content
+        setTimeout(() => {
+          document.dispatchEvent(new CustomEvent('loadingComplete'));
+        }, 100);
+      }, 50);
+    } else {
+      console.log('🔄 MasonryGrid: Some images not cached, using normal initialization');
+      isInitialized = false;
+      setTimeout(initializeMasonryGrid, 50);
+    }
   });
   
   function initializeLoadingCoordination() {
