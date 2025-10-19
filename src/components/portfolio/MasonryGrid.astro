@@ -331,14 +331,11 @@ const processedCategories = new Set();
   }
 </style>
 
-<!-- Motion.js + Lenis smooth scroll reveals -->
+<!-- Motion.js animations - coordinated with MasonryAnimations.js and LoadingOverlay -->
 
 <script>
   console.log('🚀 MasonryGrid script is executing...');
   
-  // Image loading coordination with LoadingOverlay
-  let eagerImagesLoaded = 0;
-  let totalEagerImages = 0;
   let animationsReady = false;
   let isInitialized = false;
   
@@ -353,11 +350,11 @@ const processedCategories = new Set();
     isInitialized = true;
     
     // Reset state for fresh initialization
-    eagerImagesLoaded = 0;
-    totalEagerImages = 0;
     animationsReady = false;
     
-    initializeLoadingCoordination();
+    // Setup touch interactions and prepare for animations
+    setupTouchInteractions();
+    setupAnimations();
   }
   
   // Wait for DOM to be ready
@@ -367,7 +364,7 @@ const processedCategories = new Set();
     initializeMasonryGrid();
   }
   
-  // Handle view transitions more intelligently
+  // Handle view transitions
   document.addEventListener('astro:after-swap', () => {
     console.log('🔄 MasonryGrid: Handling view transition');
     
@@ -378,203 +375,55 @@ const processedCategories = new Set();
       return;
     }
 
-    // Check if images are already cached/loaded
-    const images = container.querySelectorAll('img');
-    const cachedImages = Array.from(images).filter(img => img.complete && img.naturalWidth > 0);
-    const cacheRatio = images.length > 0 ? cachedImages.length / images.length : 0;
+    // Reset initialization state for new page
+    isInitialized = false;
+    animationsReady = false;
     
-    console.log(`🔄 MasonryGrid: ${cachedImages.length}/${images.length} images cached (${Math.round(cacheRatio * 100)}%)`);
-    
-    // If most images are cached, skip loading overlay and initialize immediately
-    if (cacheRatio > 0.7) {
-      console.log('🔄 MasonryGrid: Most images cached, initializing immediately');
-      isInitialized = false;
-      
-      // Mark images as loaded
-      cachedImages.forEach(img => {
-        const container = img.closest('.image-container');
-        if (container) {
-          container.setAttribute('data-loaded', 'true');
-        }
-      });
-      
-      // Initialize without loading overlay
-      setTimeout(() => {
-        initializeMasonryGrid();
-        // Dispatch loading complete immediately for cached content
-        setTimeout(() => {
-          document.dispatchEvent(new CustomEvent('loadingComplete'));
-        }, 100);
-      }, 50);
-    } else {
-      console.log('🔄 MasonryGrid: Some images not cached, using normal initialization');
-      isInitialized = false;
-      setTimeout(initializeMasonryGrid, 50);
-    }
+    // Initialize after a brief delay to ensure DOM is ready
+    setTimeout(initializeMasonryGrid, 50);
   });
   
-  function initializeLoadingCoordination() {
-    console.log('🎯 Initializing loading coordination...');
-    
-    // Find the masonry container and eager images
-    const container = document.querySelector('.masonry-container');
-    if (!container) {
-      console.warn('❌ No masonry container found');
-      return;
-    }
-    
-    // Get all eager images (first 3-6 items based on loading="eager")
-    const eagerImages = container.querySelectorAll('img[loading="eager"], img[fetchpriority="high"]');
-    const allImages = container.querySelectorAll('img');
-    
-    // Fallback to first N images if no eager images found
-    if (eagerImages.length === 0 && allImages.length > 0) {
-      totalEagerImages = Math.min(3, allImages.length);
-      console.log('⚡ No eager images found, using first', totalEagerImages, 'images as critical');
-      
-      // Track first 3 images instead
-      for (let i = 0; i < totalEagerImages; i++) {
-        const img = allImages[i];
-        if (img.complete && img.naturalWidth > 0) {
-          console.log(`🔄 Image already cached: ${img.src.split('/').pop()}`);
-          handleImageLoad(img);
-        } else {
-          img.addEventListener('load', () => handleImageLoad(img));
-          img.addEventListener('error', () => {
-            console.warn(`❌ Image failed to load: ${img.src.split('/').pop()}`);
-            handleImageLoad(img);
-          });
-        }
-      }
-    } else {
-      totalEagerImages = eagerImages.length;
-      console.log('📸 Found eager images to track:', totalEagerImages);
-      
-      if (totalEagerImages === 0) {
-        console.log('⚡ No images found, proceeding with animations immediately');
-        startAnimations();
-        return;
-      }
-    }
-    
-    // Track loading progress of eager images
-    function updateLoadingProgress() {
-      const progress = totalEagerImages > 0 ? (eagerImagesLoaded / totalEagerImages) * 100 : 100;
-      console.log(`📊 Loading progress: ${eagerImagesLoaded}/${totalEagerImages} (${Math.round(progress)}%)`);
-      
-      // Update the global loading overlay
-      if (window.updateLoadingProgress) {
-        window.updateLoadingProgress(progress);
-      }
-      
-      // Start animations when all eager images are loaded
-      if (eagerImagesLoaded >= totalEagerImages && !animationsReady) {
-        console.log('🎬 All eager images loaded, preparing animations...');
-        setTimeout(() => {
-          setupTouchInteractions();
-          startAnimations();
-        }, 200); // Small delay to ensure overlay completes first
-      }
-    }
-    
-    // Handle image load events
-    function handleImageLoad(img) {
-      const container = img.closest('.image-container');
-      if (container) {
-        container.setAttribute('data-loaded', 'true');
-      }
-      
-      eagerImagesLoaded++;
-      console.log(`✅ Eager image loaded: ${img.src.split('/').pop()}`);
-      updateLoadingProgress();
-    }
-    
-    // Check for already loaded images and add event listeners (only if we have eager images)
-    if (eagerImages.length > 0) {
-      eagerImages.forEach(img => {
-        if (img.complete && img.naturalWidth > 0) {
-          console.log(`🔄 Image already cached: ${img.src.split('/').pop()}`);
-          handleImageLoad(img);
-        } else {
-          img.addEventListener('load', () => handleImageLoad(img));
-          img.addEventListener('error', () => {
-            console.warn(`❌ Image failed to load: ${img.src.split('/').pop()}`);
-            handleImageLoad(img); // Count failed images as "loaded" to avoid blocking
-          });
-        }
-      });
-    }
-    
-    // Add debugging for stuck loading
-    setTimeout(() => {
-      if (eagerImagesLoaded < totalEagerImages) {
-        console.warn(`🚨 Loading stuck: ${eagerImagesLoaded}/${totalEagerImages} images loaded`);
-        const remainingImages = eagerImages.length > 0 
-          ? Array.from(eagerImages).filter(img => !img.complete).map(img => img.src)
-          : Array.from(allImages).slice(0, totalEagerImages).filter(img => !img.complete).map(img => img.src);
-        console.warn('Remaining images:', remainingImages);
-      }
-    }, 2000);
-    
-    // Fallback timeout - ensure animations start even if images fail
-    setTimeout(() => {
-      if (!animationsReady) {
-        console.log('⏰ Fallback timeout reached, starting animations');
-        if (window.updateLoadingProgress) {
-          window.updateLoadingProgress(100);
-        }
-        setupTouchInteractions();
-        startAnimations();
-      }
-    }, 3000);
-    
-    // Initialize immediately if images are already cached
-    if (eagerImagesLoaded >= totalEagerImages) {
-      updateLoadingProgress();
-    }
+  function setupTouchInteractions() {
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    if (!isTouchDevice) return;
 
-    function setupTouchInteractions() {
-      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-      if (!isTouchDevice) return;
+    const masonryItems = document.querySelectorAll('.masonry-item');
+    let tappedItem = null;
 
-      const masonryItems = document.querySelectorAll('.masonry-item');
-      let tappedItem = null;
+    masonryItems.forEach(item => {
+      const link = item.querySelector('.project-link');
 
-      masonryItems.forEach(item => {
-        const link = item.querySelector('.project-link');
+      link.addEventListener('click', (e) => {
+        if (item !== tappedItem) {
+          e.preventDefault();
 
-        link.addEventListener('click', (e) => {
-          if (item !== tappedItem) {
-            e.preventDefault();
-
-            // Remove active class from previously tapped item
-            if (tappedItem) {
-              tappedItem.classList.remove('mobile-overlay-active');
-            }
-            
-            // Add active class to current item and set it as tapped
-            item.classList.add('mobile-overlay-active');
-            tappedItem = item;
+          // Remove active class from previously tapped item
+          if (tappedItem) {
+            tappedItem.classList.remove('mobile-overlay-active');
           }
-          // If it's the second tap, the default link behavior will proceed
-        });
-      });
-
-      // Add a listener to the document to close the overlay if tapping outside
-      document.addEventListener('click', (e) => {
-        if (tappedItem && !tappedItem.contains(e.target)) {
-          tappedItem.classList.remove('mobile-overlay-active');
-          tappedItem = null;
+          
+          // Add active class to current item and set it as tapped
+          item.classList.add('mobile-overlay-active');
+          tappedItem = item;
         }
+        // If it's the second tap, the default link behavior will proceed
       });
-    }
+    });
+
+    // Add a listener to the document to close the overlay if tapping outside
+    document.addEventListener('click', (e) => {
+      if (tappedItem && !tappedItem.contains(e.target)) {
+        tappedItem.classList.remove('mobile-overlay-active');
+        tappedItem = null;
+      }
+    });
   }
   
-  async function startAnimations() {
+  async function setupAnimations() {
     if (animationsReady) return; // Prevent double initialization
     animationsReady = true;
     
-    console.log('🎭 Starting Motion.js animations...');
+    console.log('🎭 Setting up Motion.js animations...');
     
     try {
       // Import Motion.js functions dynamically
@@ -583,9 +432,8 @@ const processedCategories = new Set();
       
       // Find the masonry container
       const container = document.querySelector('.masonry-container');
-      const uniqueId = container?.id;
       
-      if (!uniqueId || !animate || !inView) {
+      if (!container || !animate || !inView) {
         console.warn('❌ Missing container or Motion.js functions');
         applyFallbackVisibility();
         return;
@@ -594,7 +442,7 @@ const processedCategories = new Set();
       const items = container.querySelectorAll('.masonry-item');
       console.log('🎬 Setting up animations for', items.length, 'masonry items');
       
-      // Wait for loading complete event from overlay
+      // Wait for loading complete event from overlay (dispatched by LoadingOverlay.astro)
       const startItemAnimations = () => {
         console.log('🌟 Loading overlay complete, starting item reveals...');
         
@@ -626,11 +474,6 @@ const processedCategories = new Set();
       
       // Listen for loading complete event from overlay
       document.addEventListener('loadingComplete', startItemAnimations);
-
-      // Also ensure touch interactions are set up after animations start
-      document.addEventListener('loadingComplete', () => {
-        setupTouchInteractions();
-      });
       
       // Fallback: start animations after a delay if event doesn't fire
       setTimeout(() => {
