@@ -37,9 +37,9 @@ export class MasonryAnimations {
       return;
     }
     
-    this.masonryContainer = this.containerElement.querySelector('.masonry-grid');
+    this.masonryContainer = this.containerElement.querySelector('.astro-masonry-grid');
     if (!this.masonryContainer) {
-      console.warn('MasonryAnimations: .masonry-grid not found within container');
+      console.warn('MasonryAnimations: .astro-masonry-grid not found within container');
       return;
     }
 
