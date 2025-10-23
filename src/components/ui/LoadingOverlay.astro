@@ -68,8 +68,12 @@ const { className = '' } = Astro.props;
     }
 
     init() {
-      // Expose progress updater globally
-      window.updateLoadingProgress = (progress) => this.updateProgress(progress);
+      // Listen for progress updates via custom events instead of global functions
+      document.addEventListener('updateLoadingProgress', (event) => {
+        if (!this.isDestroyed) {
+          this.updateProgress(event.detail.progress);
+        }
+      });
       
       // Initial setup
       document.body.classList.add('loading');
@@ -148,10 +152,7 @@ const { className = '' } = Astro.props;
         cancelAnimationFrame(this.animationFrame);
         this.animationFrame = null;
       }
-      // Clean up global reference
-      if (window.updateLoadingProgress) {
-        window.updateLoadingProgress = null;
-      }
+      // Event listeners are automatically cleaned up when the element is removed
     }
   }
 

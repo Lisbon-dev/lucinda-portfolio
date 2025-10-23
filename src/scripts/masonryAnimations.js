@@ -116,19 +116,12 @@ export class MasonryAnimations {
     
     console.log(`MasonryAnimations: Found ${totalImages} images, ${eagerImages} eager images expected`);
 
-    // Enhanced progress update function
-    const updateLoadingProgressSafely = (progress, retries = 0) => {
-      const maxRetries = 10;
-      const retryDelay = 50;
-      
-      if (window.updateLoadingProgress) {
-        console.log(`MasonryAnimations: Updating progress to ${progress}%`);
-        window.updateLoadingProgress(progress);
-      } else if (retries < maxRetries) {
-        setTimeout(() => {
-          updateLoadingProgressSafely(progress, retries + 1);
-        }, retryDelay);
-      }
+    // Use custom events instead of global functions for better reliability
+    const updateLoadingProgress = (progress) => {
+      console.log(`MasonryAnimations: Updating progress to ${progress}%`);
+      document.dispatchEvent(new CustomEvent('updateLoadingProgress', { 
+        detail: { progress } 
+      }));
     };
 
     // Handle image load events
@@ -145,7 +138,7 @@ export class MasonryAnimations {
         console.log(`MasonryAnimations: Eager image ${this.eagerImagesLoaded}/${eagerImages} loaded`);
         
         const progress = Math.min(100, (this.eagerImagesLoaded / eagerImages) * 100);
-        updateLoadingProgressSafely(progress);
+        updateLoadingProgress(progress);
       }
 
       // Initialize animations after eager images load
@@ -179,9 +172,9 @@ export class MasonryAnimations {
     console.log('MasonryAnimations: Initializing eager item animations');
     
     // Update progress to 100%
-    if (window.updateLoadingProgress) {
-      window.updateLoadingProgress(100);
-    }
+    document.dispatchEvent(new CustomEvent('updateLoadingProgress', { 
+      detail: { progress: 100 } 
+    }));
     
     setTimeout(() => {
       // Reveal eager items immediately with Motion.js
