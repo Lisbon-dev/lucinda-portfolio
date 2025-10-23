@@ -31,26 +31,24 @@ const { className = '' } = Astro.props;
     
     if (!overlay || !percentageElement) return;
 
-    // Detect if this is a view transition navigation
-    const isNavigatingWithViewTransitions = document.startViewTransition !== undefined && 
-                                           performance.navigation?.type === 1; // navigate type
+    // Improved cache detection - check if images are already loaded
+    const images = document.querySelectorAll('img[loading="eager"], .masonry-image');
+    const cachedImageCount = Array.from(images).filter(img => img.complete && img.naturalWidth > 0).length;
+    const totalEagerImages = Math.min(3, images.length);
     
-    // Check if we're coming from a cached page (back/forward navigation)
-    const isCachedNavigation = performance.getEntriesByType('navigation')[0]?.type === 'back_forward';
-    
-    // Don't show loading overlay for view transitions or cached navigation
-    if (isViewTransition || isNavigatingWithViewTransitions || isCachedNavigation) {
-      console.log('LoadingOverlay: Skipping overlay for view transition or cached navigation');
+    // Skip overlay only for view transitions, not for cached content
+    if (isViewTransition) {
+      console.log('LoadingOverlay: Skipping overlay for view transition');
       overlay.style.display = 'none';
       document.body.classList.remove('loading');
-      // Still dispatch the event for components that depend on it
       setTimeout(() => {
         document.dispatchEvent(new CustomEvent('loadingComplete'));
       }, 50);
       return;
     }
 
-    // Create overlay instance to avoid conflicts
+    // Always show overlay on initial page load, even with cached images
+    // This ensures consistent behavior and proper coordination with masonry grid
     if (overlayInstance) {
       overlayInstance.destroy();
     }
