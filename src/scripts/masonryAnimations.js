@@ -408,5 +408,3 @@ export class MasonryAnimations {
   }
 }
 
-// Export the class for use in other modules
-export { MasonryAnimations };
