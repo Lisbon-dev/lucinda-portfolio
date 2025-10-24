@@ -153,10 +153,32 @@ const homeSEO = {
   // Initialize on page load
   initializeLenis();
 
-  // Reinitialize after view transitions
+  // Handle view transitions more intelligently
   document.addEventListener('astro:after-swap', () => {
     console.log('Reinitializing Lenis after view transition');
-    initializeLenis();
+    
+    // Small delay to ensure DOM is ready after transition
+    setTimeout(() => {
+      initializeLenis();
+      
+      // Check if we're on the homepage and should skip loading overlay
+      const masonryContainer = document.querySelector('.masonry-container');
+      if (masonryContainer) {
+        // If returning to homepage, check for cached images
+        const images = masonryContainer.querySelectorAll('img');
+        const cachedImages = Array.from(images).filter(img => img.complete && img.naturalWidth > 0);
+        
+        if (cachedImages.length > images.length * 0.7) {
+          console.log('Homepage: Most images cached, ensuring loading overlay is hidden');
+          // Ensure loading overlay doesn't interfere
+          const overlay = document.getElementById('loading-overlay');
+          if (overlay) {
+            overlay.style.display = 'none';
+            document.body.classList.remove('loading');
+          }
+        }
+      }
+    }, 100);
   });
 
   // Core Web Vitals Monitoring for Task-009 optimization

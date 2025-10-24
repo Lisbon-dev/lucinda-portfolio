@@ -22,93 +22,170 @@ const { className = '' } = Astro.props;
 </div>
 
 <script>
+  let isViewTransition = false;
+  let overlayInstance = null;
+
   function initializeLoadingOverlay() {
     const overlay = document.getElementById('loading-overlay');
     const percentageElement = document.getElementById('loading-percentage');
     
     if (!overlay || !percentageElement) return;
+
+    // Improved cache detection - check if images are already loaded
+    const images = document.querySelectorAll('img[loading="eager"], .masonry-image');
+    const cachedImageCount = Array.from(images).filter(img => img.complete && img.naturalWidth > 0).length;
+    const totalEagerImages = Math.min(3, images.length);
     
-    let currentProgress = 0;
-    let targetProgress = 0;
-    let animationFrame;
-    
-    // Smooth progress animation
-    function animateProgress() {
-      if (currentProgress < targetProgress) {
+    // Skip overlay only for view transitions, not for cached content
+    if (isViewTransition) {
+      console.log('LoadingOverlay: Skipping overlay for view transition');
+      overlay.style.display = 'none';
+      document.body.classList.remove('loading');
+      setTimeout(() => {
+        document.dispatchEvent(new CustomEvent('loadingComplete'));
+      }, 50);
+      return;
+    }
+
+    // Always show overlay on initial page load, even with cached images
+    // This ensures consistent behavior and proper coordination with masonry grid
+    if (overlayInstance) {
+      overlayInstance.destroy();
+    }
+    overlayInstance = new LoadingOverlayController(overlay, percentageElement);
+  }
+
+  class LoadingOverlayController {
+    constructor(overlay, percentageElement) {
+      this.overlay = overlay;
+      this.percentageElement = percentageElement;
+      this.currentProgress = 0;
+      this.targetProgress = 0;
+      this.animationFrame = null;
+      this.isDestroyed = false;
+      
+      this.init();
+    }
+
+    init() {
+      // Listen for progress updates via custom events instead of global functions
+      document.addEventListener('updateLoadingProgress', (event) => {
+        if (!this.isDestroyed) {
+          this.updateProgress(event.detail.progress);
+        }
+      });
+      
+      // Initial setup
+      document.body.classList.add('loading');
+      this.overlay.style.display = 'flex';
+      
+      // Start with small progress to show activity
+      setTimeout(() => this.updateProgress(15), 100);
+      
+      // Add safety checkpoints to prevent sticking
+      setTimeout(() => this.updateProgress(30), 500);
+      setTimeout(() => this.updateProgress(50), 1000);
+      
+      // Reduced fallback timeout for better UX
+      setTimeout(() => {
+        if (!this.isDestroyed) {
+          console.log('LoadingOverlay: Fallback timeout reached (1.5s), forcing completion');
+          this.updateProgress(100);
+        }
+      }, 1500);
+    }
+
+    updateProgress(progress) {
+      if (this.isDestroyed) return;
+      
+      this.targetProgress = Math.min(100, Math.max(0, progress));
+      if (!this.animationFrame) {
+        this.animateProgress();
+      }
+    }
+
+    animateProgress() {
+      if (this.isDestroyed) return;
+
+      if (this.currentProgress < this.targetProgress) {
         // Much faster animation for cached images (when jumping to 100% quickly)
-        const isCachedScenario = targetProgress >= 100 && currentProgress < 30;
+        const isCachedScenario = this.targetProgress >= 100 && this.currentProgress < 30;
         const speed = isCachedScenario ? 0.4 : 0.15;
-        currentProgress += (targetProgress - currentProgress) * speed;
-        percentageElement.textContent = `${Math.floor(currentProgress)}%`;
+        this.currentProgress += (this.targetProgress - this.currentProgress) * speed;
+        this.percentageElement.textContent = `${Math.floor(this.currentProgress)}%`;
         
         // Force completion if very close to target
-        if (currentProgress >= targetProgress - 1) {
-          currentProgress = targetProgress;
-          percentageElement.textContent = `${Math.floor(targetProgress)}%`;
+        if (this.currentProgress >= this.targetProgress - 1) {
+          this.currentProgress = this.targetProgress;
+          this.percentageElement.textContent = `${Math.floor(this.targetProgress)}%`;
         }
         
-        animationFrame = requestAnimationFrame(animateProgress);
-      } else if (currentProgress >= 100) {
+        this.animationFrame = requestAnimationFrame(() => this.animateProgress());
+      } else if (this.currentProgress >= 100) {
         // Ensure display shows 100%
-        percentageElement.textContent = '100%';
+        this.percentageElement.textContent = '100%';
         
         // Fade out overlay when complete with better timing
         setTimeout(() => {
-          console.log('LoadingOverlay: Starting fade out sequence...');
-          overlay.classList.add('fade-out');
-          setTimeout(() => {
-            overlay.style.display = 'none';
-            document.body.classList.remove('loading');
-            console.log('LoadingOverlay: Overlay hidden, dispatching loadingComplete event');
-            // Trigger content reveal - this coordinates with MasonryGrid animations
-            document.dispatchEvent(new CustomEvent('loadingComplete'));
-          }, 600); // Match CSS transition duration
+          if (!this.isDestroyed) {
+            console.log('LoadingOverlay: Starting fade out sequence...');
+            this.overlay.classList.add('fade-out');
+            setTimeout(() => {
+              if (!this.isDestroyed) {
+                this.overlay.style.display = 'none';
+                document.body.classList.remove('loading');
+                console.log('LoadingOverlay: Overlay hidden, dispatching loadingComplete event');
+                // Trigger content reveal - this coordinates with MasonryGrid animations
+                document.dispatchEvent(new CustomEvent('loadingComplete'));
+              }
+            }, 600); // Match CSS transition duration
+          }
         }, 300); // Slightly longer pause to ensure images are visually ready
       } else {
-        animationFrame = null;
+        this.animationFrame = null;
       }
     }
-    
-    // Update progress function (called by other components)
-    function updateProgress(progress) {
-      targetProgress = Math.min(100, Math.max(0, progress));
-      if (!animationFrame) {
-        animateProgress();
+
+    destroy() {
+      this.isDestroyed = true;
+      if (this.animationFrame) {
+        cancelAnimationFrame(this.animationFrame);
+        this.animationFrame = null;
       }
+      // Event listeners are automatically cleaned up when the element is removed
     }
-    
-    // Expose progress updater globally
-    window.updateLoadingProgress = updateProgress;
-    
-    // Initial setup
-    document.body.classList.add('loading');
-    
-    // Start with small progress to show activity
-    setTimeout(() => updateProgress(15), 100);
-    
-    // Add safety checkpoints to prevent sticking
-    setTimeout(() => updateProgress(30), 500);
-    setTimeout(() => updateProgress(50), 1000);
-    
-    // Reduced fallback timeout for better UX
-    setTimeout(() => {
-      console.log('LoadingOverlay: Fallback timeout reached (1.5s), forcing completion');
-      updateProgress(100);
-    }, 1500);
-    
-    // Don't auto-complete for fully loaded pages - wait for image loading coordination
-    // The MasonryGrid script will drive the progress updates based on actual image loading
   }
 
-  // Initialize on DOM ready
+  // Handle view transition detection
+  document.addEventListener('astro:before-preparation', () => {
+    console.log('LoadingOverlay: View transition starting, marking as transition');
+    isViewTransition = true;
+    
+    // Clean up current overlay instance
+    if (overlayInstance) {
+      overlayInstance.destroy();
+      overlayInstance = null;
+    }
+  });
+
+  document.addEventListener('astro:after-swap', () => {
+    console.log('LoadingOverlay: After view transition swap');
+    // Reset transition flag after a delay to allow for proper detection
+    setTimeout(() => {
+      isViewTransition = false;
+      initializeLoadingOverlay();
+    }, 100);
+  });
+
+  // Initialize on DOM ready (for initial page load only)
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeLoadingOverlay);
   } else {
-    initializeLoadingOverlay();
+    // Only initialize if this is the initial page load, not a view transition
+    if (!isViewTransition) {
+      initializeLoadingOverlay();
+    }
   }
-
-  // Reinitialize after view transitions
-  document.addEventListener('astro:after-swap', initializeLoadingOverlay);
 </script>
 
 <style>

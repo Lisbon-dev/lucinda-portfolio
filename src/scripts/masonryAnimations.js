@@ -37,9 +37,9 @@ export class MasonryAnimations {
       return;
     }
     
-    this.masonryContainer = this.containerElement.querySelector('.masonry-grid');
+    this.masonryContainer = this.containerElement.querySelector('.astro-masonry-grid');
     if (!this.masonryContainer) {
-      console.warn('MasonryAnimations: .masonry-grid not found within container');
+      console.warn('MasonryAnimations: .astro-masonry-grid not found within container');
       return;
     }
 
@@ -102,7 +102,11 @@ export class MasonryAnimations {
     return inView(
       element,
       () => {
-        this.createRevealAnimation(element, isLowEndDevice ? index * 0.05 : index * 0.1);
+        console.log(`MasonryAnimations: Scroll reveal triggered for lazy item ${index}`);
+        if (!element.dataset.motionRevealed) {
+          this.createRevealAnimation(element, isLowEndDevice ? index * 0.05 : index * 0.1);
+          element.dataset.motionRevealed = 'true';
+        }
       },
       { 
         margin: isLowEndDevice ? '-10% 0px -5% 0px' : '-20% 0px -10% 0px' // Earlier trigger on low-end devices
@@ -116,19 +120,12 @@ export class MasonryAnimations {
     
     console.log(`MasonryAnimations: Found ${totalImages} images, ${eagerImages} eager images expected`);
 
-    // Enhanced progress update function
-    const updateLoadingProgressSafely = (progress, retries = 0) => {
-      const maxRetries = 10;
-      const retryDelay = 50;
-      
-      if (window.updateLoadingProgress) {
-        console.log(`MasonryAnimations: Updating progress to ${progress}%`);
-        window.updateLoadingProgress(progress);
-      } else if (retries < maxRetries) {
-        setTimeout(() => {
-          updateLoadingProgressSafely(progress, retries + 1);
-        }, retryDelay);
-      }
+    // Use custom events instead of global functions for better reliability
+    const updateLoadingProgress = (progress) => {
+      console.log(`MasonryAnimations: Updating progress to ${progress}%`);
+      document.dispatchEvent(new CustomEvent('updateLoadingProgress', { 
+        detail: { progress } 
+      }));
     };
 
     // Handle image load events
@@ -145,7 +142,7 @@ export class MasonryAnimations {
         console.log(`MasonryAnimations: Eager image ${this.eagerImagesLoaded}/${eagerImages} loaded`);
         
         const progress = Math.min(100, (this.eagerImagesLoaded / eagerImages) * 100);
-        updateLoadingProgressSafely(progress);
+        updateLoadingProgress(progress);
       }
 
       // Initialize animations after eager images load
@@ -179,13 +176,15 @@ export class MasonryAnimations {
     console.log('MasonryAnimations: Initializing eager item animations');
     
     // Update progress to 100%
-    if (window.updateLoadingProgress) {
-      window.updateLoadingProgress(100);
-    }
+    document.dispatchEvent(new CustomEvent('updateLoadingProgress', { 
+      detail: { progress: 100 } 
+    }));
     
     setTimeout(() => {
-      // Reveal eager items immediately with Motion.js
+      // Reveal ONLY eager items immediately with Motion.js
       const eagerItems = this.masonryContainer.querySelectorAll('.masonry-item:not([data-lazy="true"])');
+      console.log(`MasonryAnimations: Revealing ${eagerItems.length} eager items`);
+      
       eagerItems.forEach((item, index) => {
         if (!item.dataset.motionRevealed) {
           this.createRevealAnimation(item, index * 0.15);
@@ -193,25 +192,38 @@ export class MasonryAnimations {
         }
       });
 
+      // Ensure lazy items remain hidden until scroll
+      const lazyItems = this.masonryContainer.querySelectorAll('.masonry-item[data-lazy="true"]');
+      lazyItems.forEach(item => {
+        if (!item.dataset.motionRevealed) {
+          // Keep lazy items hidden
+          item.style.opacity = '0';
+          item.style.transform = 'translate3d(0, 40px, 0) scale(0.95)';
+        }
+      });
+
+      console.log(`MasonryAnimations: ${lazyItems.length} lazy items kept hidden for scroll reveal`);
+      
       // Setup scroll-based reveal for lazy items
       this.setupScrollRevealsForLazyItems();
     }, 100);
   }
 
   setupScrollReveals() {
-    // Initial setup for lazy items if animations are already initialized
-    if (this.animationsInitialized) {
-      this.setupScrollRevealsForLazyItems();
-    }
+    // Always setup scroll reveals for lazy items, regardless of animation state
+    this.setupScrollRevealsForLazyItems();
   }
 
   setupScrollRevealsForLazyItems() {
     const lazyItems = this.masonryContainer.querySelectorAll('.masonry-item[data-lazy="true"]');
+    console.log(`MasonryAnimations: Setting up scroll reveals for ${lazyItems.length} lazy items`);
+    
     lazyItems.forEach((item, index) => {
-      if (!item.dataset.motionRevealed) {
+      if (!item.dataset.scrollRevealSetup) {
         const cleanup = this.setupScrollReveal(item, index);
         this.revealCleanups.push(cleanup);
-        item.dataset.motionRevealed = 'true';
+        item.dataset.scrollRevealSetup = 'true';
+        console.log(`MasonryAnimations: Scroll reveal setup for lazy item ${index}`);
       }
     });
   }
@@ -396,5 +408,3 @@ export class MasonryAnimations {
   }
 }
 
-// Export the class for use in other modules
-export { MasonryAnimations };
