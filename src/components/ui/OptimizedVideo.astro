@@ -51,7 +51,8 @@ const formats = [
   class OptimizedVideo {
     private observer: IntersectionObserver | null = null;
     private playAttempts: Map<HTMLVideoElement, number> = new Map();
-    private readonly MAX_PLAY_ATTEMPTS = 3;
+    private readonly MAX_PLAY_ATTEMPTS = 2; // Reduced from 3
+    private eventCleanupFunctions: Map<HTMLVideoElement, (() => void)[]> = new Map();
 
     constructor() {
       this.setupIntersectionObserver();
@@ -66,52 +67,81 @@ const formats = [
       videos.forEach(videoEl => {
         const video = videoEl as HTMLVideoElement;
         
+        // Initialize cleanup array for this video
+        this.eventCleanupFunctions.set(video, []);
+        
         // CRITICAL: Set iOS-required attributes via both property AND attribute
         video.muted = true;
         video.playsInline = true;
         video.setAttribute('muted', '');
         video.setAttribute('playsinline', '');
         
-        // Set up event listeners
+        // Set up event listeners with proper cleanup tracking
         this.setupVideoEventListeners(video);
         
-        // Attempt immediate play for above-the-fold videos
-        setTimeout(() => this.playVideo(video), 100);
+        // Attempt immediate play for above-the-fold videos (with error handling)
+        setTimeout(() => {
+          try {
+            this.playVideo(video);
+          } catch (error) {
+            console.warn('Initial video play failed:', error);
+          }
+        }, 100);
       });
     }
 
     setupVideoEventListeners(video: HTMLVideoElement) {
-      video.addEventListener('loadstart', () => {
-        video.classList.add('loading');
-      });
+      const cleanupFunctions = this.eventCleanupFunctions.get(video) || [];
 
-      video.addEventListener('loadeddata', () => {
+      // Loadstart handler
+      const handleLoadStart = () => video.classList.add('loading');
+      video.addEventListener('loadstart', handleLoadStart);
+      cleanupFunctions.push(() => video.removeEventListener('loadstart', handleLoadStart));
+
+      // Loadeddata handler
+      const handleLoadedData = () => {
         video.classList.remove('loading');
         video.classList.add('loaded');
-      });
+      };
+      video.addEventListener('loadeddata', handleLoadedData);
+      cleanupFunctions.push(() => video.removeEventListener('loadeddata', handleLoadedData));
 
-      video.addEventListener('error', () => {
+      // Error handler
+      const handleError = () => {
         video.classList.add('error');
         console.warn('Video failed to load:', video.dataset.videoSrc);
-      });
+        // Stop retry attempts on error
+        this.playAttempts.set(video, this.MAX_PLAY_ATTEMPTS);
+      };
+      video.addEventListener('error', handleError);
+      cleanupFunctions.push(() => video.removeEventListener('error', handleError));
 
-      video.addEventListener('playing', () => {
+      // Playing handler
+      const handlePlaying = () => {
         video.classList.remove('loading');
         video.classList.add('loaded');
-      });
+      };
+      video.addEventListener('playing', handlePlaying);
+      cleanupFunctions.push(() => video.removeEventListener('playing', handlePlaying));
 
-      // iOS-specific: Handle unexpected pauses
-      video.addEventListener('pause', () => {
+      // Simplified pause handler - no automatic retry
+      const handlePause = () => {
+        // Only log, don't automatically retry to prevent loops
         if (video.dataset.shouldPlay === 'true' && !video.dataset.userPaused) {
-          this.setupPlayRetry(video);
+          console.log('Video paused unexpectedly, user can tap to resume');
         }
-      });
+      };
+      video.addEventListener('pause', handlePause);
+      cleanupFunctions.push(() => video.removeEventListener('pause', handlePause));
 
-      video.addEventListener('play', () => {
+      // Play handler
+      const handlePlay = () => {
         video.dataset.shouldPlay = 'true';
         video.dataset.userPaused = 'false';
         this.playAttempts.delete(video);
-      });
+      };
+      video.addEventListener('play', handlePlay);
+      cleanupFunctions.push(() => video.removeEventListener('play', handlePlay));
 
       // Set up click/touch to pause functionality
       if (video.dataset.clickToPause === 'true') {
@@ -119,23 +149,23 @@ const formats = [
       }
     }
 
+    // Simplified retry logic - no global event listeners
     setupPlayRetry(video: HTMLVideoElement) {
       const attempts = this.playAttempts.get(video) || 0;
       
       if (attempts >= this.MAX_PLAY_ATTEMPTS) {
+        console.log('Max play attempts reached for video, stopping retries');
         return;
       }
 
-      const retryPlay = () => {
-        this.playVideo(video);
-        document.removeEventListener('touchstart', retryPlay);
-        document.removeEventListener('click', retryPlay);
-        document.removeEventListener('scroll', retryPlay);
-      };
-      
-      document.addEventListener('touchstart', retryPlay, { once: true, passive: true });
-      document.addEventListener('click', retryPlay, { once: true });
-      document.addEventListener('scroll', retryPlay, { once: true, passive: true });
+      // Simple timeout-based retry instead of global event listeners
+      setTimeout(() => {
+        try {
+          this.playVideo(video);
+        } catch (error) {
+          console.warn('Video retry failed:', error);
+        }
+      }, 1000);
     }
 
     setupIntersectionObserver() {
@@ -184,52 +214,81 @@ const formats = [
       const container = video.closest('.video-container') as HTMLElement;
       if (!container) return;
 
+      const cleanupFunctions = this.eventCleanupFunctions.get(video) || [];
+
       // Add visual indicator that video is clickable
       container.style.cursor = 'pointer';
       container.setAttribute('title', 'Click to pause/play video');
 
-      // Handle click events
+      // Handle click events (desktop)
       const handleClick = (e: Event) => {
         e.preventDefault();
         e.stopPropagation();
 
-        if (video.paused) {
-          video.dataset.userPaused = 'false';
-          this.playVideo(video);
-        } else {
-          video.dataset.userPaused = 'true';
-          video.pause();
+        try {
+          if (video.paused) {
+            video.dataset.userPaused = 'false';
+            this.playVideo(video);
+          } else {
+            video.dataset.userPaused = 'true';
+            video.pause();
+          }
+        } catch (error) {
+          console.warn('Video play/pause failed:', error);
         }
       };
 
-      // Handle touch events for mobile
+      // Separate touch handling to avoid conflicts with swipe navigation
       const handleTouch = (e: TouchEvent) => {
+        // Only handle single-finger taps directly on video
+        if (e.touches.length > 1 || e.changedTouches.length > 1) {
+          return; // Ignore multi-touch gestures
+        }
+
+        // Check if touch is directly on video element
+        const target = e.target as Element;
+        if (target !== video && !video.contains(target)) {
+          return; // Ignore touches outside video
+        }
+
         e.preventDefault();
         e.stopPropagation();
 
-        if (video.paused) {
-          video.dataset.userPaused = 'false';
-          this.playVideo(video);
-        } else {
-          video.dataset.userPaused = 'true';
-          video.pause();
+        try {
+          if (video.paused) {
+            video.dataset.userPaused = 'false';
+            this.playVideo(video);
+          } else {
+            video.dataset.userPaused = 'true';
+            video.pause();
+          }
+        } catch (error) {
+          console.warn('Video play/pause failed:', error);
         }
       };
 
+      // Add event listeners with cleanup tracking
       container.addEventListener('click', handleClick);
-      container.addEventListener('touchend', handleTouch, { passive: false });
+      cleanupFunctions.push(() => container.removeEventListener('click', handleClick));
+
+      // Use touchstart instead of touchend to avoid conflicts with swipe detection
+      container.addEventListener('touchstart', handleTouch, { passive: false });
+      cleanupFunctions.push(() => container.removeEventListener('touchstart', handleTouch));
 
       // Keyboard accessibility
       container.setAttribute('tabindex', '0');
       container.setAttribute('role', 'button');
       container.setAttribute('aria-label', 'Play/pause video');
 
-      container.addEventListener('keydown', (e: KeyboardEvent) => {
+      const handleKeydown = (e: KeyboardEvent) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           handleClick(e);
         }
-      });
+      };
+
+      container.addEventListener('keydown', handleKeydown);
+      cleanupFunctions.push(() => container.removeEventListener('keydown', handleKeydown));
     }
 
     setupReducedMotionSupport() {
@@ -252,8 +311,14 @@ const formats = [
 
     async playVideo(video: HTMLVideoElement) {
       const attempts = this.playAttempts.get(video) || 0;
-      this.playAttempts.set(video, attempts + 1);
+      
+      // Check if we've exceeded max attempts
+      if (attempts >= this.MAX_PLAY_ATTEMPTS) {
+        console.log('Max play attempts reached, stopping video play attempts');
+        return;
+      }
 
+      this.playAttempts.set(video, attempts + 1);
       video.dataset.shouldPlay = 'true';
 
       // Ensure iOS attributes are set (belt and suspenders)
@@ -264,7 +329,12 @@ const formats = [
 
       const src = video.dataset.videoSrc;
       if (src && video.currentSrc === '') {
-        video.load();
+        try {
+          video.load();
+        } catch (error) {
+          console.warn('Video load failed:', error);
+          return;
+        }
       }
       
       try {
@@ -273,18 +343,39 @@ const formats = [
           await playPromise;
           video.classList.remove('loading');
           video.classList.add('loaded');
+          console.log('Video playing successfully');
         }
       } catch (error: any) {
-        console.warn("Video autoplay prevented:", error.message);
-        this.setupPlayRetry(video);
+        console.warn(`Video autoplay prevented (attempt ${attempts + 1}):`, error.message);
+        
+        // Only retry if we haven't exceeded max attempts
+        if (attempts < this.MAX_PLAY_ATTEMPTS - 1) {
+          this.setupPlayRetry(video);
+        }
       }
     }
 
     destroy() {
+      // Clean up intersection observer
       if (this.observer) {
         this.observer.disconnect();
+        this.observer = null;
       }
+
+      // Clean up all event listeners
+      this.eventCleanupFunctions.forEach((cleanupFunctions, video) => {
+        cleanupFunctions.forEach(cleanup => {
+          try {
+            cleanup();
+          } catch (error) {
+            console.warn('Error during event cleanup:', error);
+          }
+        });
+      });
+
+      // Clear all maps
       this.playAttempts.clear();
+      this.eventCleanupFunctions.clear();
     }
   }
 

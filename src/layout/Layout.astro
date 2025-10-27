@@ -199,13 +199,31 @@ const organizationSchema = {
     <!-- View Transitions -->
     <ViewTransitions />
     
-    <!-- Close modals on navigation -->
+    <!-- Handle navigation and modal cleanup -->
     <script>
       document.addEventListener('astro:before-preparation', () => {
         // Close any open modals before navigation
         const openDialogs = document.querySelectorAll('dialog[open]');
         openDialogs.forEach(dialog => {
           dialog.close();
+        });
+
+        // Ensure loading overlay is hidden during view transitions
+        const overlay = document.getElementById('loading-overlay');
+        if (overlay) {
+          overlay.style.display = 'none';
+          document.body.classList.remove('loading');
+        }
+      });
+
+      // Optimize view transition performance
+      document.addEventListener('astro:page-load', () => {
+        // Ensure smooth transitions by preventing layout shifts
+        const images = document.querySelectorAll('img[loading="lazy"]');
+        images.forEach(img => {
+          if (img.complete && img.naturalWidth > 0) {
+            img.style.opacity = '1';
+          }
         });
       });
     </script>

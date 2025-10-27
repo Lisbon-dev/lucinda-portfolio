@@ -302,13 +302,23 @@ const activeDotIndex = currentIndex - dotsStartIndex;
   requestAnimationFrame(raf);
 
   document.addEventListener("DOMContentLoaded", () => {
-    const projectPage = document.querySelector(".project-page");
-    if (!projectPage) return;
+    try {
+      const projectPage = document.querySelector(".project-page");
+      if (!projectPage) return;
 
-    const prevUrl = projectPage.dataset.prevUrl;
-    const nextUrl = projectPage.dataset.nextUrl;
+      const prevUrl = projectPage.dataset.prevUrl;
+      const nextUrl = projectPage.dataset.nextUrl;
 
-    if (!prevUrl || !nextUrl) return;
+      if (!prevUrl || !nextUrl) return;
+
+      // Add error handling for the entire swipe system
+      initializeSwipeNavigation(projectPage, prevUrl, nextUrl);
+    } catch (error) {
+      console.error('Failed to initialize project page:', error);
+    }
+  });
+
+  function initializeSwipeNavigation(projectPage: Element, prevUrl: string, nextUrl: string) {
 
     // Enhanced swipe detection with zoom protection
     let touchStartX = 0;
@@ -336,13 +346,20 @@ const activeDotIndex = currentIndex - dotsStartIndex;
       maxTouchCount = touchCount;
       
       // Check if touch started on media element (allow zoom on media)
-      const target = event.target;
+      const target = event.target as Element;
       const isMediaElement = 
         target instanceof HTMLImageElement ||
         target instanceof HTMLVideoElement ||
         target.closest('.image-wrapper') !== null ||
         target.closest('.video-wrapper') !== null;
       
+      // For video elements, allow video controls to work but prevent swipe
+      if (target instanceof HTMLVideoElement || target.closest('video')) {
+        touchStartX = 0;
+        return;
+      }
+      
+      // For images, allow zoom gestures but prevent swipe
       if (isMediaElement) {
         touchStartX = 0;
         return;
@@ -462,10 +479,16 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     const backToTopLink = document.querySelector(".back-to-top-link");
     backToTopLink?.addEventListener("click", (event) => {
       event.preventDefault();
-      // Use the locally initialized lenis instance
-      lenis?.scrollTo("#top");
+      try {
+        // Use the locally initialized lenis instance
+        lenis?.scrollTo("#top");
+      } catch (error) {
+        console.warn('Smooth scroll failed, using fallback:', error);
+        // Fallback to native scroll
+        document.getElementById('top')?.scrollIntoView({ behavior: 'smooth' });
+      }
     });
-  });
+  }
 </script>
 
 <style>
