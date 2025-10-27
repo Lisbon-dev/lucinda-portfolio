@@ -665,7 +665,6 @@ const subjectOptions = [
       if (!this.privacyConsent?.checked) {
         consentContainer?.classList.add('privacy-consent--error');
         this.privacyConsent?.focus();
-        setTimeout(() => consentContainer?.classList.remove('privacy-consent--error'), 4000);
         return false;
       }
       consentContainer?.classList.remove('privacy-consent--error');
@@ -728,8 +727,6 @@ const subjectOptions = [
       if (fieldContainer && errorElement && errorContent) {
         fieldContainer.classList.add('form-field--error');
         errorContent.textContent = errorMessage;
-        
-        setTimeout(() => fieldContainer.classList.remove('form-field--error'), 4000);
       }
     }
 
