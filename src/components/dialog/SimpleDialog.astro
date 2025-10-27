@@ -160,10 +160,11 @@ const { id, class: className } = Astro.props;
     font-weight: 400;
     color: var(--color-text-primary, #000000);
     line-height: var(--leading-tight, 1.25);
+    letter-spacing: var(--tracking-wide, 0.05em);
   }
 
   .content-area :global(p) {
-    font-family: var(--font-heading, serif);
+    font-family: var(--font-sub-heading, serif);
     font-size: var(--text-base, 1rem);
     font-weight: 300;
     color: var(--color-text-primary, #000000);
@@ -239,6 +240,29 @@ const { id, class: className } = Astro.props;
             closeButton.focus();
           }
         }, 100);
+
+        // Handle dialog triggers that are inside this dialog
+        const triggers = dialog.querySelectorAll('[data-dialog-trigger]');
+        triggers.forEach(trigger => {
+          // Prevent attaching listener multiple times if dialog is re-opened
+          if (trigger.dataset.listenerAttached === 'true') return;
+          
+          const targetDialogId = trigger.dataset.dialogTrigger;
+          const targetDialog = document.getElementById(targetDialogId);
+
+          if (targetDialog) {
+            trigger.addEventListener('click', () => {
+              dialog.close(); // Close the current dialog
+              
+              if (typeof targetDialog.showModal === 'function') {
+                targetDialog.showModal(); // Open the target dialog
+              } else {
+                targetDialog.setAttribute('open', ''); // Fallback
+              }
+            });
+            trigger.dataset.listenerAttached = 'true';
+          }
+        });
       });
     });
   });

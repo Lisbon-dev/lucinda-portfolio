@@ -14,16 +14,18 @@ import SimpleDialog from "./SimpleDialog.astro";
     to individuals, from all around the world.
   </p>
 
+
+    <h2>Select clients</h2>
   <p>
-    <h3>Select clients</h3>
     <br />
     W Hotel Paris, Marriott/ The Spectator Magazine (UK & USA)/ Carlowrie Group/
     Zwift/ Motcombs Knightsbridge/ Pascal Huser Design & Build/ Tall Tape/ The Painted
     Door Company, South Africa/ Willow & Ivy Events, USA
   </p>
 
+
+    <h2>Select Exhibitions</h2>
   <p>
-    <h3>Select Exhibitions</h3>
     <br />
     The Grapefruit Gallery - Fulham, London - 2012-2017
     <br />
@@ -38,5 +40,27 @@ import SimpleDialog from "./SimpleDialog.astro";
   <div class="contact-info">
     <p>contact me:</p>
     <p><a href="mailto:hello@lucindaburman.com">hello@lucindaburman.com</a></p>
+    <p>or use the</p>
+    <button type="button" class="contact-button focusable" data-dialog-trigger="contact-dialog">Contact Form</button>
   </div>
 </SimpleDialog>
+
+<style>
+  .contact-button {
+    background: transparent;
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: 2px;
+    font-family: var(--font-heading);
+    font-size: var(--text-base);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    margin-top: var(--spacing-xs);
+  }
+
+  .contact-button:hover {
+    background: var(--color-primary);
+    color: white;
+  }
+</style>
