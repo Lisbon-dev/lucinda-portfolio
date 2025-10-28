@@ -6,8 +6,6 @@ import ContactForm from '../forms/ContactForm.astro';
 <SimpleDialog id="contact-dialog" class="contact-dialog">
   <h2>Get in Touch</h2>
   
-  <p>Let's discuss your project and how we can work together.</p>
-  
   <div class="form-container">
     <ContactForm />
   </div>
@@ -44,6 +42,16 @@ import ContactForm from '../forms/ContactForm.astro';
     .contact-dialog :global(.form-container) {
       max-width: 100%;
       margin-top: var(--spacing-xs, 1.5rem);
+    }
+  }
+
+  /* Reduce spacing on short viewports to avoid scrolling */
+  @media (max-height: 700px) {
+    .contact-dialog :global(.form-container) {
+      margin-top: var(--spacing-md, 1.5rem);
+    }
+    .contact-dialog :global(.form-field) {
+      margin-bottom: var(--spacing-sm, 1rem);
     }
   }
 </style>
