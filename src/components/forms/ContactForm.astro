@@ -95,6 +95,19 @@ const subjectOptions = [
     </div>
   </div>
 
+  <!-- Success Message -->
+  <div class="contact-form__success-message" data-success-message style="display: none;">
+    <div class="contact-form__success-icon">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+    </div>
+    <h3 class="contact-form__success-title">Message Sent!</h3>
+    <p class="contact-form__success-text">Thank you for getting in touch. I'll get back to you as soon as possible.</p>
+    <button type="button" class="contact-form__close-button focusable" onclick="this.closest('dialog')?.close()">Close</button>
+  </div>
+
   <div class="contact-form__actions">
     <button type="button" class="contact-form__nav-button contact-form__nav-button--prev focusable" data-prev-button style="display: none;">Previous</button>
     <button type="button" class="contact-form__nav-button contact-form__nav-button--next focusable" data-next-button>Next</button>
@@ -264,6 +277,54 @@ const subjectOptions = [
 
   .contact-form__messages {
     margin-top: var(--spacing-md);
+  }
+
+  .contact-form__success-message {
+    display: none; /* Initially hidden */
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: var(--spacing-xl) 0;
+    animation: fade-in 0.5s ease;
+    min-height: 350px;
+    justify-content: center;
+  }
+
+  .contact-form__success-icon {
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .contact-form__success-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .contact-form__success-text {
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    max-width: 45ch;
+    margin-bottom: var(--spacing-lg);
+    line-height: 1.6;
+  }
+
+  .contact-form__close-button {
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    padding: var(--spacing-sm) var(--spacing-xl);
+    border-radius: 2px;
+    font-family: var(--font-heading);
+    font-size: var(--text-base);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .contact-form__close-button:hover {
+    background: var(--color-primary-hover);
   }
 
   /* Privacy consent styling */
@@ -519,6 +580,10 @@ const subjectOptions = [
     private steps: HTMLElement[];
     private currentStep = 1;
     private totalSteps: number;
+    private successMessage: HTMLElement;
+    private formStepsContainer: HTMLElement;
+    private formActions: HTMLElement;
+    private formProgress: HTMLElement;
 
     private formSteps: Record<number, string[]> = {
       1: ['name', 'email'],
@@ -537,10 +602,24 @@ const subjectOptions = [
       this.progressBar = this.form.querySelector('[data-progress-bar]') as HTMLElement;
       this.steps = Array.from(this.form.querySelectorAll('[data-step]'));
       this.totalSteps = this.steps.length;
+      this.successMessage = this.form.querySelector('[data-success-message]') as HTMLElement;
+      this.formStepsContainer = this.form.querySelector('[data-form-steps]') as HTMLElement;
+      this.formActions = this.form.querySelector('.contact-form__actions') as HTMLElement;
+      this.formProgress = this.form.querySelector('.contact-form__progress') as HTMLElement;
       
       this.setupFields();
       this.attachEventListeners();
       this.updateFormUI();
+
+      const dialog = this.form.closest('dialog');
+      if (dialog) {
+        dialog.addEventListener('close', () => {
+          // Use a timeout to allow the closing animation to finish before resetting
+          setTimeout(() => {
+            this.resetForm();
+          }, 300);
+        });
+      }
     }
 
     private setupFields(): void {
@@ -682,10 +761,7 @@ const subjectOptions = [
         });
         const result = await response.json();
         if (response.ok && result.success) {
-          this.showSuccessMessage(result.message || 'Message sent successfully!');
-          this.resetForm();
-          this.form.classList.add('contact-form--success');
-          this.announceToScreenReader('Message sent successfully');
+          this.showSuccessStep();
         } else {
           if (result.errors) {
             this.displayErrors(result.errors);
@@ -701,6 +777,15 @@ const subjectOptions = [
       } finally {
         this.setSubmittingState(false);
       }
+    }
+
+    private showSuccessStep(): void {
+      if (this.formProgress) this.formProgress.style.display = 'none';
+      if (this.formStepsContainer) this.formStepsContainer.style.display = 'none';
+      if (this.formActions) this.formActions.style.display = 'none';
+      if (this.messagesContainer) this.messagesContainer.innerHTML = '';
+      if (this.successMessage) this.successMessage.style.display = 'flex';
+      this.announceToScreenReader('Message sent successfully');
     }
 
     private validateField(fieldName: string, showEagerError: boolean = false): void {
@@ -813,6 +898,12 @@ const subjectOptions = [
       this.clearAllErrors();
       this.currentStep = 1;
       this.updateFormUI();
+
+      // Also hide success message and show form again
+      if (this.successMessage) this.successMessage.style.display = 'none';
+      if (this.formProgress) this.formProgress.style.display = 'block';
+      if (this.formStepsContainer) this.formStepsContainer.style.display = '';
+      if (this.formActions) this.formActions.style.display = 'flex';
     }
 
     private announceToScreenReader(message: string): void {

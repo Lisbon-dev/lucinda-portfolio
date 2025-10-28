@@ -77,13 +77,10 @@ const homeSEO = {
           />
           <Container size="narrow">
             <div class="hero-categories">
-              {categories.map((category, index) => (
-                <>
-                  <span class="category-text">
-                    {category.name}
-                  </span>
-                  {index < categories.length - 1 && <span class="separator">|</span>}
-                </>
+              {categories.map((category) => (
+                <span class="category-text">
+                  {category.name}
+                </span>
               ))}
             </div>
           </Container>
@@ -249,6 +246,9 @@ const homeSEO = {
     letter-spacing: var(--tracking-wide);
     color: var(--color-text-primary);
     opacity: 0.8;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
   }
   
   .category-text {
@@ -257,22 +257,18 @@ const homeSEO = {
     white-space: nowrap; /* Prevent category names from breaking across lines */
   }
 
-  .separator {
-    margin: 0 0.05em;
+  .category-text:not(:last-child)::after {
+    content: '|';
     user-select: none;
+    margin-left: 0.5em;
+    position: relative;
+    top: -0.05em; /* Helps vertically align the separator with the text */
   }
 
   @media (max-width: 480px) {
     .hero-categories {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .separator {
-      display: none;
-    }
-    .category-text {
-      padding: 0.2em 0.5em;
+      /* Adjust font size for better responsiveness on small screens */
+      font-size: clamp(0.8rem, 3vw, 1rem);
     }
   }
 
