@@ -43,6 +43,20 @@ const formats = [
     </p>
   </video>
   
+  <!-- Play/Pause UI Indicator -->
+  <div class="video-overlay" aria-hidden="true">
+    <div class="video-icon video-icon--play">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 5V19L19 12L8 5Z" fill="currentColor"/>
+      </svg>
+    </div>
+    <div class="video-icon video-icon--pause">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6 19H10V5H6V19ZM14 5V19H18V5H14Z" fill="currentColor"/>
+      </svg>
+    </div>
+  </div>
+  
   <!-- Screen reader description -->
   <span class="sr-only">{alt}</span>
 </div>
@@ -92,6 +106,11 @@ const formats = [
 
     setupVideoEventListeners(video: HTMLVideoElement) {
       const cleanupFunctions = this.eventCleanupFunctions.get(video) || [];
+      const container = video.closest('.video-container') as HTMLElement;
+      if (!container) return;
+
+      // Set initial state
+      container.classList.add('is-paused');
 
       // Loadstart handler
       const handleLoadStart = () => video.classList.add('loading');
@@ -126,6 +145,8 @@ const formats = [
 
       // Simplified pause handler - no automatic retry
       const handlePause = () => {
+        container.classList.add('is-paused');
+        container.classList.remove('is-playing');
         // Only log, don't automatically retry to prevent loops
         if (video.dataset.shouldPlay === 'true' && !video.dataset.userPaused) {
           console.log('Video paused unexpectedly, user can tap to resume');
@@ -136,6 +157,8 @@ const formats = [
 
       // Play handler
       const handlePlay = () => {
+        container.classList.add('is-playing');
+        container.classList.remove('is-paused');
         video.dataset.shouldPlay = 'true';
         video.dataset.userPaused = 'false';
         this.playAttempts.delete(video);
@@ -411,6 +434,42 @@ const formats = [
     position: relative;
     width: 100%;
     overflow: hidden;
+  }
+
+  .video-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transition: opacity var(--transition-normal, 0.3s ease);
+    pointer-events: none;
+  }
+
+  .video-container.is-paused .video-overlay,
+  .video-container:hover .video-overlay {
+    opacity: 1;
+  }
+
+  .video-icon {
+    display: none;
+    color: white;
+    width: 48px;
+    height: 48px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+  }
+
+  .video-container.is-paused .video-icon--play {
+    display: block;
+  }
+
+  .video-container.is-playing:hover .video-icon--pause {
+    display: block;
   }
 
   .video-container[style*="cursor: pointer"] {
