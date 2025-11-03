@@ -106,6 +106,7 @@ const { id, class: className, contentAlign = "center" } = Astro.props;
     overscroll-behavior: contain; /* Prevent scroll chaining */
     -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
     scroll-behavior: smooth;
+    padding: var(--spacing-lg, 3.75rem);
     
     /* Content animation */
     transform: translateY(10px);
@@ -117,24 +118,12 @@ const { id, class: className, contentAlign = "center" } = Astro.props;
     justify-content: flex-start;
   }
   
-  /* Add inner container to preserve padding when scrolling */
-  .content-area::before {
-    content: "";
-    display: block;
-    padding-top: var(--spacing-lg, 3.75rem);
-  }
-  
-  .content-area::after {
-    content: "";
-    display: block;
-    padding-bottom: var(--spacing-lg, 3.75rem);
-  }
-  
+  /* Ensure content is centered within the area */
   .content-area > :global(*) {
-    padding-left: var(--spacing-lg, 3.75rem);
-    padding-right: var(--spacing-lg, 3.75rem);
     text-align: center;
     width: 100%;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .simple-dialog[open] .content-area {
@@ -159,33 +148,19 @@ const { id, class: className, contentAlign = "center" } = Astro.props;
       background: rgba(0, 0, 0, 0.6);
       backdrop-filter: blur(5px);
     }
-
-    .content-area {
-      padding: var(--spacing-sm);
-    }
   }
 
   /* Large desktop refinements */
   @media (min-width: 1024px) {
-    .content-area > :global(*) {
-      padding-left: 12.1875rem; /* 195px */
-      padding-right: 12.1875rem; /* 195px */
+    .content-area {
+      padding: 12.1875rem; /* 195px */
     }
   }
 
   /* Improve responsiveness on short viewports */
   @media (max-height: 600px) {
-    .content-area::before {
-      padding-top: var(--spacing-xl, 2.5rem); /* Keep some top space for close button */
-    }
-    
-    .content-area::after {
-      padding-bottom: var(--spacing-lg, 2.5rem);
-    }
-    
-    .content-area > :global(*) {
-      padding-left: var(--spacing-lg, 2.5rem);
-      padding-right: var(--spacing-lg, 2.5rem);
+    .content-area {
+      padding: var(--spacing-xl, 2.5rem) var(--spacing-lg, 2.5rem) var(--spacing-lg, 2.5rem);
     }
     .dialog-close {
       top: var(--spacing-sm, 1rem);
