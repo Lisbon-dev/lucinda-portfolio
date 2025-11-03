@@ -149,7 +149,6 @@ const formats = [
         container.classList.remove('is-playing');
         // Only log, don't automatically retry to prevent loops
         if (video.dataset.shouldPlay === 'true' && !video.dataset.userPaused) {
-          console.log('Video paused unexpectedly, user can tap to resume');
         }
       };
       video.addEventListener('pause', handlePause);
@@ -177,7 +176,6 @@ const formats = [
       const attempts = this.playAttempts.get(video) || 0;
       
       if (attempts >= this.MAX_PLAY_ATTEMPTS) {
-        console.log('Max play attempts reached for video, stopping retries');
         return;
       }
 
@@ -337,7 +335,6 @@ const formats = [
       
       // Check if we've exceeded max attempts
       if (attempts >= this.MAX_PLAY_ATTEMPTS) {
-        console.log('Max play attempts reached, stopping video play attempts');
         return;
       }
 
@@ -366,7 +363,6 @@ const formats = [
           await playPromise;
           video.classList.remove('loading');
           video.classList.add('loaded');
-          console.log('Video playing successfully');
         }
       } catch (error: any) {
         console.warn(`Video autoplay prevented (attempt ${attempts + 1}):`, error.message);
@@ -478,11 +474,6 @@ const formats = [
 
   .video-container[style*="cursor: pointer"]:hover {
     opacity: 0.9;
-  }
-
-  .video-container[style*="cursor: pointer"]:focus {
-    outline: 2px solid var(--color-primary, #007acc);
-    outline-offset: 2px;
   }
 
   .optimized-video {

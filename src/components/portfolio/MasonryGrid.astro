@@ -285,16 +285,6 @@ const processedCategories = new Set();
   }
 
   /* Focus management for accessibility */
-  :global(.masonry-item):focus-within {
-  }
-
-  .project-link:focus {
-  }
-
-  :global(.masonry-item) .project-link:focus .overlay {
-    opacity: 1;
-    visibility: visible;
-  }
 
   /* Accessibility: Respect reduced motion preferences */
   @media (prefers-reduced-motion: reduce) {
@@ -334,19 +324,15 @@ const processedCategories = new Set();
 <!-- MasonryAnimations.js integration - handles all loading, scrolling, and animations -->
 
 <script>
-  console.log('🚀 MasonryGrid script is executing...');
-  
   let isInitialized = false;
   let masonryAnimations = null;
   
   async function initializeMasonryGrid() {
     // Prevent duplicate initialization
     if (isInitialized) {
-      console.log('🔄 MasonryGrid already initialized, skipping...');
       return;
     }
     
-    console.log('🎯 Initializing MasonryGrid...');
     isInitialized = true;
     
     // Get the unique container ID
@@ -364,7 +350,6 @@ const processedCategories = new Set();
       const { MasonryAnimations } = await import('/src/scripts/masonryAnimations.js');
       masonryAnimations = new MasonryAnimations(uniqueId);
       
-      console.log('✅ MasonryAnimations initialized successfully');
     } catch (error) {
       console.error('💥 Failed to initialize MasonryAnimations:', error);
       applyFallbackVisibility();
@@ -383,12 +368,9 @@ const processedCategories = new Set();
   
   // Handle view transitions
   document.addEventListener('astro:after-swap', () => {
-    console.log('🔄 MasonryGrid: Handling view transition');
-    
     // Check if we're navigating to a page with masonry grid
     const container = document.querySelector('.masonry-container');
     if (!container) {
-      console.log('🔄 MasonryGrid: No masonry container found, skipping initialization');
       return;
     }
 
@@ -437,12 +419,10 @@ const processedCategories = new Set();
   }
   
   function applyFallbackVisibility() {
-    console.log('🔄 Applying fallback visibility...');
     const items = document.querySelectorAll('.masonry-item');
     items.forEach(item => {
       item.style.opacity = '1';
       item.style.transform = 'none';
     });
-    console.log('✅ Fallback applied to', items.length, 'items');
   }
 </script>

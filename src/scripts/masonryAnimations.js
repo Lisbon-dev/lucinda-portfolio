@@ -3,9 +3,6 @@
 
 import { animate, inView } from 'motion';
 
-// Debug Motion.js availability
-console.log('Motion.js imports available:', { animate, inView });
-
 export class MasonryAnimations {
   constructor(containerId) {
     this.containerId = containerId;
@@ -42,8 +39,6 @@ export class MasonryAnimations {
       console.warn('MasonryAnimations: .astro-masonry-grid not found within container');
       return;
     }
-
-    console.log('MasonryAnimations: Setting up animations for container:', this.containerId);
 
     // Setup image loading tracking
     this.setupImageLoading();
@@ -102,7 +97,6 @@ export class MasonryAnimations {
     return inView(
       element,
       () => {
-        console.log(`MasonryAnimations: Scroll reveal triggered for lazy item ${index}`);
         if (!element.dataset.motionRevealed) {
           this.createRevealAnimation(element, isLowEndDevice ? index * 0.05 : index * 0.1);
           element.dataset.motionRevealed = 'true';
@@ -118,11 +112,8 @@ export class MasonryAnimations {
     const totalImages = this.masonryContainer.querySelectorAll('.masonry-image').length;
     const eagerImages = Math.min(3, totalImages);
     
-    console.log(`MasonryAnimations: Found ${totalImages} images, ${eagerImages} eager images expected`);
-
     // Use custom events instead of global functions for better reliability
     const updateLoadingProgress = (progress) => {
-      console.log(`MasonryAnimations: Updating progress to ${progress}%`);
       document.dispatchEvent(new CustomEvent('updateLoadingProgress', { 
         detail: { progress } 
       }));
@@ -139,7 +130,6 @@ export class MasonryAnimations {
       
       if (isEager) {
         this.eagerImagesLoaded++;
-        console.log(`MasonryAnimations: Eager image ${this.eagerImagesLoaded}/${eagerImages} loaded`);
         
         const progress = Math.min(100, (this.eagerImagesLoaded / eagerImages) * 100);
         updateLoadingProgress(progress);
@@ -156,7 +146,6 @@ export class MasonryAnimations {
     images.forEach((img, index) => {
       const isEager = img.loading === 'eager';
       if (img.complete && img.naturalWidth > 0) {
-        console.log(`MasonryAnimations: Image ${index} already loaded (cached)`);
         handleImageLoad(img, isEager);
       }
     });
@@ -173,7 +162,6 @@ export class MasonryAnimations {
 
   initializeEagerAnimations() {
     this.animationsInitialized = true;
-    console.log('MasonryAnimations: Initializing eager item animations');
     
     // Update progress to 100%
     document.dispatchEvent(new CustomEvent('updateLoadingProgress', { 
@@ -183,7 +171,6 @@ export class MasonryAnimations {
     setTimeout(() => {
       // Reveal ONLY eager items immediately with Motion.js
       const eagerItems = this.masonryContainer.querySelectorAll('.masonry-item:not([data-lazy="true"])');
-      console.log(`MasonryAnimations: Revealing ${eagerItems.length} eager items`);
       
       eagerItems.forEach((item, index) => {
         if (!item.dataset.motionRevealed) {
@@ -202,8 +189,6 @@ export class MasonryAnimations {
         }
       });
 
-      console.log(`MasonryAnimations: ${lazyItems.length} lazy items kept hidden for scroll reveal`);
-      
       // Setup scroll-based reveal for lazy items
       this.setupScrollRevealsForLazyItems();
     }, 100);
@@ -216,14 +201,12 @@ export class MasonryAnimations {
 
   setupScrollRevealsForLazyItems() {
     const lazyItems = this.masonryContainer.querySelectorAll('.masonry-item[data-lazy="true"]');
-    console.log(`MasonryAnimations: Setting up scroll reveals for ${lazyItems.length} lazy items`);
     
     lazyItems.forEach((item, index) => {
       if (!item.dataset.scrollRevealSetup) {
         const cleanup = this.setupScrollReveal(item, index);
         this.revealCleanups.push(cleanup);
         item.dataset.scrollRevealSetup = 'true';
-        console.log(`MasonryAnimations: Scroll reveal setup for lazy item ${index}`);
       }
     });
   }
@@ -235,8 +218,6 @@ export class MasonryAnimations {
     
     // Listen for loading complete event from overlay
     const handleLoadingComplete = () => {
-      console.log('MasonryAnimations: Loading complete event received');
-      
       // Ensure content is visible and animations can start
       if (!this.animationsInitialized) {
         this.initializeFallbackAnimations();
@@ -268,7 +249,6 @@ export class MasonryAnimations {
   }
 
   initializeFallbackAnimations() {
-    console.log('MasonryAnimations: Initializing fallback animations after loading complete');
     this.animationsInitialized = true;
     
     setTimeout(() => {
@@ -327,8 +307,6 @@ export class MasonryAnimations {
 
     // Handle Astro view transitions
     const handleAfterSwap = () => {
-      console.log('MasonryAnimations: View transition completed, reinitializing animations');
-      
       // Reset state for new page
       this.animationsInitialized = false;
       this.eagerImagesLoaded = 0;
@@ -342,7 +320,6 @@ export class MasonryAnimations {
         if (this.masonryContainer) {
           // Reset loading overlay state
           if (window.updateLoadingProgress) {
-            console.log('MasonryAnimations: Resetting loading progress to 0%');
             window.updateLoadingProgress(0);
           }
           
@@ -375,8 +352,6 @@ export class MasonryAnimations {
 
     // Handle page preparation (before transition starts)
     const handleBeforePreparation = () => {
-      console.log('MasonryAnimations: Preparing for view transition');
-      
       // Clean up current page animations
       this.revealCleanups.forEach(cleanup => {
         try {
