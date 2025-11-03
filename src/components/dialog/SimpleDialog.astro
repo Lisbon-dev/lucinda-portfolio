@@ -97,10 +97,8 @@ const { id, class: className } = Astro.props;
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center; /* Align content to top for scrolling */
+    justify-content: flex-start; /* Changed from center to flex-start */
     align-items: center;
-    padding: var(--spacing-lg, 3.75rem);
-    text-align: center;
     max-width: 100%;
     box-sizing: border-box;
     overflow-y: auto; /* Allow content area to scroll */
@@ -111,6 +109,26 @@ const { id, class: className } = Astro.props;
     /* Content animation */
     transform: translateY(10px);
     transition: transform var(--modal-transition-duration) var(--modal-transition-easing);
+  }
+  
+  /* Add inner container to preserve padding when scrolling */
+  .content-area::before {
+    content: "";
+    display: block;
+    padding-top: var(--spacing-lg, 3.75rem);
+  }
+  
+  .content-area::after {
+    content: "";
+    display: block;
+    padding-bottom: var(--spacing-lg, 3.75rem);
+  }
+  
+  .content-area > :global(*) {
+    padding-left: var(--spacing-lg, 3.75rem);
+    padding-right: var(--spacing-lg, 3.75rem);
+    text-align: center;
+    width: 100%;
   }
 
   .simple-dialog[open] .content-area {
@@ -143,16 +161,33 @@ const { id, class: className } = Astro.props;
 
   /* Large desktop refinements */
   @media (min-width: 1024px) {
-    .content-area {
-      padding: 12.1875rem; /* 195px */
+    .content-area::before {
+      padding-top: 12.1875rem; /* 195px */
+    }
+    
+    .content-area::after {
+      padding-bottom: 12.1875rem; /* 195px */
+    }
+    
+    .content-area > :global(*) {
+      padding-left: 12.1875rem; /* 195px */
+      padding-right: 12.1875rem; /* 195px */
     }
   }
 
   /* Improve responsiveness on short viewports */
   @media (max-height: 600px) {
-    .content-area {
+    .content-area::before {
       padding-top: var(--spacing-xl, 2.5rem); /* Keep some top space for close button */
+    }
+    
+    .content-area::after {
       padding-bottom: var(--spacing-lg, 2.5rem);
+    }
+    
+    .content-area > :global(*) {
+      padding-left: var(--spacing-lg, 2.5rem);
+      padding-right: var(--spacing-lg, 2.5rem);
     }
     .dialog-close {
       top: var(--spacing-sm, 1rem);
