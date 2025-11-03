@@ -105,6 +105,8 @@ const { id, class: className } = Astro.props;
     box-sizing: border-box;
     overflow-y: auto; /* Allow content area to scroll */
     overscroll-behavior: contain; /* Prevent scroll chaining */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    scroll-behavior: smooth;
     
     /* Content animation */
     transform: translateY(10px);
@@ -255,11 +257,22 @@ const { id, class: className } = Astro.props;
         const isOpen = dialog.hasAttribute('open');
         
         if (isOpen) {
+          // Save current scroll position
+          const scrollY = window.scrollY;
+          document.body.style.top = `-${scrollY}px`;
+          
           document.documentElement.classList.add('dialog-is-open');
           document.body.classList.add('dialog-is-open');
         } else {
+          // Restore body scroll position when dialog closes
+          const scrollY = document.body.style.top;
           document.documentElement.classList.remove('dialog-is-open');
           document.body.classList.remove('dialog-is-open');
+          document.body.style.position = '';
+          document.body.style.top = '';
+          document.body.style.width = '';
+          document.body.style.height = '';
+          window.scrollTo(0, parseInt(scrollY || '0') * -1);
         }
 
         // When dialog opens, focus the close button
@@ -296,6 +309,69 @@ const { id, class: className } = Astro.props;
           trigger.dataset.listenerAttached = 'true';
         }
       });
+      
+      // Add scroll event handling
+      const contentArea = dialog.querySelector('.content-area');
+      if (contentArea) {
+        // Handle wheel events
+        dialog.addEventListener('wheel', (event) => {
+          if (dialog.hasAttribute('open')) {
+            // Check if we're at the top or bottom of scroll
+            const atTop = contentArea.scrollTop === 0;
+            const atBottom = contentArea.scrollHeight - contentArea.scrollTop <= contentArea.clientHeight + 1;
+            
+            // Only prevent default if we're not at the boundaries or scrolling in the "bounce" direction
+            if (!(atTop && event.deltaY < 0) && !(atBottom && event.deltaY > 0)) {
+              event.preventDefault();
+              
+              // Manually scroll the content area
+              contentArea.scrollTop += event.deltaY;
+            }
+          }
+        }, { passive: false });
+        
+        // Handle keyboard navigation within dialog
+        dialog.addEventListener('keydown', (event) => {
+          if (dialog.hasAttribute('open')) {
+            // Handle arrow keys, page up/down, etc.
+            switch (event.key) {
+              case 'ArrowDown':
+                event.preventDefault();
+                contentArea.scrollTop += 30;
+                break;
+              case 'ArrowUp':
+                event.preventDefault();
+                contentArea.scrollTop -= 30;
+                break;
+              case 'PageDown':
+                event.preventDefault();
+                contentArea.scrollTop += contentArea.clientHeight * 0.9;
+                break;
+              case 'PageUp':
+                event.preventDefault();
+                contentArea.scrollTop -= contentArea.clientHeight * 0.9;
+                break;
+              case 'Home':
+                event.preventDefault();
+                contentArea.scrollTop = 0;
+                break;
+              case 'End':
+                event.preventDefault();
+                contentArea.scrollTop = contentArea.scrollHeight;
+                break;
+            }
+          }
+        });
+        
+        // Handle touch events for mobile
+        dialog.addEventListener('touchmove', (event) => {
+          if (dialog.hasAttribute('open')) {
+            if (!contentArea.contains(event.target)) {
+              event.preventDefault(); // Prevent touch scrolling outside content area
+            }
+          }
+        }, { passive: false });
+      }
     });
   });
 </script>
