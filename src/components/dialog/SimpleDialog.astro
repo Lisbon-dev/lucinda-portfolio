@@ -2,12 +2,13 @@
 export interface Props {
   id: string;
   class?: string;
+  contentAlign?: "top" | "center";
 }
 
-const { id, class: className } = Astro.props;
+const { id, class: className, contentAlign = "center" } = Astro.props;
 ---
 
-<dialog id={id} class={`simple-dialog ${className || ""}`}>
+<dialog id={id} class={`simple-dialog ${className || ""}`} data-content-align={contentAlign}>
   <div class="dialog-content">
     <button
       type="button"
@@ -97,7 +98,7 @@ const { id, class: className } = Astro.props;
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: center; /* Default center alignment */
     align-items: center;
     max-width: 100%;
     box-sizing: border-box;
@@ -111,22 +112,27 @@ const { id, class: className } = Astro.props;
     transition: transform var(--modal-transition-duration) var(--modal-transition-easing);
   }
   
+  /* Top-aligned content */
+  .simple-dialog[data-content-align="top"] .content-area {
+    justify-content: flex-start;
+  }
+  
   /* Add inner container to preserve padding when scrolling */
   .content-area::before {
     content: "";
     display: block;
-    padding-top: var(--spacing-sm, 3.75rem);
+    padding-top: var(--spacing-lg, 3.75rem);
   }
   
   .content-area::after {
     content: "";
     display: block;
-    padding-bottom: var(--spacing-sm, 3.75rem);
+    padding-bottom: var(--spacing-lg, 3.75rem);
   }
   
   .content-area > :global(*) {
-    padding-left: var(--spacing-sm, 3.75rem);
-    padding-right: var(--spacing-sm, 3.75rem);
+    padding-left: var(--spacing-lg, 3.75rem);
+    padding-right: var(--spacing-lg, 3.75rem);
     text-align: center;
     width: 100%;
   }
