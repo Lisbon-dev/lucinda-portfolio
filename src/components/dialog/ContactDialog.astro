@@ -12,12 +12,6 @@ import ContactForm from '../forms/ContactForm.astro';
 </SimpleDialog>
 
 <style>
-  /* Make dialog scrollable on smaller viewports */
-  :global(.contact-dialog[open]) {
-    max-height: 100vh;
-    overflow-y: auto;
-  }
-
   .contact-dialog :global(.form-container) {
     width: 100%;
     max-width: 400px;
@@ -53,19 +47,9 @@ import ContactForm from '../forms/ContactForm.astro';
     .contact-dialog :global(.form-field) {
       margin-bottom: var(--spacing-sm, 1rem);
     }
+    .contact-dialog :global(h2) {
+      font-size: var(--text-xl, 1.5rem);
+    }
   }
 </style>
 
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const dialog = document.getElementById('contact-dialog');
-    if (!dialog) return;
-
-    const observer = new MutationObserver(() => {
-      const isOpen = dialog.hasAttribute('open');
-      document.body.style.overflow = isOpen ? 'hidden' : '';
-    });
-
-    observer.observe(dialog, { attributes: true, attributeFilter: ['open'] });
-  });
-</script>

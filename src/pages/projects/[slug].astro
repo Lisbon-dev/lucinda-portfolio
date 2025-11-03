@@ -108,6 +108,49 @@ const activeDotIndex = currentIndex - dotsStartIndex;
 
   <!-- Main Project Content -->
   <main class="project-page" id="top">
+    <!-- Desktop Navigation Arrows -->
+    <a
+      href={previousProjectUrl}
+      class="desktop-nav-arrow desktop-nav-arrow--prev"
+      aria-label={`Previous project: ${previousProject.data.title}`}
+      data-astro-prefetch
+    >
+      <svg
+        width="32"
+        height="32"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M15 18L9 12L15 6"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"></path>
+      </svg>
+    </a>
+    <a
+      href={nextProjectUrl}
+      class="desktop-nav-arrow desktop-nav-arrow--next"
+      aria-label={`Next project: ${nextProject.data.title}`}
+      data-astro-prefetch
+    >
+      <svg
+        width="32"
+        height="32"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M9 18L15 12L9 6"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"></path>
+      </svg>
+    </a>
     <!-- Hero Section - Match landing page exactly -->
     <BaseSection variant="hero" fullHeight={false} backgroundColor="background">
       <div class="hero-container">
@@ -130,6 +173,7 @@ const activeDotIndex = currentIndex - dotsStartIndex;
               href={previousProjectUrl}
               class="touch-nav-arrow touch-nav-arrow--prev"
               aria-label={`Previous project: ${previousProject.data.title}`}
+              data-astro-prefetch
             >
               <svg
                 width="32"
@@ -150,6 +194,7 @@ const activeDotIndex = currentIndex - dotsStartIndex;
               href={nextProjectUrl}
               class="touch-nav-arrow touch-nav-arrow--next"
               aria-label={`Next project: ${nextProject.data.title}`}
+              data-astro-prefetch
             >
               <svg
                 width="32"
@@ -264,6 +309,7 @@ const activeDotIndex = currentIndex - dotsStartIndex;
             href={previousProjectUrl}
             class="touch-nav-arrow touch-nav-arrow--prev"
             aria-label={`Previous project: ${previousProject.data.title}`}
+            data-astro-prefetch
           >
             <svg
               width="32"
@@ -284,6 +330,7 @@ const activeDotIndex = currentIndex - dotsStartIndex;
             href={nextProjectUrl}
             class="touch-nav-arrow touch-nav-arrow--next"
             aria-label={`Next project: ${nextProject.data.title}`}
+            data-astro-prefetch
           >
             <svg
               width="32"
@@ -382,7 +429,7 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     --project-hero-padding-top: max(11.2vh, 110px); /* 110px / 982px */
 
     /* Navigation Arrow Positioning */
-    --nav-arrow-inset-base: -15vw; /* Distance from container edge */
+    --nav-arrow-inset-desktop: 5vw; /* Distance from viewport edge */
     --nav-arrow-size: 32px;
     --nav-arrow-size-mobile: 24px;
 
@@ -545,6 +592,36 @@ const activeDotIndex = currentIndex - dotsStartIndex;
 
   .touch-nav-arrow--next {
     margin-left: var(--spacing-md);
+  }
+
+  /* ============================================
+     DESKTOP NAVIGATION ARROWS
+     ============================================ */
+  .desktop-nav-arrow {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    opacity: 0.7;
+    transition:
+      opacity var(--transition-normal),
+      color var(--transition-normal);
+    display: none; /* Hidden on mobile by default */
+  }
+
+  .desktop-nav-arrow:hover {
+    opacity: 1;
+    color: var(--color-text-primary);
+  }
+
+  .desktop-nav-arrow--prev {
+    left: var(--nav-arrow-inset-desktop);
+  }
+
+  .desktop-nav-arrow--next {
+    right: var(--nav-arrow-inset-desktop);
   }
 
   /* ============================================
@@ -730,10 +807,17 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     }
   }
 
+  @media (min-width: 1024px) {
+    .desktop-nav-arrow {
+      display: block;
+    }
+  }
+
   /* ============================================
      ACCESSIBILITY
      ============================================ */
   @media (prefers-reduced-motion: reduce) {
+    .desktop-nav-arrow,
     .touch-nav-arrow,
     .home-link {
       transition: none;
@@ -741,10 +825,12 @@ const activeDotIndex = currentIndex - dotsStartIndex;
   }
 
   @media (prefers-contrast: high) {
+    .desktop-nav-arrow,
     .touch-nav-arrow {
       border: 2px solid transparent; /* Reserve space */
       color: ButtonText;
     }
+    .desktop-nav-arrow:focus-visible,
     .touch-nav-arrow:focus-visible {
       border-color: ButtonText;
     }

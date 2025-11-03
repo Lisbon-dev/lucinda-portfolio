@@ -115,18 +115,18 @@ const { id, class: className } = Astro.props;
   .content-area::before {
     content: "";
     display: block;
-    padding-top: var(--spacing-lg, 3.75rem);
+    padding-top: var(--spacing-sm, 3.75rem);
   }
   
   .content-area::after {
     content: "";
     display: block;
-    padding-bottom: var(--spacing-lg, 3.75rem);
+    padding-bottom: var(--spacing-sm, 3.75rem);
   }
   
   .content-area > :global(*) {
-    padding-left: var(--spacing-lg, 3.75rem);
-    padding-right: var(--spacing-lg, 3.75rem);
+    padding-left: var(--spacing-sm, 3.75rem);
+    padding-right: var(--spacing-sm, 3.75rem);
     text-align: center;
     width: 100%;
   }
@@ -155,20 +155,12 @@ const { id, class: className } = Astro.props;
     }
 
     .content-area {
-      padding: var(--spacing-2xl, 5rem);
+      padding: var(--spacing-sm);
     }
   }
 
   /* Large desktop refinements */
   @media (min-width: 1024px) {
-    .content-area::before {
-      padding-top: 12.1875rem; /* 195px */
-    }
-    
-    .content-area::after {
-      padding-bottom: 12.1875rem; /* 195px */
-    }
-    
     .content-area > :global(*) {
       padding-left: 12.1875rem; /* 195px */
       padding-right: 12.1875rem; /* 195px */
@@ -225,7 +217,6 @@ const { id, class: className } = Astro.props;
     line-height: var(--leading-relaxed, 1.625);
     letter-spacing: var(--tracking-wider);
     margin-bottom: var(--spacing-md, 1.5rem);
-    max-width: 65ch;
   }
 
   .content-area :global(p:last-child) {
