@@ -73,13 +73,12 @@ const { id, class: className } = Astro.props;
     display: flex;
     flex-direction: column;
     position: relative;
-    overflow-y: auto;
   }
 
   .dialog-close {
     position: absolute;
-    top: var(--spacing-sm, 2.5rem);
-    right: var(--spacing-sm, 2.5rem);
+    top: var(--spacing-md, 1.5rem);
+    right: var(--spacing-md, 1.5rem);
     background: none;
     border: none;
     color: var(--color-text-primary, #000000);
@@ -93,20 +92,19 @@ const { id, class: className } = Astro.props;
     transition: color var(--transition-fast, 0.2s ease);
   }
 
-  .dialog-close:hover {
-    color: var(--color-primary, #325c59);
-  }
 
   .content-area {
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: center; /* Align content to top for scrolling */
     align-items: center;
     padding: var(--spacing-lg, 3.75rem);
     text-align: center;
     max-width: 100%;
     box-sizing: border-box;
+    overflow-y: auto; /* Allow content area to scroll */
+    overscroll-behavior: contain; /* Prevent scroll chaining */
     
     /* Content animation */
     transform: translateY(10px);
@@ -123,7 +121,8 @@ const { id, class: className } = Astro.props;
       position: fixed;
       inset: 0;
       margin: auto;
-      width: 50vw;
+      width: 63.3vw; /* Based on 957px width on 1512px viewport */
+      max-width: 957px;
       height: 100vh;
       min-width: 400px;
       border-radius: 0;
@@ -149,15 +148,30 @@ const { id, class: className } = Astro.props;
   /* Large desktop refinements */
   @media (min-width: 1024px) {
     .content-area {
-      padding: 4rem 3rem;
+      padding: 12.1875rem; /* 195px */
     }
   }
 
   /* Improve responsiveness on short viewports */
   @media (max-height: 600px) {
     .content-area {
-      padding-top: var(--spacing-md, 1.5rem);
-      padding-bottom: var(--spacing-md, 1.5rem);
+      padding-top: var(--spacing-xl, 2.5rem); /* Keep some top space for close button */
+      padding-bottom: var(--spacing-lg, 2.5rem);
+    }
+    .dialog-close {
+      top: var(--spacing-sm, 1rem);
+      right: var(--spacing-sm, 1rem);
+    }
+    .content-area :global(h2) {
+      font-size: var(--text-xl, 1.5rem);
+      margin-top: var(--spacing-md, 1.5rem);
+    }
+    .content-area :global(p) {
+      font-size: var(--text-sm, 0.875rem);
+      line-height: var(--leading-normal, 1.5);
+    }
+    .content-area :global(.contact-info) {
+      margin-top: var(--spacing-md, 1.5rem);
     }
   }
 
@@ -165,7 +179,7 @@ const { id, class: className } = Astro.props;
   .content-area :global(h2) {
     font-family: var(--font-heading, serif);
     font-size: var(--text-2xl, 2rem);
-    font-weight: 400;
+    font-weight: 300;
     color: var(--color-text-primary, #000000);
     line-height: var(--leading-tight, 1.25);
     letter-spacing: var(--tracking-wide, 0.05em);
@@ -175,9 +189,10 @@ const { id, class: className } = Astro.props;
   .content-area :global(p) {
     font-family: var(--font-sub-heading, serif);
     font-size: var(--text-base, 1rem);
-    font-weight: 400;
+    font-weight: 300;
     color: var(--color-text-primary, #000000);
     line-height: var(--leading-relaxed, 1.625);
+    letter-spacing: var(--tracking-wider);
     margin-bottom: var(--spacing-md, 1.5rem);
     max-width: 65ch;
   }
@@ -236,20 +251,34 @@ const { id, class: className } = Astro.props;
 </style>
 
 <script>
-  // Enhance accessibility for dialog
+  // Enhance accessibility and functionality for dialogs
   document.addEventListener("DOMContentLoaded", () => {
     const dialogs = document.querySelectorAll(".simple-dialog");
 
     dialogs.forEach((dialog) => {
-      // Focus the close button when dialog opens
-      dialog.addEventListener("show", () => {
-        setTimeout(() => {
-          const closeButton = dialog.querySelector(".dialog-close") as HTMLButtonElement;
-          if (closeButton) {
-            closeButton.focus();
-          }
-        }, 100);
+      // Observer for open/close state changes
+      const observer = new MutationObserver(() => {
+        const isOpen = dialog.hasAttribute('open');
+        
+        if (isOpen) {
+          document.documentElement.classList.add('dialog-is-open');
+          document.body.classList.add('dialog-is-open');
+        } else {
+          document.documentElement.classList.remove('dialog-is-open');
+          document.body.classList.remove('dialog-is-open');
+        }
+
+        // When dialog opens, focus the close button
+        if (isOpen) {
+          setTimeout(() => {
+            const closeButton = dialog.querySelector(".dialog-close") as HTMLButtonElement;
+            if (closeButton) {
+              closeButton.focus();
+            }
+          }, 100); // Timeout to allow for transition
+        }
       });
+      observer.observe(dialog, { attributes: true, attributeFilter: ['open'] });
 
       // Handle dialog triggers that are inside this dialog
       const triggers = dialog.querySelectorAll('[data-dialog-trigger]');
