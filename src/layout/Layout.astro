@@ -613,6 +613,12 @@ const organizationSchema = {
 
   /* Focus Management */
   .focusable:focus {
+    outline: none;
+  }
+  
+  /* Remove focus outlines for all interactive elements */
+  a:focus, button:focus, [role="button"]:focus, input:focus, select:focus, textarea:focus {
+    outline: none;
   }
 
   /* Performance-Optimized Font Loading */
