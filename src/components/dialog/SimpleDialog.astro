@@ -127,12 +127,6 @@ const { id, class: className } = Astro.props;
       min-width: 400px;
       border-radius: 0;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    /* Initial hidden state */
-    opacity: 0;
-    transform: scale(0.95);
-    transition: 
-      opacity var(--modal-transition-duration) var(--modal-transition-easing),
-      transform var(--modal-transition-duration) var(--modal-transition-easing);
     }
 
     .simple-dialog[open]::backdrop {
