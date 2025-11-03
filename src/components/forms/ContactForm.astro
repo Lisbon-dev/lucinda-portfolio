@@ -24,7 +24,6 @@ const subjectOptions = [
   <div class="contact-form__steps" data-form-steps>
     <!-- Step 1: Name and Email -->
     <div class="contact-form__step active" data-step="1">
-      <h3 class="contact-form__step-title">About You</h3>
       <FormField
         type="text"
         name="name"
@@ -45,7 +44,6 @@ const subjectOptions = [
 
     <!-- Step 2: Subject and Message -->
     <div class="contact-form__step" data-step="2">
-      <h3 class="contact-form__step-title">The Details</h3>
       <FormField
         type="select"
         name="subject"
@@ -63,15 +61,11 @@ const subjectOptions = [
         rows={6}
         validation="minLength:10,maxLength:1000"
       >
-        <div slot="help">
-          Share details about your project, timeline, and any specific requirements.
-        </div>
       </FormField>
     </div>
 
     <!-- Step 3: Privacy and Submit -->
     <div class="contact-form__step" data-step="3">
-      <h3 class="contact-form__step-title">Legal</h3>
       <div class="privacy-consent">
         <label class="privacy-consent__label">
           <input 
@@ -193,10 +187,15 @@ const subjectOptions = [
 
   .contact-form__actions {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
+    align-items: center;
     gap: var(--spacing-md);
     margin-top: auto;
     padding-top: var(--spacing-lg);
+  }
+
+  .contact-form__actions.is-first-step {
+    justify-content: center;
   }
 
   .contact-form__nav-button {
@@ -680,6 +679,13 @@ const subjectOptions = [
       this.prevButton.style.display = this.currentStep > 1 ? 'inline-flex' : 'none';
       this.nextButton.style.display = this.currentStep < this.totalSteps ? 'inline-flex' : 'none';
       this.submitButton.style.display = this.currentStep === this.totalSteps ? 'inline-flex' : 'none';
+
+      // Add class to center button on first step
+      if (this.currentStep === 1) {
+        this.formActions.classList.add('is-first-step');
+      } else {
+        this.formActions.classList.remove('is-first-step');
+      }
     }
 
     private validateCurrentStep(): boolean {

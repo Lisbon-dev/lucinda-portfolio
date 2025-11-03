@@ -16,7 +16,10 @@ export async function getStaticPaths() {
     const orderA = a.data.order ?? 999;
     const orderB = b.data.order ?? 999;
     if (orderA !== orderB) return orderA - orderB;
-    return new Date(b.data.publishedDate).getTime() - new Date(a.data.publishedDate).getTime();
+    return (
+      new Date(b.data.publishedDate).getTime() -
+      new Date(a.data.publishedDate).getTime()
+    );
   });
 
   return sortedProjects.map((project) => ({
@@ -33,18 +36,29 @@ const { project } = Astro.props;
 
 // Generate SEO data for this project
 const projectSEO = {
-  title: project.data.seo?.title || `${project.data.title} - ${project.data.category} by Lucinda Burman`,
-  description: project.data.seo?.description || `${project.data.description} ${project.data.category} project by Lucinda Burman, featuring ${project.data.tags?.join(", ") || "creative design"}.`,
-  keywords: project.data.seo?.keywords || [
-    ...project.data.tags || [],
-    project.data.category,
-    "editorial illustration",
-    "creative design",
-    project.data.client ? `${project.data.client} project` : "portfolio project"
-  ].filter(Boolean),
+  title:
+    project.data.seo?.title ||
+    `${project.data.title} - ${project.data.category} by Lucinda Burman`,
+  description:
+    project.data.seo?.description ||
+    `${project.data.description} ${project.data.category} project by Lucinda Burman, featuring ${project.data.tags?.join(", ") || "creative design"}.`,
+  keywords:
+    project.data.seo?.keywords ||
+    [
+      ...(project.data.tags || []),
+      project.data.category,
+      "editorial illustration",
+      "creative design",
+      project.data.client
+        ? `${project.data.client} project`
+        : "portfolio project",
+    ].filter(Boolean),
   type: "article" as const,
-  image: project.data.seo?.ogImage || project.data.mainImage.src.src || project.data.mainImage.src,
-  noindex: project.data.seo?.noindex || false
+  image:
+    project.data.seo?.ogImage ||
+    project.data.mainImage.src.src ||
+    project.data.mainImage.src,
+  noindex: project.data.seo?.noindex || false,
 };
 
 // Get all projects for navigation carousel
@@ -52,7 +66,10 @@ const allProjects = (await getCollection("projects")).sort((a, b) => {
   const orderA = a.data.order ?? 999;
   const orderB = b.data.order ?? 999;
   if (orderA !== orderB) return orderA - orderB;
-  return new Date(b.data.publishedDate).getTime() - new Date(a.data.publishedDate).getTime();
+  return (
+    new Date(b.data.publishedDate).getTime() -
+    new Date(a.data.publishedDate).getTime()
+  );
 });
 const currentIndex = allProjects.findIndex((p) => p.slug === project.slug);
 const previousProject =
@@ -80,7 +97,7 @@ if (totalProjects > maxDots) {
 
 const projectsForDots = allProjects.slice(
   dotsStartIndex,
-  dotsStartIndex + numDots,
+  dotsStartIndex + numDots
 );
 const activeDotIndex = currentIndex - dotsStartIndex;
 ---
@@ -90,62 +107,52 @@ const activeDotIndex = currentIndex - dotsStartIndex;
   <Header />
 
   <!-- Main Project Content -->
-  <main
-    class="project-page"
-    id="top"
-    data-prev-url={previousProjectUrl}
-    data-next-url={nextProjectUrl}
-  >
-    <!-- Navigation Arrows positioned beside description -->
-    <nav class="project-navigation" aria-label="Project navigation">
-      <a
-        href={previousProjectUrl}
-        class="nav-arrow nav-arrow--prev"
-        aria-label={`Previous project: ${previousProject.data.title}`}
-      >
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M15 18L9 12L15 6"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"></path>
-        </svg>
-      </a>
-      <a
-        href={nextProjectUrl}
-        class="nav-arrow nav-arrow--next"
-        aria-label={`Next project: ${nextProject.data.title}`}
-      >
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M9 18L15 12L9 6"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"></path>
-        </svg>
-      </a>
-    </nav>
-
-    <!-- Hero Section - Match landing page exactly -->
-    <BaseSection
-      variant="hero"
-      fullHeight={false}
-      backgroundColor="background"
+  <main class="project-page" id="top">
+    <!-- Desktop Navigation Arrows -->
+    <a
+      href={previousProjectUrl}
+      class="desktop-nav-arrow desktop-nav-arrow--prev"
+      aria-label={`Previous project: ${previousProject.data.title}`}
+      data-astro-prefetch
     >
+      <svg
+        width="32"
+        height="32"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M15 18L9 12L15 6"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"></path>
+      </svg>
+    </a>
+    <a
+      href={nextProjectUrl}
+      class="desktop-nav-arrow desktop-nav-arrow--next"
+      aria-label={`Next project: ${nextProject.data.title}`}
+      data-astro-prefetch
+    >
+      <svg
+        width="32"
+        height="32"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M9 18L15 12L9 6"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"></path>
+      </svg>
+    </a>
+    <!-- Hero Section - Match landing page exactly -->
+    <BaseSection variant="hero" fullHeight={false} backgroundColor="background">
       <div class="hero-container">
         <header class="project-hero">
           <a href="/" class="home-link" aria-label="Go to homepage">
@@ -161,6 +168,50 @@ const activeDotIndex = currentIndex - dotsStartIndex;
       <div class="project-content-container">
         <!-- Project Description with Navigation -->
         <div class="description-with-navigation">
+          <div class="navigation">
+            <a
+              href={previousProjectUrl}
+              class="touch-nav-arrow touch-nav-arrow--prev"
+              aria-label={`Previous project: ${previousProject.data.title}`}
+              data-astro-prefetch
+            >
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M15 18L9 12L15 6"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"></path>
+              </svg>
+            </a>
+            <a
+              href={nextProjectUrl}
+              class="touch-nav-arrow touch-nav-arrow--next"
+              aria-label={`Next project: ${nextProject.data.title}`}
+              data-astro-prefetch
+            >
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M9 18L15 12L9 6"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"></path>
+              </svg>
+            </a>
+          </div>
           <div class="project-description">
             <h2 class="project-title">{project.data.title}</h2>
             <p class="project-description-text">{project.data.description}</p>
@@ -190,35 +241,35 @@ const activeDotIndex = currentIndex - dotsStartIndex;
             (() => {
               // Combine images and videos with their positions
               const mediaItems = [];
-              
+
               // Add additional images
               if (project.data.images) {
                 project.data.images.forEach((image, index) => {
                   mediaItems.push({
-                    type: 'image',
+                    type: "image",
                     data: image,
-                    position: index + 1
+                    position: index + 1,
                   });
                 });
               }
-              
+
               // Add videos at their specified positions
               if (project.data.videos) {
                 project.data.videos.forEach((video) => {
                   mediaItems.push({
-                    type: 'video',
+                    type: "video",
                     data: video,
-                    position: video.position ?? mediaItems.length + 1
+                    position: video.position ?? mediaItems.length + 1,
                   });
                 });
               }
-              
+
               // Sort by position
               mediaItems.sort((a, b) => a.position - b.position);
-              
+
               // Render sorted media items
               return mediaItems.map((item, index) => {
-                if (item.type === 'video') {
+                if (item.type === "video") {
                   return (
                     <div class="video-wrapper">
                       <OptimizedVideo
@@ -253,7 +304,50 @@ const activeDotIndex = currentIndex - dotsStartIndex;
             })()
           }
         </div>
-
+        <div class="navigation">
+          <a
+            href={previousProjectUrl}
+            class="touch-nav-arrow touch-nav-arrow--prev"
+            aria-label={`Previous project: ${previousProject.data.title}`}
+            data-astro-prefetch
+          >
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M15 18L9 12L15 6"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"></path>
+            </svg>
+          </a>
+          <a
+            href={nextProjectUrl}
+            class="touch-nav-arrow touch-nav-arrow--next"
+            aria-label={`Next project: ${nextProject.data.title}`}
+            data-astro-prefetch
+          >
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9 18L15 12L9 6"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"></path>
+            </svg>
+          </a>
+        </div>
         <!-- Back to Top Link -->
         <div class="back-to-top">
           <a href="#top" class="back-to-top-link">BACK TO TOP</a>
@@ -262,15 +356,9 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     </div>
   </main>
 
-  <!-- Mobile Swipe Hint -->
-  <div class="mobile-swipe-hint" aria-hidden="true">
-    <div class="swipe-dots">
-      {
-        projectsForDots.map((_p, index) => (
-          <span class:list={["swipe-dot", { active: index === activeDotIndex }]} />
-        ))
-      }
-    </div>
+  <!-- Project Counter for mobile -->
+  <div class="project-counter" aria-hidden="true">
+    <span>{currentIndex + 1} / {totalProjects}</span>
   </div>
 
   <!-- Dialog Modals -->
@@ -302,180 +390,6 @@ const activeDotIndex = currentIndex - dotsStartIndex;
   requestAnimationFrame(raf);
 
   document.addEventListener("DOMContentLoaded", () => {
-    try {
-      const projectPage = document.querySelector(".project-page");
-      if (!projectPage) return;
-
-      const prevUrl = projectPage.dataset.prevUrl;
-      const nextUrl = projectPage.dataset.nextUrl;
-
-      if (!prevUrl || !nextUrl) return;
-
-      // Add error handling for the entire swipe system
-      initializeSwipeNavigation(projectPage, prevUrl, nextUrl);
-    } catch (error) {
-      console.error('Failed to initialize project page:', error);
-    }
-  });
-
-  function initializeSwipeNavigation(projectPage: Element, prevUrl: string, nextUrl: string) {
-
-    // Enhanced swipe detection with zoom protection
-    let touchStartX = 0;
-    let touchEndX = 0;
-    let touchStartY = 0;
-    let touchEndY = 0;
-    let touchStartTime = 0;
-    let initialTouchCount = 0;
-    let maxTouchCount = 0;
-    let isPinching = false;
-    let lastPinchTime = 0;
-    
-    // Configuration
-    const config = {
-      swipeThreshold: 40,           // Minimum distance (px)
-      velocityThreshold: 0.3,       // Minimum speed (px/ms)
-      maxVerticalRatio: 0.5,        // Max vertical/horizontal movement ratio
-      maxDuration: 750,             // Maximum swipe duration (ms)
-      pinchCooldown: 300,           // Time after pinch before allowing swipe (ms)
-    };
-
-    projectPage.addEventListener("touchstart", (event) => {
-      const touchCount = event.touches.length;
-      initialTouchCount = touchCount;
-      maxTouchCount = touchCount;
-      
-      // Check if touch started on media element (allow zoom on media)
-      const target = event.target as Element;
-      const isMediaElement = 
-        target instanceof HTMLImageElement ||
-        target instanceof HTMLVideoElement ||
-        target.closest('.image-wrapper') !== null ||
-        target.closest('.video-wrapper') !== null;
-      
-      // For video elements, allow video controls to work but prevent swipe
-      if (target instanceof HTMLVideoElement || target.closest('video')) {
-        touchStartX = 0;
-        return;
-      }
-      
-      // For images, allow zoom gestures but prevent swipe
-      if (isMediaElement) {
-        touchStartX = 0;
-        return;
-      }
-      
-      // Reset pinch flag on new single-touch gesture
-      if (touchCount === 1) {
-        isPinching = false;
-        touchStartX = event.touches[0].clientX;
-        touchStartY = event.touches[0].clientY;
-        touchStartTime = Date.now();
-      } else {
-        // Multi-touch detected - this is a pinch/zoom gesture
-        isPinching = true;
-        lastPinchTime = Date.now();
-        touchStartX = 0;
-        touchStartY = 0;
-      }
-    }, { passive: true });
-
-    projectPage.addEventListener("touchmove", (event) => {
-      const touchCount = event.touches.length;
-      
-      // Track maximum touch count during gesture
-      if (touchCount > maxTouchCount) {
-        maxTouchCount = touchCount;
-      }
-      
-      // If we ever had multiple touches, mark as pinch
-      if (touchCount > 1 || maxTouchCount > 1) {
-        isPinching = true;
-        lastPinchTime = Date.now();
-      }
-    }, { passive: true });
-
-    projectPage.addEventListener("touchend", (event) => {
-      // Ignore if there are still touches on screen
-      if (event.touches.length > 0) {
-        return;
-      }
-      
-      const timeSincePinch = Date.now() - lastPinchTime;
-      
-      // Reject swipe if:
-      // - We detected a pinch during this gesture
-      // - We're in cooldown period after a pinch
-      // - Initial touch wasn't single-finger
-      // - We ever had multiple touches
-      // - Touch start wasn't recorded
-      if (
-        isPinching ||
-        timeSincePinch < config.pinchCooldown ||
-        initialTouchCount !== 1 ||
-        maxTouchCount > 1 ||
-        touchStartX === 0
-      ) {
-        // Reset state
-        touchStartX = 0;
-        touchStartY = 0;
-        initialTouchCount = 0;
-        maxTouchCount = 0;
-        return;
-      }
-
-      touchEndX = event.changedTouches[0].clientX;
-      touchEndY = event.changedTouches[0].clientY;
-      
-      handleSwipe();
-      
-      // Reset state
-      touchStartX = 0;
-      touchStartY = 0;
-      initialTouchCount = 0;
-      maxTouchCount = 0;
-    }, { passive: true });
-
-    function handleSwipe() {
-      const deltaX = touchEndX - touchStartX;
-      const deltaY = touchEndY - touchStartY;
-      const deltaTime = Date.now() - touchStartTime;
-      
-      const absX = Math.abs(deltaX);
-      const absY = Math.abs(deltaY);
-      
-      // Calculate velocity (px/ms)
-      const velocity = absX / deltaTime;
-      
-      // Validation checks
-      const isHorizontal = absX > absY;
-      const meetsDistanceThreshold = absX >= config.swipeThreshold;
-      const meetsVelocityThreshold = velocity >= config.velocityThreshold;
-      const verticalRatio = absY / (absX || 1);
-      const isNotTooVertical = verticalRatio <= config.maxVerticalRatio;
-      const isNotTooSlow = deltaTime <= config.maxDuration;
-      
-      // All conditions must be met
-      if (
-        !isHorizontal ||
-        !meetsDistanceThreshold ||
-        !meetsVelocityThreshold ||
-        !isNotTooVertical ||
-        !isNotTooSlow
-      ) {
-        return;
-      }
-      
-      // Navigate
-      if (deltaX < 0) {
-        // Swiped left -> Next project
-        window.location.href = nextUrl;
-      } else {
-        // Swiped right -> Previous project
-        window.location.href = prevUrl;
-      }
-    }
-
     const backToTopLink = document.querySelector(".back-to-top-link");
     backToTopLink?.addEventListener("click", (event) => {
       event.preventDefault();
@@ -483,12 +397,12 @@ const activeDotIndex = currentIndex - dotsStartIndex;
         // Use the locally initialized lenis instance
         lenis?.scrollTo("#top");
       } catch (error) {
-        console.warn('Smooth scroll failed, using fallback:', error);
+        console.warn("Smooth scroll failed, using fallback:", error);
         // Fallback to native scroll
-        document.getElementById('top')?.scrollIntoView({ behavior: 'smooth' });
+        document.getElementById("top")?.scrollIntoView({ behavior: "smooth" });
       }
     });
-  }
+  });
 </script>
 
 <style>
@@ -508,17 +422,17 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     --project-container-margin-ratio: 27.12%; /* 410px / 1512px - maintains proportion */
     --project-container-margin-fixed: 410px; /* Locks at 1512px+ */
     --project-container-max-width: 1512px;
-    
+
     /* Content Spacing - Wireframe measurements */
     --project-content-gap: 66px; /* Image spacing from wireframe */
     --project-hero-to-content: 79px; /* 397px total - 318px hero */
     --project-hero-padding-top: max(11.2vh, 110px); /* 110px / 982px */
-    
+
     /* Navigation Arrow Positioning */
-    --nav-arrow-inset-base: -15vw; /* Distance from container edge */
+    --nav-arrow-inset-desktop: 5vw; /* Distance from viewport edge */
     --nav-arrow-size: 32px;
     --nav-arrow-size-mobile: 24px;
-    
+
     /* Responsive Scale Factors */
     --scale-tablet: 0.8; /* 481px - 768px */
     --scale-mobile: 0.7; /* max-width 480px */
@@ -538,7 +452,7 @@ const activeDotIndex = currentIndex - dotsStartIndex;
   .project-hero {
     text-align: center;
     padding-block-start: var(--project-hero-padding-top);
-    
+
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -609,9 +523,17 @@ const activeDotIndex = currentIndex - dotsStartIndex;
   .description-with-navigation {
     position: relative;
     display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: column;
     margin-block-end: var(--project-content-gap);
+    gap: var(--space-2xl);
+  }
+
+  .navigation {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
   }
 
   .project-description {
@@ -621,6 +543,7 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     gap: var(--spacing-sm);
     text-align: start;
     padding: 0 var(--spacing-xxs);
+    flex-grow: 1;
   }
 
   .project-title {
@@ -644,40 +567,61 @@ const activeDotIndex = currentIndex - dotsStartIndex;
   }
 
   /* ============================================
-     NAVIGATION ARROWS
-     Positioned within margin area (27.12% or 410px)
+     TOUCH NAVIGATION ARROWS
      ============================================ */
-  .project-navigation {
-    /* Semantic wrapper only */
-  }
-  
-  .nav-arrow {
-    position: fixed;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 10;
-    
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    
-    inline-size: var(--nav-arrow-size);
-    block-size: var(--nav-arrow-size);
-    
+  .touch-nav-arrow {
+    display: none; /* Hidden by default, shown on mobile */
     color: var(--color-text-secondary);
     text-decoration: none;
     opacity: 0.7;
-    transition: opacity var(--transition-normal), color var(--transition-normal);
+    transition:
+      opacity var(--transition-normal),
+      color var(--transition-normal);
+    padding: var(--spacing-sm); /* Larger tap area */
+    margin: calc(-1 * var(--spacing-sm)); /* Negative margin to keep layout */
   }
 
-  .nav-arrow:hover {
+  .touch-nav-arrow:hover {
     opacity: 1;
     color: var(--color-text-primary);
   }
 
-  .nav-arrow svg {
-    width: var(--nav-arrow-size);
-    height: var(--nav-arrow-size);
+  .touch-nav-arrow--prev {
+    margin-right: var(--spacing-md);
+  }
+
+  .touch-nav-arrow--next {
+    margin-left: var(--spacing-md);
+  }
+
+  /* ============================================
+     DESKTOP NAVIGATION ARROWS
+     ============================================ */
+  .desktop-nav-arrow {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    opacity: 0.7;
+    transition:
+      opacity var(--transition-normal),
+      color var(--transition-normal);
+    display: none; /* Hidden on mobile by default */
+  }
+
+  .desktop-nav-arrow:hover {
+    opacity: 1;
+    color: var(--color-text-primary);
+  }
+
+  .desktop-nav-arrow--prev {
+    left: var(--nav-arrow-inset-desktop);
+  }
+
+  .desktop-nav-arrow--next {
+    right: var(--nav-arrow-inset-desktop);
   }
 
   /* ============================================
@@ -709,40 +653,18 @@ const activeDotIndex = currentIndex - dotsStartIndex;
   }
 
   /* ============================================
-     MOBILE SWIPE UI
+     PROJECT COUNTER
      ============================================ */
-  .mobile-swipe-hint {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  .project-counter {
+    display: none; /* Hidden by default, shown on mobile */
+    text-align: center;
     color: var(--color-text-secondary);
-    opacity: 0.8;
-    margin-bottom: var(--spacing-xl);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    letter-spacing: var(--tracking-wide);
+    padding-block-end: var(--spacing-lg);
     user-select: none;
     -webkit-user-select: none;
-  }
-
-  .swipe-dots {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: var(--spacing-sm);
-  }
-
-  .swipe-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background-color: currentColor;
-    opacity: 0.4;
-    transition:
-      opacity var(--transition-normal),
-      transform var(--transition-normal);
-  }
-
-  .swipe-dot.active {
-    opacity: 1;
-    transform: scale(1.1);
   }
 
   /* ============================================
@@ -783,22 +705,11 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     .hero-container {
       padding: 0 var(--spacing-container-desktop);
     }
-    
+
     /* project-content-container inherits base 27.12% padding */
     /* No override needed - respects design system */
-    
-    /* Position arrows within the 27.12% margin area with additional spacing */
-    .nav-arrow--prev {
-      inset-inline-start: calc(var(--project-container-margin-ratio) + var(--nav-arrow-inset-base) + 20px);
-    }
-    
-    .nav-arrow--next {
-      inset-inline-end: calc(var(--project-container-margin-ratio) + var(--nav-arrow-inset-base) + 20px);
-    }
-    
-    .mobile-swipe-hint {
-      display: none;
-    }
+
+    /* Desktop view does not have touch arrows or swipe hints */
   }
 
   /* ============================================
@@ -809,19 +720,12 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     .project-content-container {
       padding-inline: var(--project-container-margin-fixed);
     }
-    
+
     .hero-container {
       padding: 0 var(--spacing-container-desktop);
     }
-    
-    .nav-arrow--prev {
-      /* 410px margin + 20px inset + 20px additional spacing */
-      inset-inline-start: calc(var(--project-container-margin-fixed) + var(--nav-arrow-inset-base) + 20px);
-    }
-    
-    .nav-arrow--next {
-      inset-inline-end: calc(var(--project-container-margin-fixed) + var(--nav-arrow-inset-base) + 20px);
-    }
+
+    /* Large desktop view does not have touch arrows */
   }
 
   /* ============================================
@@ -830,24 +734,28 @@ const activeDotIndex = currentIndex - dotsStartIndex;
      ============================================ */
   @media (min-width: 481px) and (max-width: 768px) {
     .project-content-section {
-      padding-block-start: calc(var(--project-hero-to-content) * var(--scale-tablet));
+      padding-block-start: calc(
+        var(--project-hero-to-content) * var(--scale-tablet)
+      );
     }
-    
+
     .hero-container,
     .project-content-container {
       padding-inline: var(--spacing-container-mobile);
     }
-    
+
     .image-wrapper:not(:last-child),
     .video-wrapper:not(:last-child),
     .description-with-navigation {
       margin-block-end: calc(var(--project-content-gap) * var(--scale-tablet));
     }
-    
+
     .back-to-top {
-      margin-block-start: calc(var(--project-content-gap) * var(--scale-tablet));
+      margin-block-start: calc(
+        var(--project-content-gap) * var(--scale-tablet)
+      );
     }
-    
+
     .nav-arrow svg {
       width: var(--nav-arrow-size-mobile);
       height: var(--nav-arrow-size-mobile);
@@ -860,24 +768,28 @@ const activeDotIndex = currentIndex - dotsStartIndex;
      ============================================ */
   @media (max-width: 480px) {
     .project-content-section {
-      padding-block-start: calc(var(--project-hero-to-content) * var(--scale-mobile));
+      padding-block-start: calc(
+        var(--project-hero-to-content) * var(--scale-mobile)
+      );
     }
-    
+
     .hero-container,
     .project-content-container {
       padding-inline: 5vw;
     }
-    
+
     .image-wrapper:not(:last-child),
     .video-wrapper:not(:last-child),
     .description-with-navigation {
       margin-block-end: calc(var(--project-content-gap) * var(--scale-mobile));
     }
-    
+
     .back-to-top {
-      margin-block-start: calc(var(--project-content-gap) * var(--scale-mobile));
+      margin-block-start: calc(
+        var(--project-content-gap) * var(--scale-mobile)
+      );
     }
-    
+
     .project-description {
       padding: 0 var(--spacing-sm);
     }
@@ -887,8 +799,17 @@ const activeDotIndex = currentIndex - dotsStartIndex;
      RESPONSIVE: HIDE/SHOW NAVIGATION
      ============================================ */
   @media (max-width: 1023px) {
-    .nav-arrow {
-      display: none;
+    .touch-nav-arrow {
+      display: block;
+    }
+    .project-counter {
+      display: block;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .desktop-nav-arrow {
+      display: block;
     }
   }
 
@@ -896,23 +817,22 @@ const activeDotIndex = currentIndex - dotsStartIndex;
      ACCESSIBILITY
      ============================================ */
   @media (prefers-reduced-motion: reduce) {
-    .nav-arrow,
-    .nav-arrow:hover,
-    .swipe-dot,
+    .desktop-nav-arrow,
+    .touch-nav-arrow,
     .home-link {
       transition: none;
-    }
-    
-    .nav-arrow:hover {
-      transform: translateY(-50%);
     }
   }
 
   @media (prefers-contrast: high) {
-    .nav-arrow {
-      border: 2px solid ButtonText;
-      background: ButtonFace;
+    .desktop-nav-arrow,
+    .touch-nav-arrow {
+      border: 2px solid transparent; /* Reserve space */
       color: ButtonText;
+    }
+    .desktop-nav-arrow:focus-visible,
+    .touch-nav-arrow:focus-visible {
+      border-color: ButtonText;
     }
   }
 </style>

@@ -653,6 +653,15 @@ const organizationSchema = {
     color: var(--color-text-primary);
   }
 
+  /* Dialog Open State - Prevent Body Scrolling */
+  html.dialog-is-open,
+  body.dialog-is-open {
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    position: fixed;
+  }
+
   /* View Transitions Styles */
   @view-transition {
     navigation: auto;

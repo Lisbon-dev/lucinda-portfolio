@@ -2,12 +2,13 @@
 export interface Props {
   id: string;
   class?: string;
+  contentAlign?: "top" | "center";
 }
 
-const { id, class: className } = Astro.props;
+const { id, class: className, contentAlign = "center" } = Astro.props;
 ---
 
-<dialog id={id} class={`simple-dialog ${className || ""}`}>
+<dialog id={id} class={`simple-dialog ${className || ""}`} data-content-align={contentAlign}>
   <div class="dialog-content">
     <button
       type="button"
@@ -73,13 +74,12 @@ const { id, class: className } = Astro.props;
     display: flex;
     flex-direction: column;
     position: relative;
-    overflow-y: auto;
   }
 
   .dialog-close {
     position: absolute;
-    top: var(--spacing-sm, 2.5rem);
-    right: var(--spacing-sm, 2.5rem);
+    top: var(--spacing-md, 1.5rem);
+    right: var(--spacing-md, 1.5rem);
     background: none;
     border: none;
     color: var(--color-text-primary, #000000);
@@ -93,24 +93,58 @@ const { id, class: className } = Astro.props;
     transition: color var(--transition-fast, 0.2s ease);
   }
 
-  .dialog-close:hover {
-    color: var(--color-primary, #325c59);
-  }
 
   .content-area {
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: center; /* Default center alignment */
     align-items: center;
-    padding: var(--spacing-lg, 3.75rem);
-    text-align: center;
     max-width: 100%;
     box-sizing: border-box;
+    position: relative; /* For inner wrapper positioning */
     
     /* Content animation */
     transform: translateY(10px);
     transition: transform var(--modal-transition-duration) var(--modal-transition-easing);
+  }
+  
+  /* Scrollable inner wrapper to preserve padding */
+  .content-area::before {
+    content: "";
+    display: block;
+    height: var(--spacing-lg, 3.75rem);
+    flex-shrink: 0;
+  }
+  
+  .content-area::after {
+    content: "";
+    display: block;
+    height: var(--spacing-lg, 3.75rem);
+    flex-shrink: 0;
+  }
+  
+  /* Scrollable container */
+  .content-area {
+    overflow-y: auto; /* Allow content area to scroll */
+    overscroll-behavior: contain; /* Prevent scroll chaining */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    scroll-behavior: smooth;
+    padding-left: var(--spacing-lg, 3.75rem);
+    padding-right: var(--spacing-lg, 3.75rem);
+  }
+  
+  /* Top-aligned content */
+  .simple-dialog[data-content-align="top"] .content-area {
+    justify-content: flex-start;
+  }
+  
+  /* Ensure content is centered within the area */
+  .content-area > :global(*) {
+    text-align: center;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .simple-dialog[open] .content-area {
@@ -123,33 +157,64 @@ const { id, class: className } = Astro.props;
       position: fixed;
       inset: 0;
       margin: auto;
-      width: 50vw;
+      width: 63.3vw; /* Based on 957px width on 1512px viewport */
+      max-width: 957px;
       height: 100vh;
       min-width: 400px;
       border-radius: 0;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    /* Initial hidden state */
-    opacity: 0;
-    transform: scale(0.95);
-    transition: 
-      opacity var(--modal-transition-duration) var(--modal-transition-easing),
-      transform var(--modal-transition-duration) var(--modal-transition-easing);
     }
 
     .simple-dialog[open]::backdrop {
       background: rgba(0, 0, 0, 0.6);
       backdrop-filter: blur(5px);
     }
-
-    .content-area {
-      padding: var(--spacing-2xl, 5rem);
-    }
   }
 
   /* Large desktop refinements */
   @media (min-width: 1024px) {
     .content-area {
-      padding: 4rem 3rem;
+      padding-left: 12.1875rem; /* 195px */
+      padding-right: 12.1875rem; /* 195px */
+    }
+    
+    .content-area::before {
+      height: 12.1875rem; /* 195px */
+    }
+    
+    .content-area::after {
+      height: 12.1875rem; /* 195px */
+    }
+  }
+
+  /* Improve responsiveness on short viewports */
+  @media (max-height: 600px) {
+    .content-area {
+      padding-left: var(--spacing-lg, 2.5rem);
+      padding-right: var(--spacing-lg, 2.5rem);
+    }
+    
+    .content-area::before {
+      height: var(--spacing-xl, 2.5rem);
+    }
+    
+    .content-area::after {
+      height: var(--spacing-lg, 2.5rem);
+    }
+    .dialog-close {
+      top: var(--spacing-sm, 1rem);
+      right: var(--spacing-sm, 1rem);
+    }
+    .content-area :global(h2) {
+      font-size: var(--text-xl, 1.5rem);
+      margin-top: var(--spacing-md, 1.5rem);
+    }
+    .content-area :global(p) {
+      font-size: var(--text-sm, 0.875rem);
+      line-height: var(--leading-normal, 1.5);
+    }
+    .content-area :global(.contact-info) {
+      margin-top: var(--spacing-md, 1.5rem);
     }
   }
 
@@ -157,7 +222,7 @@ const { id, class: className } = Astro.props;
   .content-area :global(h2) {
     font-family: var(--font-heading, serif);
     font-size: var(--text-2xl, 2rem);
-    font-weight: 400;
+    font-weight: 300;
     color: var(--color-text-primary, #000000);
     line-height: var(--leading-tight, 1.25);
     letter-spacing: var(--tracking-wide, 0.05em);
@@ -170,8 +235,8 @@ const { id, class: className } = Astro.props;
     font-weight: 300;
     color: var(--color-text-primary, #000000);
     line-height: var(--leading-relaxed, 1.625);
+    letter-spacing: var(--tracking-wider);
     margin-bottom: var(--spacing-md, 1.5rem);
-    max-width: 65ch;
   }
 
   .content-area :global(p:last-child) {
@@ -228,20 +293,45 @@ const { id, class: className } = Astro.props;
 </style>
 
 <script>
-  // Enhance accessibility for dialog
+  // Enhance accessibility and functionality for dialogs
   document.addEventListener("DOMContentLoaded", () => {
     const dialogs = document.querySelectorAll(".simple-dialog");
 
     dialogs.forEach((dialog) => {
-      // Focus the close button when dialog opens
-      dialog.addEventListener("show", () => {
-        setTimeout(() => {
-          const closeButton = dialog.querySelector(".dialog-close") as HTMLButtonElement;
-          if (closeButton) {
-            closeButton.focus();
-          }
-        }, 100);
+      // Observer for open/close state changes
+      const observer = new MutationObserver(() => {
+        const isOpen = dialog.hasAttribute('open');
+        
+        if (isOpen) {
+          // Save current scroll position
+          const scrollY = window.scrollY;
+          document.body.style.top = `-${scrollY}px`;
+          
+          document.documentElement.classList.add('dialog-is-open');
+          document.body.classList.add('dialog-is-open');
+        } else {
+          // Restore body scroll position when dialog closes
+          const scrollY = document.body.style.top;
+          document.documentElement.classList.remove('dialog-is-open');
+          document.body.classList.remove('dialog-is-open');
+          document.body.style.position = '';
+          document.body.style.top = '';
+          document.body.style.width = '';
+          document.body.style.height = '';
+          window.scrollTo(0, parseInt(scrollY || '0') * -1);
+        }
+
+        // When dialog opens, focus the close button
+        if (isOpen) {
+          setTimeout(() => {
+            const closeButton = dialog.querySelector(".dialog-close") as HTMLButtonElement;
+            if (closeButton) {
+              closeButton.focus();
+            }
+          }, 100); // Timeout to allow for transition
+        }
       });
+      observer.observe(dialog, { attributes: true, attributeFilter: ['open'] });
 
       // Handle dialog triggers that are inside this dialog
       const triggers = dialog.querySelectorAll('[data-dialog-trigger]');
@@ -265,6 +355,69 @@ const { id, class: className } = Astro.props;
           trigger.dataset.listenerAttached = 'true';
         }
       });
+      
+      // Add scroll event handling
+      const contentArea = dialog.querySelector('.content-area');
+      if (contentArea) {
+        // Handle wheel events
+        dialog.addEventListener('wheel', (event) => {
+          if (dialog.hasAttribute('open')) {
+            // Check if we're at the top or bottom of scroll
+            const atTop = contentArea.scrollTop === 0;
+            const atBottom = contentArea.scrollHeight - contentArea.scrollTop <= contentArea.clientHeight + 1;
+            
+            // Only prevent default if we're not at the boundaries or scrolling in the "bounce" direction
+            if (!(atTop && event.deltaY < 0) && !(atBottom && event.deltaY > 0)) {
+              event.preventDefault();
+              
+              // Manually scroll the content area
+              contentArea.scrollTop += event.deltaY;
+            }
+          }
+        }, { passive: false });
+        
+        // Handle keyboard navigation within dialog
+        dialog.addEventListener('keydown', (event) => {
+          if (dialog.hasAttribute('open')) {
+            // Handle arrow keys, page up/down, etc.
+            switch (event.key) {
+              case 'ArrowDown':
+                event.preventDefault();
+                contentArea.scrollTop += 30;
+                break;
+              case 'ArrowUp':
+                event.preventDefault();
+                contentArea.scrollTop -= 30;
+                break;
+              case 'PageDown':
+                event.preventDefault();
+                contentArea.scrollTop += contentArea.clientHeight * 0.9;
+                break;
+              case 'PageUp':
+                event.preventDefault();
+                contentArea.scrollTop -= contentArea.clientHeight * 0.9;
+                break;
+              case 'Home':
+                event.preventDefault();
+                contentArea.scrollTop = 0;
+                break;
+              case 'End':
+                event.preventDefault();
+                contentArea.scrollTop = contentArea.scrollHeight;
+                break;
+            }
+          }
+        });
+        
+        // Handle touch events for mobile
+        dialog.addEventListener('touchmove', (event) => {
+          if (dialog.hasAttribute('open')) {
+            if (!contentArea.contains(event.target)) {
+              event.preventDefault(); // Prevent touch scrolling outside content area
+            }
+          }
+        }, { passive: false });
+      }
     });
   });
 </script>
