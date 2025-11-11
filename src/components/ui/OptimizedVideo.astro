@@ -447,8 +447,7 @@ const formats = [
     pointer-events: none;
   }
 
-  .video-container.is-paused .video-overlay,
-  .video-container:hover .video-overlay {
+  .video-container.is-paused .video-overlay {
     opacity: 1;
   }
 
@@ -464,8 +463,14 @@ const formats = [
     display: block;
   }
 
-  .video-container.is-playing:hover .video-icon--pause {
-    display: block;
+  /* On devices that support hover, show overlay and pause icon on hover */
+  @media (hover: hover) and (pointer: fine) {
+    .video-container:hover .video-overlay {
+      opacity: 1;
+    }
+    .video-container.is-playing:hover .video-icon--pause {
+      display: block;
+    }
   }
 
   .video-container[style*="cursor: pointer"] {
