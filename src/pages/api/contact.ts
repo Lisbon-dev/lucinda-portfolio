@@ -119,7 +119,7 @@ async function sendContactEmail(data: ContactFormData): Promise<{ success: boole
 
     const result = await resend.emails.send({
       from: import.meta.env.CONTACT_FROM_EMAIL || 'contact@lucindaburman.com',
-      to: [import.meta.env.CONTACT_TO_EMAIL || 'hello@lucindaburman.com'],
+      to: [import.meta.env.CONTACT_TO_EMAIL || 'lucinda.burman@yahoo.co.uk'],
       replyTo: data.email,
       subject: `Portfolio Contact: ${data.subject}`,
       html: emailHtml,

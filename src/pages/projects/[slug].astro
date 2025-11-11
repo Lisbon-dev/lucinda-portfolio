@@ -524,16 +524,16 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     position: relative;
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: start;
     flex-direction: column;
     margin-block-end: var(--project-content-gap);
-    gap: var(--space-2xl);
   }
 
   .navigation {
     width: 100%;
     display: flex;
     justify-content: space-between;
+    padding-top: var(--spacing-lg);
   }
 
   .project-description {
@@ -799,11 +799,18 @@ const activeDotIndex = currentIndex - dotsStartIndex;
      RESPONSIVE: HIDE/SHOW NAVIGATION
      ============================================ */
   @media (max-width: 1023px) {
+    .description-with-navigation {
+      gap: var(--space-lg);
+    }
     .touch-nav-arrow {
       display: block;
     }
     .project-counter {
       display: block;
+    }
+
+    .project-content-section {
+      padding-block-start: unset;
     }
   }
 
