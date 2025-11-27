@@ -1,176 +1,261 @@
-# Lucinda Portfolio - Sophisticated Minimalist Design
+# Lucinda Burman Portfolio - Client Guide
 
-A professional portfolio website built with Astro, featuring a sophisticated minimalist aesthetic with Ivy Presto typography and strategic teal accent colors.
+Welcome to your portfolio website! This guide will help you manage and update your website content, contact information, and handle deployments.
 
-## 🎨 Design Philosophy
+## 📋 Website Architecture Overview
 
-- **Aesthetic:** Sophisticated minimalist approach with premium feel
-- **Primary Color:** Teal rgb(50, 92, 89) with full palette variations  
-- **Typography:** Ivy Presto font family with systematic hierarchy
-- **Layout:** Clean geometric structures with strategic white space
+Your portfolio website is built with modern technologies that ensure excellent performance, security, and ease of maintenance:
 
-## 🏗️ Project Architecture
+- **Framework:** [Astro](https://astro.build) - A modern static site generator
+- **Hosting:** [Vercel](https://vercel.com) - Enterprise-grade hosting with global CDN
+- **Content Management:** Markdown-based content system (no database required)
+- **Contact Form:** [Resend](https://resend.com) email integration
 
-### Technology Stack
-- **Framework:** Astro v5.x with TypeScript strict mode
-- **Package Manager:** pnpm v8.x for optimal performance
-- **Testing:** Playwright for comprehensive E2E testing
-- **Deployment:** Vercel with Edge runtime optimization
-- **Email:** Resend integration for contact form functionality
+### Key Website Sections
 
-### Key Features
-- **Animated Hero Section:** Professional presentation with performance optimization
-- **Masonry Portfolio Grid:** Responsive layout showcasing work with elegant hover effects
-- **Modal Navigation System:** Minimal aesthetic with smooth animations
-- **Contact & About Modals:** Functional forms with sophisticated presentation
-- **Progressive Image Loading:** Optimized performance across all devices
-- **WCAG 2.1 AA Compliance:** Full accessibility implementation
+1. **Homepage:** Masonry grid portfolio showcase
+2. **Project Detail Pages:** Individual pages for each portfolio item
+3. **About Modal:** Your biography and professional information
+4. **Contact Modal:** Contact form for client inquiries
+5. **Privacy & Terms Pages:** Legal information
 
-## 📋 Project Management
+## 🔄 How to Update Your Content
 
-### Agile Methodology
-This project follows a comprehensive agile approach with **46 GitHub issues** organized across **4 deliverable milestones** covering a **14-day development timeline** (August 15-29, 2025).
+### Managing Portfolio Projects
 
-#### Issue Structure
-- **4 Epic Issues:** Major project phases aligned with milestones
-- **11 User Stories:** Feature requirements (97 story points total)
-- **27 Implementation Tasks:** Detailed development breakdown
-- **3 QA/Testing Issues:** Quality assurance and validation
-- **1 Setup Issue:** Project organization and tooling
+Your portfolio projects are stored as Markdown files in the `src/content/projects/` directory. Each project has its own file with a `.md` extension.
 
-#### GitHub Labels System
-- **Type Labels:** Epic, Story, Task, QA, Setup
-- **Priority Labels:** High, Medium, Low
-- **Component Labels:** Design System, Frontend, Content, Performance, Testing
-- **Story Point Labels:** 1, 2, 3, 5, 8, 13 (Fibonacci sequence)
+#### Option 1: Update via GitHub Web Interface
 
-### Development Timeline
+1. Go to your GitHub repository at `https://github.com/yourusername/lucinda-portfolio`
+2. Navigate to `src/content/projects/`
+3. Select the project file you want to edit (e.g., `w-hotel-paris-brand.md`)
+4. Click the pencil icon (Edit this file)
+5. Make your changes to the content
+6. Scroll down and click "Commit changes"
+7. Add a brief description of your changes (e.g., "Update W Hotel project description")
+8. Click "Commit changes" button
 
-#### **Milestone 1: First Deliverable (Aug 15, 2025)**
-**Focus:** Foundation & Setup (9 issues, 21 story points)
-- Development environment configuration
-- Base component library with Ivy Presto integration
-- Testing framework setup
+#### Option 2: Update via Visual Studio Code
 
-#### **Milestone 2: Second Deliverable (Aug 22, 2025)** 
-**Focus:** Core Content Implementation (12 issues, 34 story points)
-- Animated hero section with performance optimization
-- Masonry portfolio grid with progressive image loading
-- Project detail pages with interactive galleries
-- Content management structure
+If you prefer using VS Code:
 
-#### **Milestone 3: Third Deliverable (Aug 27, 2025)**
-**Focus:** Navigation & Interactions (10 issues, 21 story points)
-- Interactive navigation with minimal styling
-- Contact and about modals with Resend integration
-- Comprehensive accessibility testing (WCAG 2.1 AA)
-- Cross-device responsive validation
+1. Clone the repository to your computer (one-time setup):
+   ```
+   git clone https://github.com/yourusername/lucinda-portfolio.git
+   cd lucinda-portfolio
+   ```
 
-#### **Milestone 4: Fourth Deliverable (Aug 29, 2025)**
-**Focus:** Launch & Optimization (15 issues, 21 story points)
-- Performance optimization (Core Web Vitals targets)
-- Production deployment with security headers
-- Cross-browser compatibility testing
-- Client documentation and handover
+2. Open the project in VS Code:
+   ```
+   code .
+   ```
 
-## ⚙️ Automated Workflows
+3. Navigate to `src/content/projects/` in the file explorer
+4. Edit the desired project file
+5. Save your changes
+6. Commit and push your changes:
+   ```
+   git add .
+   git commit -m "Update project description"
+   git push
+   ```
 
-The project includes comprehensive GitHub Actions workflows for efficient development:
+### Project File Structure
 
-### Issue Management Automation
-- **Auto-labeling:** Automatically applies appropriate labels based on issue content
-- **Project board sync:** Issues automatically added to project board with proper status
-- **Milestone tracking:** Progress updates and notifications for milestone completion
-- **Story point tracking:** Automatic calculation of sprint velocity and burndown
+Each project file follows this structure:
 
-### Development Workflows
-- **PR Integration:** Pull requests automatically linked to related issues
-- **Status Updates:** Project board automatically updated based on PR status
-- **Code Quality:** Automated testing runs on all pull requests
-- **Deployment:** Automatic deployment triggers for staging and production
+```markdown
+---
+title: "W Hotel Paris Brand"
+description: "Brand identity development for W Hotel Paris"
+client: "W Hotels"
+date: "2023-05-15"
+category: "Branding"
+tags: ["Hospitality", "Luxury", "Identity"]
+featured: true
+coverImage: "../assets/portfolio/whotel/W Hotel 6.png"
+videoUrl: "/videos/whotel/W-HOTEL-PRESENTATION.mp4"
+images:
+  - "../assets/portfolio/whotel/W Hotel 6.png"
+  - "../assets/portfolio/whotel/W Hotel 7.png"
+---
 
-### Quality Assurance
-- **Accessibility Testing:** Automated WCAG 2.1 AA compliance checks
-- **Performance Monitoring:** Core Web Vitals tracking and alerts
-- **Cross-browser Testing:** Automated testing across Chrome, Firefox, Safari, Edge
-- **Security Scanning:** Dependency vulnerability detection and alerts
+This project involved developing a comprehensive brand identity for the W Hotel Paris location. The design approach focused on blending Parisian elegance with the W Hotel's contemporary aesthetic.
 
-## 🧞 Development Commands
+The brand package included logo variations, color palette, typography guidelines, and application examples across various touchpoints including signage, stationery, and digital assets.
 
-All commands are run from the root of the project, from a terminal:
+Key elements of the design include...
+```
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `pnpm install`            | Install all project dependencies                 |
-| `pnpm dev`                | Start local dev server at `localhost:4321`      |
-| `pnpm build`              | Build production site to `./dist/`              |
-| `pnpm preview`            | Preview production build locally                 |
-| `pnpm playwright test`    | Run E2E tests across all browsers               |
-| `pnpm playwright show-report` | Open detailed test report                    |
-| `pnpm astro check`        | Run TypeScript and Astro diagnostics            |
+### Adding a New Project
 
-## 🎯 Performance Targets
+To add a new project:
 
-### Core Web Vitals
-- **Largest Contentful Paint (LCP):** < 2.5s
-- **First Input Delay (FID):** < 100ms
-- **Cumulative Layout Shift (CLS):** < 0.1
-- **First Contentful Paint (FCP):** < 1.5s
+1. Create a new `.md` file in `src/content/projects/` (e.g., `new-project-name.md`)
+2. Copy the structure from an existing project
+3. Update all fields with your new project information
+4. Add your project images to the appropriate folder in `src/assets/portfolio/`
+5. Reference these images in your project file
+6. Commit and push your changes
 
-### Quality Standards
-- **Lighthouse Performance:** >90
-- **Accessibility Score:** 100 (WCAG 2.1 AA compliant)
-- **Best Practices:** >90
-- **SEO Score:** >90
+### Adding Project Images
 
-## 🚀 Deployment
+1. Add your image files to the appropriate folder in `src/assets/portfolio/`
+   - For organization, create a new folder for each project (e.g., `src/assets/portfolio/new-project/`)
+2. Reference these images in your project markdown file:
+   ```
+   images:
+     - "../assets/portfolio/new-project/image1.png"
+     - "../assets/portfolio/new-project/image2.png"
+   ```
+3. Note that the images are configured in order of showing in the project page, with the `main image` being the first as well as the displayed image in the homepage masonry grid for this project
 
-### Production Environment
-- **Platform:** Vercel with Edge runtime
-- **Domain:** Custom domain with SSL certificate (A+ rating)
-- **Security:** Comprehensive security headers (CSP, HSTS, etc.)
-- **Monitoring:** Performance tracking with Core Web Vitals
-- **Analytics:** Privacy-focused analytics implementation
+### Adding Project Videos
 
-### Environment Variables
-Required environment variables for production:
-- `RESEND_API_KEY` - For contact form email functionality
-- Additional variables documented in deployment guide
+1. Add your video files to the `public/videos/` directory
+   - Create a new folder for each project (e.g., `public/videos/new-project/`)
+2. Add both MP4 and WebM formats for best compatibility
+3. Reference the video in your project markdown:
+   ```
+   videoUrl: "/videos/new-project/PROJECT-VIDEO.mp4"
+   ```
 
-## 📊 Project Status
+## 📧 Updating Contact Information
 
-**Current Phase:** Foundation & Setup (Milestone 1)  
-**Overall Progress:** Issue #1 completed - Project organization established  
-**Next Steps:** Begin development environment setup (US-001)
+### Changing Contact Email Address
 
-**GitHub Project Board:** [View Live Progress](https://github.com/Lisbon-dev/lucinda-portfolio/projects)  
-**Issues Dashboard:** [All Project Issues](https://github.com/Lisbon-dev/lucinda-portfolio/issues)
+Your contact form sends emails to the address configured in the environment variables on Vercel. To update:
 
-## 📚 Documentation
+1. Log in to your [Vercel dashboard](https://vercel.com)
+2. Select your portfolio project
+3. Go to "Settings" > "Environment Variables"
+4. Update the `CONTACT_TO_EMAIL` variable with your new email address
+5. Click "Save"
 
-Comprehensive documentation is maintained throughout development:
-- **Technical Architecture:** Detailed system design and implementation decisions
-- **Design System:** Complete design token documentation and component library
-- **Deployment Guide:** Step-by-step production deployment procedures
-- **User Training:** Content management and maintenance guides
-- **API Documentation:** Contact form and third-party service integrations
+### Updating About Me Content
 
-## 🤝 Contributing
+To update your biography and information in the About modal:
 
-This project follows agile development practices with:
-- **Branch Strategy:** Feature branches linked to GitHub issues
-- **Code Reviews:** Required PR reviews before merge
-- **Testing Requirements:** All features must include corresponding tests
-- **Accessibility First:** WCAG 2.1 AA compliance mandatory for all features
-- **Performance Budget:** Core Web Vitals targets must be maintained
+1. Navigate to `src/components/dialog/AboutDialog.astro`
+2. Edit the content within the HTML sections
+3. Commit and push your changes
 
-## 📞 Support
+Example:
 
-For technical support or questions about the project:
-- **Issues:** [Create GitHub Issue](https://github.com/Lisbon-dev/lucinda-portfolio/issues/new)
-- **Documentation:** Reference project documentation in `/docs` (when available)
-- **Emergency:** Contact project maintainers for critical issues
+```html
+<SimpleDialog id="about-dialog">
+  <p>
+    I'm an image maker who thrives on adapting my work to a variety of
+    applications. Everything I do begins with something that is hand-drawn or
+    painted…
+    <br /><br />
+    This has led to projects across editorial, brand storytelling and collaborations,
+    installation, publishing, bespoke commissions, and events.
+  </p>
+
+  <h2>Select clients</h2>
+  <p>
+    W Hotel Paris, Marriott/ The Spectator Magazine (UK & USA)/ Carlowrie Group/
+    Zwift/ Motcombs Knightsbridge/ Pascal Huser Design & Build
+  </p>
+  
+  <!-- Update your content here -->
+</SimpleDialog>
+```
+
+### Updating Contact Form Options
+
+To modify the subject dropdown options in the contact form:
+
+1. Navigate to `src/components/forms/ContactForm.astro`
+2. Find the `subjectOptions` array at the top of the file
+3. Edit the options to change available subjects
+4. Commit and push your changes
+
+Example:
+
+```js
+const subjectOptions = [
+  { value: 'general', label: 'General Inquiry' },
+  { value: 'project', label: 'Project Collaboration' },
+  { value: 'commission', label: 'Commission Request' },
+  { value: 'press', label: 'Press & Media' },
+  { value: 'other', label: 'Other' },
+  // Add a new option
+  { value: 'exhibition', label: 'Exhibition Opportunity' },
+];
+```
+
+## 🚀 Deployment & Troubleshooting
+
+### How Deployments Work
+
+Your website uses automatic deployments:
+
+1. When you push changes to the `main` branch on GitHub, Vercel automatically detects the changes
+2. Vercel builds and deploys your updated website (typically takes 1-2 minutes)
+3. Once complete, your changes are live on your domain
+
+### Viewing Deployment Status
+
+To check the status of your deployments:
+
+1. Log in to your [Vercel dashboard](https://vercel.com)
+2. Select your portfolio project
+3. Go to the "Deployments" tab to see all recent deployments
+4. Click on any deployment to see build logs and details
+
+### Common Issues & Solutions
+
+#### Issue: Changes not appearing after deployment
+
+**Solution:**
+1. Check that your changes were successfully committed and pushed to GitHub
+2. Verify the deployment completed successfully in Vercel
+3. Try hard-refreshing your browser (Ctrl+F5 or Cmd+Shift+R)
+4. Check for any build errors in the Vercel deployment logs
+
+#### Issue: Contact form not sending emails
+
+**Solution:**
+1. Verify your Resend API key is correctly set in Vercel environment variables
+2. Check that the recipient email address is correctly configured
+3. Review Vercel Function logs for any errors
+
+#### Issue: Images not displaying correctly
+
+**Solution:**
+1. Ensure image paths in your markdown files are correct
+2. Verify images are in the correct directory
+3. Check image formats are supported (PNG, JPG, WebP recommended)
+
+### Getting Help
+
+If you encounter issues you can't resolve:
+
+1. Contact your developer at [developer@example.com](mailto:developer@example.com)
+2. Provide specific details about the issue and any error messages
+3. Include screenshots if applicable
+
+## 🧰 Useful Commands (For Advanced Users)
+
+If you're comfortable using the command line, these commands can be helpful for local development:
+
+```bash
+# Install dependencies
+pnpm install
+
+# Start local development server
+pnpm dev
+
+# Build the website locally
+pnpm build
+
+# Preview the production build locally
+pnpm preview
+```
 
 ---
 
-*Built with [Astro](https://astro.build) • Deployed on [Vercel](https://vercel.com)*
+*This guide was last updated: November 2025*
