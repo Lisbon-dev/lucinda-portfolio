@@ -234,7 +234,7 @@ To check the status of your deployments:
 
 If you encounter issues you can't resolve:
 
-1. Contact your developer at [developer@example.com](mailto:developer@example.com)
+1. Contact your developer at [help@lisbon.dev](mailto:help@lisbon.dev)
 2. Provide specific details about the issue and any error messages
 3. Include screenshots if applicable
 
