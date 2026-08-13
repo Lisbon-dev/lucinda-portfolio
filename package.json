@@ -6,7 +6,11 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0"
   },
   "dependencies": {
     "@astrojs/vercel": "^8.2.6",
@@ -16,5 +20,11 @@
     "motion": "^12.23.12",
     "resend": "^6.0.1",
     "sharp": "^0.34.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp"
+    ]
   }
 }

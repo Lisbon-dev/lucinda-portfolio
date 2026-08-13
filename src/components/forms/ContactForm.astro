@@ -934,6 +934,9 @@ const subjectOptions = [
   function initializeContactForms(): void {
     const forms = document.querySelectorAll('[data-contact-form]') as NodeListOf<HTMLFormElement>;
     forms.forEach(form => {
+      // Skip forms already wrapped in a handler (idempotent across view transitions)
+      if (form.dataset.contactFormInit === 'true') return;
+      form.dataset.contactFormInit = 'true';
       new ContactFormHandler(form);
     });
   }
@@ -944,4 +947,10 @@ const subjectOptions = [
   } else {
     initializeContactForms();
   }
+
+  // Re-run after every view transition (swapped-in DOM needs re-binding).
+  // Listen to both events: after-swap fires reliably on back/forward history
+  // navigation, page-load on forward navigation. init is idempotent.
+  document.addEventListener('astro:after-swap', initializeContactForms);
+  document.addEventListener('astro:page-load', initializeContactForms);
 </script>

@@ -183,22 +183,38 @@ if (!message) return null;
 
 <script>
   // Auto-dismiss success messages after a delay
-  document.addEventListener('DOMContentLoaded', () => {
+  function initializeFormMessages() {
     const successMessages = document.querySelectorAll('.form-message--success');
-    
+
     successMessages.forEach((message) => {
+      // Skip messages already scheduled for dismissal (idempotent across transitions)
+      if ((message as HTMLElement).dataset.formMessageInit === 'true') return;
+      (message as HTMLElement).dataset.formMessageInit = 'true';
+
       // Auto-dismiss after 5 seconds
       setTimeout(() => {
         if (message.parentNode) {
-          message.style.opacity = '0';
-          message.style.transform = 'translateY(-10px)';
-          message.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-          
+          (message as HTMLElement).style.opacity = '0';
+          (message as HTMLElement).style.transform = 'translateY(-10px)';
+          (message as HTMLElement).style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+
           setTimeout(() => {
             message.remove();
           }, 300);
         }
       }, 5000);
     });
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeFormMessages);
+  } else {
+    initializeFormMessages();
+  }
+
+  // Re-run after every view transition (swapped-in DOM needs re-binding).
+  // Listen to both events: after-swap fires reliably on back/forward history
+  // navigation, page-load on forward navigation. init is idempotent.
+  document.addEventListener('astro:after-swap', initializeFormMessages);
+  document.addEventListener('astro:page-load', initializeFormMessages);
 </script>
