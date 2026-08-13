@@ -1,5 +1,5 @@
 ---
-import { ViewTransitions } from 'astro:transitions';
+import { ClientRouter } from 'astro:transitions';
 import Footer from "../components/layout/Footer.astro";
 
 // SEO Props Interface
@@ -197,7 +197,7 @@ const organizationSchema = {
     <meta name="msapplication-TileColor" content="#325C59" />
 
     <!-- View Transitions -->
-    <ViewTransitions />
+    <ClientRouter />
     
     <!-- Handle navigation and modal cleanup -->
     <script>

@@ -106,46 +106,59 @@ const homeSEO = {
 <script>
   import Lenis from 'lenis';
 
+  // Module-scoped references so we can tear down the previous instance and its
+  // RAF loop before creating a new one on each navigation (avoids stacking loops).
   let lenis;
+  let rafId;
 
   function initializeLenis() {
-    // Clean up existing instance
+    // Cancel any running RAF loop and destroy the previous instance first.
+    if (rafId) {
+      cancelAnimationFrame(rafId);
+      rafId = undefined;
+    }
     if (lenis) {
       lenis.destroy();
+      lenis = undefined;
+    }
+
+    // Dev-only instrumentation for the transitions regression test.
+    if (import.meta.env.DEV) {
+      window.__lenisInits = (window.__lenisInits || 0) + 1;
     }
 
     // Initialize Lenis with optimized settings for masonry grid
     lenis = new Lenis({
-    lerp: 0.08, // Smooth interpolation
-    duration: 1.2, // Natural timing
-    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Custom easing curve
-    orientation: 'vertical',
-    gestureOrientation: 'vertical',
-    smoothWheel: true,
-    wheelMultiplier: 1,
-    touchMultiplier: 1,
-    autoResize: true
-  });
+      lerp: 0.08, // Smooth interpolation
+      duration: 1.2, // Natural timing
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Custom easing curve
+      orientation: 'vertical',
+      gestureOrientation: 'vertical',
+      smoothWheel: true,
+      wheelMultiplier: 1,
+      touchMultiplier: 1,
+      autoResize: true
+    });
 
-  // Coordinated RAF loop for Lenis and Motion.js synchronization
-  function raf(time) {
-    lenis.raf(time);
-    requestAnimationFrame(raf);
-  }
-  requestAnimationFrame(raf);
+    // Coordinated RAF loop for Lenis and Motion.js synchronization
+    function raf(time) {
+      lenis?.raf(time);
+      rafId = requestAnimationFrame(raf);
+    }
+    rafId = requestAnimationFrame(raf);
 
     // Make lenis available globally for masonry grid integration
     window.lenis = lenis;
-
-    // Coordinate with loading overlay for smooth transition
-    document.addEventListener('loadingComplete', () => {
-      // Ensure Lenis is ready and smooth scrolling is active
-      setTimeout(() => {
-        lenis.start(); // Ensure Lenis is running
-        console.log('Lenis smooth scrolling activated after loading complete');
-      }, 100);
-    });
   }
+
+  // Coordinate with loading overlay for smooth transition (bind once).
+  document.addEventListener('loadingComplete', () => {
+    // Ensure Lenis is ready and smooth scrolling is active
+    setTimeout(() => {
+      lenis?.start(); // Ensure Lenis is running
+      console.log('Lenis smooth scrolling activated after loading complete');
+    }, 100);
+  });
 
   // Initialize on page load
   initializeLenis();
@@ -156,10 +169,25 @@ const homeSEO = {
     
     // Small delay to ensure DOM is ready after transition
     setTimeout(() => {
-      initializeLenis();
-      
       // Check if we're on the homepage and should skip loading overlay
       const masonryContainer = document.querySelector('.masonry-container');
+
+      // Only drive smooth scroll while the homepage is rendered; otherwise
+      // tear down this module's instance so it doesn't compete on other pages.
+      if (!masonryContainer) {
+        if (rafId) {
+          cancelAnimationFrame(rafId);
+          rafId = undefined;
+        }
+        if (lenis) {
+          lenis.destroy();
+          lenis = undefined;
+        }
+        return;
+      }
+
+      initializeLenis();
+
       if (masonryContainer) {
         // If returning to homepage, check for cached images
         const images = masonryContainer.querySelectorAll('img');
@@ -217,11 +245,11 @@ const homeSEO = {
       });
     }
 
-    // Monitor smooth scroll performance
-    lenis.on('scroll', () => {
+    // Monitor smooth scroll performance (guard against an undefined instance)
+    lenis?.on('scroll', () => {
       // Log scroll performance occasionally
       if (Math.random() < 0.01) { // 1% sampling rate
-        console.log('Smooth scroll active - Lenis velocity:', lenis.velocity);
+        console.log('Smooth scroll active - Lenis velocity:', lenis?.velocity);
       }
     });
   }

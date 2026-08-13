@@ -299,10 +299,14 @@ const { id, class: className, contentAlign = "center" } = Astro.props;
 
 <script>
   // Enhance accessibility and functionality for dialogs
-  document.addEventListener("DOMContentLoaded", () => {
+  function initializeDialogs() {
     const dialogs = document.querySelectorAll(".simple-dialog");
 
     dialogs.forEach((dialog) => {
+      // Skip dialogs already initialized (idempotent across view transitions)
+      if ((dialog as HTMLElement).dataset.dialogInit === 'true') return;
+      (dialog as HTMLElement).dataset.dialogInit = 'true';
+
       // Observer for open/close state changes
       const observer = new MutationObserver(() => {
         const isOpen = dialog.hasAttribute('open');
@@ -358,7 +362,19 @@ const { id, class: className, contentAlign = "center" } = Astro.props;
           trigger.dataset.listenerAttached = 'true';
         }
       });
-      
+
     });
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeDialogs);
+  } else {
+    initializeDialogs();
+  }
+
+  // Re-run after every view transition (swapped-in DOM needs re-binding).
+  // Listen to both events: after-swap fires reliably on back/forward history
+  // navigation, page-load on forward navigation. init is idempotent.
+  document.addEventListener('astro:after-swap', initializeDialogs);
+  document.addEventListener('astro:page-load', initializeDialogs);
 </script>
