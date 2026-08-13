@@ -10,6 +10,8 @@ import ContactDialog from "../components/dialog/ContactDialog.astro";
 import HeaderAnimation from "../components/ui/HeaderAnimation.astro";
 import LoadingOverlay from "../components/ui/LoadingOverlay.astro";
 import { getCollection } from 'astro:content';
+import { createReader } from '@keystatic/core/reader';
+import keystaticConfig from '../../keystatic.config';
 
 // Get all portfolio projects from content collection
 let portfolioProjects;
@@ -21,21 +23,30 @@ try {
   portfolioProjects = [];
 }
 
-const socialLinks = [
-  { name: 'Instagram', href: '#', external: true },
-  { name: 'Behance', href: '#', external: true },
-  { name: 'LinkedIn', href: '#', external: true }
+// Read homepage categories + social links from Keystatic (/keystatic).
+const reader = createReader(process.cwd(), keystaticConfig);
+const siteSettings = await reader.singletons.siteSettings.read();
+
+const defaultCategories = [
+  'Illustration',
+  'Editorial',
+  'Brand Storytelling',
+  'Bespoke Commissions',
+  'Installations',
+  'Events',
 ];
 
-// Define categories for clickable sub-header
-const categories = [
-  { name: 'Illustration' },
-  { name: 'Editorial' },
-  { name: 'Brand Storytelling' },
-  { name: 'Bespoke Commissions' },
-  { name: 'Installations' },
-  { name: 'Events' }
-];
+// Categories for the clickable sub-header.
+const categories = (
+  siteSettings?.categories?.length ? siteSettings.categories : defaultCategories
+).map((name) => ({ name }));
+
+// Social links (component currently disabled below, but sourced from the CMS).
+const socialLinks = (siteSettings?.socialLinks ?? []).map((link) => ({
+  name: link.label,
+  href: link.url,
+  external: link.external,
+}));
 
 // Generate SEO data for homepage
 const homeSEO = {

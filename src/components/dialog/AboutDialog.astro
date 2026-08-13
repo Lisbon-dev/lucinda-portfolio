@@ -1,52 +1,56 @@
 ---
 import SimpleDialog from "./SimpleDialog.astro";
+import { createReader } from "@keystatic/core/reader";
+import keystaticConfig from "../../../keystatic.config";
+
+// Read the About content managed via Keystatic (/keystatic).
+// Falls back to sensible defaults if the singleton is missing so the modal
+// never renders empty.
+const reader = createReader(process.cwd(), keystaticConfig);
+const about = await reader.singletons.about.read();
+
+const bio = about?.bio ?? "";
+const selectClients = about?.selectClients ?? "";
+const selectExhibitions = about?.selectExhibitions ?? "";
+const contactEmail = about?.contactEmail ?? "lucinda.burman@yahoo.co.uk";
+
+// Split the bio into paragraphs (blank-line separated).
+const bioParagraphs = bio
+  .split(/\n\s*\n/)
+  .map((p) => p.trim())
+  .filter(Boolean);
+
+// Exhibitions are stored one per line.
+const exhibitionLines = selectExhibitions
+  .split(/\n/)
+  .map((line) => line.trim())
+  .filter(Boolean);
 ---
 
 <SimpleDialog id="about-dialog">
+  {bioParagraphs.map((paragraph) => <p>{paragraph}</p>)}
+
+  <h2>Select clients</h2>
+  <p>{selectClients}</p>
+
+  <h2>Select Exhibitions</h2>
   <p>
-    I’m an image maker who thrives on adapting my work to a variety of
-    applications. Everything I do begins with something that is hand-drawn or
-    painted…
-    <br /><br />
-    This has led to projects across editorial, brand storytelling and collaborations,
-    installation, publishing, bespoke commissions, and events. I enjoy the collaborative
-    process working with a wide spectrum of clients from large brands and companies
-    to individuals, from all around the world.
-  </p>
-
-
-    <h2>Select clients</h2>
-  <p>
-    W Hotel Paris, Marriott/ The Spectator Magazine (UK & USA)/ Carlowrie Group/
-    Zwift/ Motcombs Knightsbridge/ Pascal Huser Design & Build/ Tall Tape/ The Painted
-    Door Company, South Africa/ Willow & Ivy Events, USA
-  </p>
-
-
-    <h2>Select Exhibitions</h2>
-  <p>
-    The Grapefruit Gallery - Fulham, London - 2012-2017
-    <br />
-    Montpellier Gallery - Stratford-upon-Avon 2015<br />
-    The Gallery Upstairs - Henley, UK 2014<br />
-    The Hollywood Gallery - Chelsea, London - 2014<br />
-    'Emerging Collectors' - The Hamptons, NYC - July 2013<br />
-    'Place' - Kings Road, London - September 2013<br />
-    'Birmingham Today' - RBSA, February 2014 <br />
+    {
+      exhibitionLines.map((line, index) => (
+        <>
+          {line}
+          {index < exhibitionLines.length - 1 && <br />}
+        </>
+      ))
+    }
   </p>
 
   <div class="contact-info">
     <p>contact me:</p>
-    <p><a href="mailto:lucinda.burman@yahoo.co.uk">lucinda.burman@yahoo.co.uk</a></p>
+    <p><a href={`mailto:${contactEmail}`}>{contactEmail}</a></p>
     <p>or use the</p>
     <button type="button" class="contact-button focusable" data-dialog-trigger="contact-dialog">Contact Form</button>
   </div>
-  
-  <!-- 
-  To update your contact email:
-  1. Change the email address above
-  2. Update the CONTACT_TO_EMAIL variable in Vercel
-  -->
 </SimpleDialog>
 
 <style>

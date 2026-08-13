@@ -8,8 +8,20 @@ Your portfolio website is built with modern technologies that ensure excellent p
 
 - **Framework:** [Astro](https://astro.build) - A modern static site generator
 - **Hosting:** [Vercel](https://vercel.com) - Enterprise-grade hosting with global CDN
-- **Content Management:** Markdown-based content system (no database required)
+- **Content Management:** [Keystatic](https://keystatic.com) admin panel at `/keystatic`, backed by Markdown/YAML files (no database required)
 - **Contact Form:** [Resend](https://resend.com) email integration
+
+## ✨ The easiest way to edit: the `/keystatic` admin panel
+
+You now have a friendly, no-code admin panel for editing your content.
+
+- Go to **`https://your-domain.com/keystatic`** (or `http://localhost:4321/keystatic` when running locally).
+- Sign in with GitHub (one time per device), then edit **Projects**, the **About** section, and **Site settings** through simple forms.
+- Clicking **Save** commits the change and Vercel republishes the site automatically.
+
+👉 **See [`documentation/CMS-guide.md`](documentation/CMS-guide.md) for the full step-by-step client guide.**
+
+The manual, file-editing instructions below still work and are kept for reference and advanced edits.
 
 ### Key Website Sections
 
@@ -135,34 +147,16 @@ Your contact form sends emails to the address configured in the environment vari
 
 ### Updating About Me Content
 
-To update your biography and information in the About modal:
+**Easiest way:** open the **`/keystatic`** admin panel, click **About**, edit the
+Bio / Select clients / Select exhibitions / Contact email fields, and Save. See
+[`documentation/CMS-guide.md`](documentation/CMS-guide.md).
 
-1. Navigate to `src/components/dialog/AboutDialog.astro`
-2. Edit the content within the HTML sections
-3. Commit and push your changes
+Under the hood, the About text now lives in `src/data/about/index.yaml` (managed
+by Keystatic). The `src/components/dialog/AboutDialog.astro` component reads that
+file automatically — you no longer edit the biography by hand-editing HTML.
 
-Example:
-
-```html
-<SimpleDialog id="about-dialog">
-  <p>
-    I'm an image maker who thrives on adapting my work to a variety of
-    applications. Everything I do begins with something that is hand-drawn or
-    painted…
-    <br /><br />
-    This has led to projects across editorial, brand storytelling and collaborations,
-    installation, publishing, bespoke commissions, and events.
-  </p>
-
-  <h2>Select clients</h2>
-  <p>
-    W Hotel Paris, Marriott/ The Spectator Magazine (UK & USA)/ Carlowrie Group/
-    Zwift/ Motcombs Knightsbridge/ Pascal Huser Design & Build
-  </p>
-  
-  <!-- Update your content here -->
-</SimpleDialog>
-```
+**Homepage categories and social links** are likewise editable under **Site
+settings** in `/keystatic` (stored in `src/data/site-settings/index.yaml`).
 
 ### Updating Contact Form Options
 
@@ -258,4 +252,4 @@ pnpm preview
 
 ---
 
-*This guide was last updated: November 2025*
+*This guide was last updated: August 2026 (added Keystatic CMS at `/keystatic`)*
