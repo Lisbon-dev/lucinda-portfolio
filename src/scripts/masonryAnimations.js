@@ -316,7 +316,7 @@ export class MasonryAnimations {
       // Find new container after transition
       this.containerElement = document.getElementById(this.containerId);
       if (this.containerElement) {
-        this.masonryContainer = this.containerElement.querySelector('.masonry-grid');
+        this.masonryContainer = this.containerElement.querySelector('.astro-masonry-grid');
         if (this.masonryContainer) {
           // Reset loading overlay state
           if (window.updateLoadingProgress) {
