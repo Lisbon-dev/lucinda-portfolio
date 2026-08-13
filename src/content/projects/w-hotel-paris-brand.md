@@ -47,9 +47,3 @@ A comprehensive brand storytelling project for W Hotel Paris that weaves togethe
 The storytelling approach developed authentic narratives that resonate with both international travelers and local Parisians, creating a brand experience that feels both globally connected and locally rooted. Through carefully crafted visual elements and messaging, the project establishes W Hotel Paris as a cultural destination that celebrates the city's artistic heritage while embracing modern luxury hospitality.
 
 The brand story encompasses multiple touchpoints, from digital experiences to physical environments, ensuring consistent narrative delivery across all guest interactions. This holistic approach to brand storytelling creates memorable experiences that extend far beyond traditional hospitality marketing.
->>>>>>>REPLACE
-```
-
-src/content/projects/w-hotel-paris-sculpture.md
-```markdown
-<<<<<<< SEARCH
