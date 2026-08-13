@@ -369,32 +369,53 @@ const activeDotIndex = currentIndex - dotsStartIndex;
 <script>
   import Lenis from "lenis";
 
-  // Initialize Lenis with optimized settings
-  const lenis = new Lenis({
-    lerp: 0.08,
-    duration: 1.2,
-    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-    orientation: "vertical",
-    gestureOrientation: "vertical",
-    smoothWheel: true,
-    wheelMultiplier: 1,
-    touchMultiplier: 1,
-    autoResize: true,
-  });
+  // Module-scoped references so each navigation tears down the previous
+  // instance and RAF loop before creating a new one (avoids stacking loops).
+  let lenis;
+  let rafId;
 
-  // Coordinated RAF loop for Lenis
-  function raf(time) {
-    lenis.raf(time);
-    requestAnimationFrame(raf);
+  function initializeLenis() {
+    if (rafId) {
+      cancelAnimationFrame(rafId);
+      rafId = undefined;
+    }
+    if (lenis) {
+      lenis.destroy();
+      lenis = undefined;
+    }
+
+    lenis = new Lenis({
+      lerp: 0.08,
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: "vertical",
+      gestureOrientation: "vertical",
+      smoothWheel: true,
+      wheelMultiplier: 1,
+      touchMultiplier: 1,
+      autoResize: true,
+    });
+
+    // Coordinated RAF loop for Lenis
+    function raf(time) {
+      lenis?.raf(time);
+      rafId = requestAnimationFrame(raf);
+    }
+    rafId = requestAnimationFrame(raf);
+
+    window.lenis = lenis;
   }
-  requestAnimationFrame(raf);
 
-  document.addEventListener("DOMContentLoaded", () => {
+  // Idempotent handler wiring for the back-to-top link.
+  function bindBackToTop() {
     const backToTopLink = document.querySelector(".back-to-top-link");
-    backToTopLink?.addEventListener("click", (event) => {
+    if (!backToTopLink || backToTopLink.dataset.backToTopBound) return;
+    backToTopLink.dataset.backToTopBound = "true";
+
+    backToTopLink.addEventListener("click", (event) => {
       event.preventDefault();
       try {
-        // Use the locally initialized lenis instance
+        // Use the live lenis instance
         lenis?.scrollTo("#top");
       } catch (error) {
         console.warn("Smooth scroll failed, using fallback:", error);
@@ -402,7 +423,34 @@ const activeDotIndex = currentIndex - dotsStartIndex;
         document.getElementById("top")?.scrollIntoView({ behavior: "smooth" });
       }
     });
-  });
+  }
+
+  function init() {
+    // Only drive smooth scroll while a project page is actually rendered.
+    // On navigation away, tear down this module's instance so it does not
+    // compete with the homepage's own Lenis instance.
+    if (!document.querySelector(".project-page")) {
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = undefined;
+      }
+      if (lenis) {
+        lenis.destroy();
+        lenis = undefined;
+      }
+      return;
+    }
+    initializeLenis();
+    bindBackToTop();
+  }
+
+  // Run immediately when the DOM is ready, and re-run on SPA navigation.
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+  document.addEventListener("astro:page-load", init);
 </script>
 
 <style>

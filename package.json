@@ -6,7 +6,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "playwright test"
   },
   "dependencies": {
     "@astrojs/vercel": "^8.2.6",
@@ -16,5 +17,8 @@
     "motion": "^12.23.12",
     "resend": "^6.0.1",
     "sharp": "^0.34.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1"
   }
 }
