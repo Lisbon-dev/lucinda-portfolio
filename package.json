@@ -9,9 +9,6 @@
     "astro": "astro",
     "test": "playwright test"
   },
-  "devDependencies": {
-    "@playwright/test": "^1.47.0"
-  },
   "dependencies": {
     "@astrojs/vercel": "^8.2.6",
     "astro": "^5.12.9",
