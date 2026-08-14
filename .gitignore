@@ -35,6 +35,7 @@ project_issues.md
 .playwright-mcp
 test-results/
 playwright-report/
+playwright/.cache/
 
 # vercel
 .vercel/

@@ -506,6 +506,11 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     justify-content: flex-start;
     align-items: center;
     gap: var(--spacing-md);
+
+    /* Reserve space during font loading to prevent CLS, matching the
+       homepage .hero-header treatment (same font-heading + text-hero-header
+       pairing is used for .project-site-title below). */
+    min-height: var(--font-hero-min-height);
   }
 
   .home-link {
@@ -602,6 +607,10 @@ const activeDotIndex = currentIndex - dotsStartIndex;
     letter-spacing: var(--tracking-wider);
     color: var(--color-text-primary);
     margin: 0;
+
+    /* Reserve space for one line to prevent CLS while ivypresto-display
+       swaps in over the fallback-metrics face (see Layout.astro). */
+    min-height: calc(var(--text-sub-header) * var(--leading-snug));
   }
 
   .project-description-text {

@@ -33,8 +33,10 @@ const Tag = tag;
       this.syllables = [];
       this.syllablePositions = [];
       this.hasAnimated = false;
+      this.isReady = false;
+      this.pendingStart = false;
       this.observer = null;
-      
+
       if (this.headerEl) {
         this.init();
       }
@@ -42,9 +44,27 @@ const Tag = tag;
 
     async init() {
       if (!this.headerEl) return;
-      
+
+      // Measure syllable offsets against the real heading font, not the fallback.
+      // Splitting before the webfont is available reads stale metrics and lets
+      // the title FOIT-swap mid-animation. Gate on document.fonts.ready first.
+      if (document.fonts && document.fonts.ready) {
+        try {
+          await document.fonts.ready;
+        } catch {
+          /* fonts.ready can reject on some engines; fall through regardless */
+        }
+      }
+
       await this.splitTextIntoSyllables();
       this.setupIntersectionObserver();
+
+      // A reveal trigger (loadingComplete / intersection) may have fired while we
+      // were waiting for fonts. Honour it now that the syllables exist.
+      this.isReady = true;
+      if (this.pendingStart) {
+        this.startAnimation();
+      }
     }
 
     async splitTextIntoSyllables() {
@@ -90,10 +110,13 @@ const Tag = tag;
         { x: -containerWidth * 0.25, y: -35, name: 'N' }     // top-left (negative X)
       ];
 
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
       this.syllables.forEach((syllable, index) => {
         const position = this.syllablePositions[index];
-        if (position.name === 'SPACE') {
-          // Handle space differently - make it visible immediately
+        if (prefersReducedMotion || position.name === 'SPACE') {
+          // Reduced motion (and the space glyph) render statically at their final
+          // position with no scatter offset, so the title never shifts.
           syllable.style.opacity = '1';
           syllable.style.transform = 'translateX(0px) translateY(0px) scale(1)';
         } else {
@@ -223,7 +246,15 @@ const Tag = tag;
     }
     
     startAnimation() {
-      if (!this.hasAnimated) {
+      if (this.hasAnimated) return;
+
+      // Reveal was requested before the font-gated split finished; run it once ready.
+      if (!this.isReady) {
+        this.pendingStart = true;
+        return;
+      }
+
+      {
         const animationDelay = parseInt((this.headerEl && this.headerEl.getAttribute('data-animation-delay')) || '0');
         const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         setTimeout(() => {

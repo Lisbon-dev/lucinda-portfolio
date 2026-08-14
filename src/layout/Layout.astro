@@ -415,7 +415,8 @@ const organizationSchema = {
 
     /* Typography with Performance Optimization */
     --font-body: "ibm-plex-sans", "Montserrat", "Inter", sans-serif; /* Clean sans for body text */
-    --font-heading: "ivypresto-display", "Times New Roman", serif;
+    --font-heading: "ivypresto-display", "ivypresto-display-optimized",
+      "Times New Roman", serif;
     --font-sub-heading: "Lato", "Helvetica Neue", sans-serif;
     --font-lisbon-dev: "Unbounded", "Inter", sans-serif;
 
@@ -621,12 +622,30 @@ const organizationSchema = {
     outline: none;
   }
 
-  /* Performance-Optimized Font Loading */
+  /*
+   * Fallback-metrics face for the hero heading font.
+   *
+   * "ivypresto-display" (Adobe Typekit) has no font-display governance and its
+   * metrics differ from Times New Roman, so a plain fallback FOITs then reflows
+   * the hero title horizontally when the webfont swaps in. This face re-scales a
+   * locally-available serif to occupy the same footprint as ivypresto so the
+   * swap does not move the title. It is wired into --font-heading between the
+   * webfont and the generic serif fallback.
+   *
+   * NOTE: size-adjust / *-override are best-effort approximations of ivypresto's
+   * metrics (the webfont file is remote, so they were not measured directly).
+   * They can be fine-tuned against the live font with a tool like Fontaine.
+   * The hero uses a fixed unitless line-height (1.2), so the vertical overrides
+   * are largely inert here; size-adjust does the load-bearing horizontal work.
+   */
   @font-face {
     font-family: "ivypresto-display-optimized";
-    src: local("ivypresto-display"), local("Ivy Presto Display");
-    font-display: optional; /* Prevents layout shifts for hero content */
-    size-adjust: var(--font-fallback-size-adjust);
+    src: local("Times New Roman"), local("TimesNewRomanPSMT"), local("Times");
+    font-display: swap;
+    size-adjust: 95%;
+    ascent-override: 90%;
+    descent-override: 22%;
+    line-gap-override: 0%;
   }
 
   /* Hero Section Performance Optimization */

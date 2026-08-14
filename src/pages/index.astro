@@ -310,27 +310,11 @@ const homeSEO = {
     align-items: center;
     
     /* Performance optimizations inherited from Layout.astro */
-    /* Animation setup for progressive enhancement */
+    /* The single hero entrance is the per-syllable Motion.js reveal in
+       HeaderAnimation.astro; the container stays static (no heroFadeIn) so the
+       two entrances don't overlap and the title doesn't translate on load. */
     opacity: 1;
     transform: translateY(0);
-  }
-
-  /* Progressive enhancement: Add animations only for capable devices */
-  @media (prefers-reduced-motion: no-preference) {
-    .hero-header {
-      animation: heroFadeIn 0.8s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
-    }
-  }
-
-  @keyframes heroFadeIn {
-    0% {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
   }
 
   .hero-header > :global(.typography:first-child) {
